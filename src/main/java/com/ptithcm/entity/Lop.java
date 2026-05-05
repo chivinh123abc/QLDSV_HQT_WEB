@@ -16,7 +16,7 @@ public class Lop {
     private String tenLop;
 
     @Column(name = "KHOAHOC")
-    private int khoaHoc;
+    private String khoaHoc;
 
     @Column(name = "MAKHOA")
     private String maKhoa;
@@ -25,8 +25,8 @@ public class Lop {
     public void setMaLop(String maLop) { this.maLop = maLop; }
     public String getTenLop() { return tenLop; }
     public void setTenLop(String tenLop) { this.tenLop = tenLop; }
-    public int getKhoaHoc() { return khoaHoc; }
-    public void setKhoaHoc(int khoaHoc) { this.khoaHoc = khoaHoc; }
+    public String getKhoaHoc() { return khoaHoc; }
+    public void setKhoaHoc(String khoaHoc) { this.khoaHoc = khoaHoc; }
     public String getMaKhoa() { return maKhoa; }
     public void setMaKhoa(String maKhoa) { this.maKhoa = maKhoa; }
 }

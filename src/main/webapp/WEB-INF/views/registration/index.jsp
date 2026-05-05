@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đăng ký & Nhập điểm - QLDSV_HTC_WEB</title>
+    <title>Đăng ký Môn học - QLDSV_HTC_WEB</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons -->
@@ -15,16 +15,12 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css" />
     <style>
         .badge-soft-primary { background-color: #e0f2fe; color: #0369a1; border-radius: 20px; font-weight: 600; padding: 6px 12px; }
-        .badge-soft-info { background-color: #ecfeff; color: #0891b2; border-radius: 20px; padding: 6px 12px; }
-        .score-box { width: 60px; text-align: center; font-weight: 700; border-radius: 8px; padding: 4px; }
-        .score-cc { background-color: #fef9c3; color: #854d0e; }
-        .score-gk { background-color: #ffedd5; color: #9a3412; }
-        .score-ck { background-color: #fce7f3; color: #9d174d; }
+        .badge-soft-success { background-color: #dcfce7; color: #166534; border-radius: 20px; font-weight: 600; padding: 6px 12px; }
+        .badge-soft-danger { background-color: #fee2e2; color: #991b1b; border-radius: 20px; font-weight: 600; padding: 6px 12px; }
         .table-custom th { font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
         .table-custom td { vertical-align: middle; padding: 1rem 0.75rem; border-bottom: 1px solid #f1f5f9; }
-        .modal-header-custom { background-color: #4361ee; color: white; border-bottom: 0; }
-        .modal-header-custom .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
-        .toolbar-btn { font-weight: 600; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; }
+        .registration-card { transition: all 0.3s; border: 1px solid #e2e8f0; }
+        .registration-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; border-color: #4361ee; }
     </style>
 </head>
 
@@ -38,99 +34,89 @@
             <jsp:include page="/WEB-INF/views/shared/header.jsp" />
 
             <!-- MAIN CONTENT -->
-            <main id="main-content" class="app-content p-4">
+            <main id="main-content" class="app-content p-4 bg-light">
                 <div class="container-fluid max-w-7xl mx-auto">
                     
-                    <c:if test="${not empty message}">
-                        <div class="alert alert-info alert-dismissible fade show shadow-sm" role="alert">
-                            <i class="bi bi-info-circle-fill me-2"></i> ${message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    </c:if>
-
-                    <div class="card border-0 shadow-sm rounded-3">
-                        <!-- HEADER -->
-                        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3">
-                                    <i class="bi bi-pencil-square fs-4"></i>
-                                </div>
-                                <div>
-                                    <h4 class="mb-0 fw-bold text-dark">Đăng ký & Nhập điểm</h4>
-                                    <p class="text-muted small mb-0">Xử lý đăng ký môn học và quản lý điểm số</p>
-                                </div>
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3">
+                                <i class="bi bi-person-check-fill fs-3"></i>
                             </div>
-                            <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#regModal" onclick="resetForm()">
-                                <i class="bi bi-plus-circle-fill me-1"></i> Đăng Ký Mới
-                            </button>
+                            <div>
+                                <h3 class="mb-0 fw-bold text-dark">Đăng ký Môn học</h3>
+                                <p class="text-muted small mb-0">Quản lý việc đăng ký lớp tín chỉ của sinh viên</p>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="card-body px-4">
-                            <!-- SEARCH/FILTER -->
-                            <div class="row g-3 mb-4 pb-3 border-bottom align-items-center">
-                                <div class="col-md-4">
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                                        <input type="text" class="form-control bg-light border-start-0 ps-0 text-muted fw-semibold shadow-none" placeholder="Nhập mã SV để tìm kiếm...">
+                    <div class="row g-4">
+                        <!-- LEFT SIDE: STUDENT INFO & SEARCH -->
+                        <div class="col-lg-4">
+                            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                <div class="card-body p-4">
+                                    <h6 class="fw-bold text-primary mb-3">Tra cứu Sinh viên</h6>
+                                    <div class="input-group mb-3 shadow-sm rounded-3 overflow-hidden">
+                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge"></i></span>
+                                        <input type="text" id="inp_maSV" class="form-control border-start-0 ps-0" placeholder="Nhập Mã SV...">
+                                        <button class="btn btn-primary fw-bold" type="button" onclick="loadStudentData()">TÌM</button>
+                                    </div>
+                                    <div id="student-info-panel" class="bg-light p-3 rounded-3 d-none">
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div class="bg-white p-2 rounded-circle border shadow-sm">
+                                                <i class="bi bi-person-circle fs-3 text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <h5 id="info-name" class="fw-bold mb-0 text-dark">---</h5>
+                                                <span id="info-maSV" class="badge bg-primary rounded-pill small">---</span>
+                                            </div>
+                                        </div>
+                                        <div class="small text-muted mb-1"><i class="bi bi-building me-2"></i>Lớp: <strong id="info-maLop" class="text-dark">---</strong></div>
+                                        <div class="small text-muted"><i class="bi bi-info-circle me-2"></i>Trạng thái: <span id="info-status" class="badge bg-success bg-opacity-10 text-success rounded-pill">Đang học</span></div>
+                                    </div>
+                                    <div id="no-student-alert" class="text-center py-4 text-muted small">
+                                        <i class="bi bi-search fs-2 d-block mb-2 opacity-25"></i>
+                                        Vui lòng nhập Mã SV để bắt đầu
                                     </div>
                                 </div>
-                                <div class="col-md-8 text-end">
-                                    <div class="text-muted small fw-medium">
-                                        <i class="bi bi-info-circle me-1"></i> Hiển thị <span class="fw-bold text-primary">${dangKyList.size()}</span> bản ghi
+                            </div>
+
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-body p-4">
+                                    <h6 class="fw-bold text-success mb-3">Lớp tín chỉ đã đăng ký</h6>
+                                    <div id="registered-list" class="list-group list-group-flush">
+                                        <div class="text-center py-4 text-muted small">Chưa có dữ liệu</div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- TABLE -->
-                            <div class="table-responsive">
-                                <table class="table table-custom">
-                                    <thead>
-                                        <tr>
-                                            <th>Mã SV</th>
-                                            <th>Mã LTC</th>
-                                            <th>Điểm CC</th>
-                                            <th>Điểm GK</th>
-                                            <th>Điểm CK</th>
-                                            <th>Trạng Thái</th>
-                                            <th class="text-center">Thao Tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach var="dk" items="${dangKyList}">
-                                            <tr>
-                                                <td><span class="badge-soft-primary">${dk.maSV}</span></td>
-                                                <td><span class="badge-soft-info">LTC: ${dk.maLTC}</span></td>
-                                                <td><div class="score-box score-cc">${dk.diemCC}</div></td>
-                                                <td><div class="score-box score-gk">${dk.diemGK}</div></td>
-                                                <td><div class="score-box score-ck">${dk.diemCK}</div></td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${dk.huyDangKy}">
-                                                            <span class="badge bg-danger">Đã hủy</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="badge bg-success">Đã đăng ký</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td class="text-center">
-                                                    <div class="d-flex gap-2 justify-content-center">
-                                                        <a href="${pageContext.request.contextPath}/registration?lnkEdit&maLTC=${dk.maLTC}&maSV=${dk.maSV}" class="btn btn-sm btn-outline-primary rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                                                            <i class="bi bi-pencil"></i>
-                                                        </a>
-                                                        <form action="${pageContext.request.contextPath}/registration" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận xóa đăng ký?');">
-                                                            <input type="hidden" name="maLTC" value="${dk.maLTC}">
-                                                            <input type="hidden" name="maSV" value="${dk.maSV}">
-                                                            <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
+                        <!-- RIGHT SIDE: AVAILABLE CLASSES -->
+                        <div class="col-lg-8">
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                                    <h6 class="fw-bold text-dark mb-0">Danh sách Lớp Tín Chỉ có thể đăng ký</h6>
+                                    <div class="input-group" style="max-width: 200px;">
+                                        <span class="input-group-text bg-light border-0"><i class="bi bi-funnel"></i></span>
+                                        <input type="text" id="ltc-search" class="form-control bg-light border-0 small" placeholder="Lọc..." onkeyup="filterLTC()">
+                                    </div>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="table-responsive rounded-3 border">
+                                        <table class="table table-custom align-middle mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="px-3">MÃ LTC</th>
+                                                    <th>MÔN HỌC / NHÓM</th>
+                                                    <th>NIÊN KHÓA / KỲ</th>
+                                                    <th class="text-center">THAO TÁC</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="available-ltc-body">
+                                                <!-- Dynamic Content -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -139,70 +125,145 @@
         </div>
     </div>
 
-    <!-- MODAL -->
-    <div class="modal fade" id="regModal" tabindex="-1" ${not empty dk.maSV ? 'data-bs-backdrop="static"' : ''}>
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header modal-header-custom">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i> Thông tin Đăng ký & Điểm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- NOTIFICATION MODAL -->
+    <div class="modal fade" id="notifyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-body text-center p-4">
+                    <div id="notifyIcon" class="mb-3"></div>
+                    <h5 id="notifyTitle" class="fw-bold mb-2"></h5>
+                    <p id="notifyMessage" class="text-muted small mb-4"></p>
+                    <button type="button" class="btn btn-primary w-100 rounded-3 fw-bold" data-bs-dismiss="modal">ĐÓNG</button>
                 </div>
-                <form action="${pageContext.request.contextPath}/registration" method="post">
-                    <div class="modal-body p-4 bg-light">
-                        <div class="d-flex gap-2 mb-4">
-                            <button type="submit" name="${not empty dk.maSV ? 'btnUpdate' : 'btnInsert'}" class="btn btn-success toolbar-btn"><i class="bi bi-save"></i> Ghi</button>
-                            <button type="reset" class="btn btn-warning toolbar-btn text-dark"><i class="bi bi-arrow-counterclockwise"></i> Phục hồi</button>
-                            <button type="button" class="btn btn-secondary toolbar-btn" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Đóng</button>
-                        </div>
-
-                        <div class="row g-3 bg-white p-3 rounded-3 shadow-sm">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small">Mã Lớp Tín Chỉ <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" name="maLTC" value="${dk.maLTC}" required ${not empty dk.maSV ? 'readonly' : ''}>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small">Mã Sinh Viên <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="maSV" value="${dk.maSV}" required ${not empty dk.maSV ? 'readonly' : ''}>
-                            </div>
-                            
-                            <div class="col-12 mt-4"><hr></div>
-                            <div class="col-12"><h6 class="fw-bold text-primary"><i class="bi bi-award"></i> Nhập điểm số</h6></div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small">Điểm CC</label>
-                                <input type="number" step="0.1" class="form-control score-cc" name="diemCC" value="${dk.diemCC}" min="0" max="10">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small">Điểm GK</label>
-                                <input type="number" step="0.1" class="form-control score-gk" name="diemGK" value="${dk.diemGK}" min="0" max="10">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small">Điểm CK</label>
-                                <input type="number" step="0.1" class="form-control score-ck" name="diemCK" value="${dk.diemCK}" min="0" max="10">
-                            </div>
-
-                            <div class="col-12 mt-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="huyDangKy" name="huyDangKy" value="true" ${dk.huyDangKy ? 'checked' : ''}>
-                                    <label class="form-check-label fw-bold text-danger" for="huyDangKy">Hủy đăng ký (Xóa tên khỏi lớp)</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
 
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if ("${not empty param.lnkEdit}" === "true") {
-                new bootstrap.Modal(document.getElementById('regModal')).show();
-            }
+        const contextPath = '${pageContext.request.contextPath}';
+        let currentStudent = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAvailableLTC();
         });
-        function resetForm() {
-            // Logic to clear form when inserting
+
+        function showNotify(title, message, type = 'success') {
+            document.getElementById('notifyTitle').innerText = title;
+            document.getElementById('notifyMessage').innerText = message;
+            const icon = document.getElementById('notifyIcon');
+            icon.innerHTML = type === 'success' ? '<i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>' : 
+                            (type === 'error' ? '<i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>' : 
+                            '<i class="bi bi-info-circle-fill text-primary" style="font-size: 3.5rem;"></i>');
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('notifyModal')).show();
+        }
+
+        async function loadStudentData() {
+            const maSV = document.getElementById('inp_maSV').value;
+            if (!maSV) return;
+            try {
+                const res = await fetch(contextPath + '/student/api/get?maSV=' + maSV);
+                const student = await res.json();
+                if (student) {
+                    currentStudent = student;
+                    updateStudentPanel(student);
+                    loadRegisteredLTC(maSV);
+                } else {
+                    showNotify('Thông báo', 'Không tìm thấy sinh viên!', 'info');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function updateStudentPanel(sv) {
+            document.getElementById('student-info-panel').classList.remove('d-none');
+            document.getElementById('no-student-alert').classList.add('d-none');
+            document.getElementById('info-name').innerText = sv.ho + ' ' + sv.ten;
+            document.getElementById('info-maSV').innerText = sv.maSV;
+            document.getElementById('info-maLop').innerText = sv.maLop;
+            document.getElementById('info-status').innerText = sv.dangNghiHoc ? 'Nghỉ học' : 'Đang học';
+            document.getElementById('info-status').className = 'badge ' + (sv.dangNghiHoc ? 'bg-danger' : 'bg-success') + ' bg-opacity-10 ' + (sv.dangNghiHoc ? 'text-danger' : 'text-success') + ' rounded-pill';
+        }
+
+        async function loadAvailableLTC() {
+            try {
+                const res = await fetch(contextPath + '/registration/api/available-classes');
+                const data = await res.json();
+                const container = document.getElementById('available-ltc-body');
+                container.innerHTML = data.map(item => `
+                    <tr>
+                        <td class="px-3"><span class="badge-soft-primary">\${item.maLTC}</span></td>
+                        <td>
+                            <div class="fw-bold text-dark">\${item.maMH}</div>
+                            <div class="small text-muted">Nhóm \${item.nhom} | \${item.maKhoa}</div>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">\${item.nienKhoa}</div>
+                            <div class="small text-muted">Học kỳ: \${item.hocKy}</div>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-primary rounded-3 px-3" onclick="registerLTC(\${item.maLTC})">
+                                <i class="bi bi-plus-circle me-1"></i> Đăng ký
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadRegisteredLTC(maSV) {
+            try {
+                const res = await fetch(contextPath + '/registration/api/list');
+                const allReg = await res.json();
+                const myReg = allReg.filter(r => r.maSV === maSV && !r.huyDangKy);
+                const container = document.getElementById('registered-list');
+                if (myReg.length === 0) {
+                    container.innerHTML = '<div class="text-center py-4 text-muted small">Chưa đăng ký môn nào</div>';
+                    return;
+                }
+                container.innerHTML = myReg.map(r => `
+                    <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold text-dark small">Lớp LTC: \${r.maLTC}</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">Trạng thái: Đã đăng ký</div>
+                        </div>
+                        <button class="btn btn-xs btn-outline-danger border-0" onclick="cancelReg(\${r.maLTC})">
+                            <i class="bi bi-x-circle-fill"></i> Hủy
+                        </button>
+                    </div>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function registerLTC(maLTC) {
+            if (!currentStudent) { showNotify('Cảnh báo', 'Vui lòng chọn sinh viên trước!', 'info'); return; }
+            try {
+                const res = await fetch(contextPath + `/registration/api/register?maSV=\${currentStudent.maSV}&maLTC=\${maLTC}`, { method: 'POST' });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    showNotify('Thành công', result.message);
+                    loadRegisteredLTC(currentStudent.maSV);
+                } else showNotify('Lỗi', result.message, 'error');
+            } catch (e) { console.error(e); }
+        }
+
+        async function cancelReg(maLTC) {
+            if (!currentStudent) return;
+            try {
+                const res = await fetch(contextPath + `/registration/api/cancel?maSV=\${currentStudent.maSV}&maLTC=\${maLTC}`, { method: 'POST' });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    showNotify('Thành công', result.message);
+                    loadRegisteredLTC(currentStudent.maSV);
+                } else showNotify('Lỗi', result.message, 'error');
+            } catch (e) { console.error(e); }
+        }
+
+        function filterLTC() {
+            const val = document.getElementById('ltc-search').value.toLowerCase();
+            document.querySelectorAll('#available-ltc-body tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
+            });
         }
     </script>
 </body>

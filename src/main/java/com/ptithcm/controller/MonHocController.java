@@ -1,6 +1,8 @@
 package com.ptithcm.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -8,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ptithcm.entity.MonHoc;
 
@@ -89,5 +94,93 @@ public class MonHocController {
 		MonHoc monHoc = session.get(MonHoc.class, maMH);
 		model.addAttribute("monHoc", monHoc);
 		return index(model);
+	}
+
+	// --- AJAX API ENDPOINTS ---
+	
+	@RequestMapping(value="/api/get", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public MonHoc getSubject(@RequestParam("maMH") String maMH) {
+		Session session = factory.getCurrentSession();
+		return session.get(MonHoc.class, maMH);
+	}
+
+	@RequestMapping(value="/api/list", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public List<MonHoc> listSubjects() {
+		Session session = factory.getCurrentSession();
+		return session.createQuery("FROM MonHoc", MonHoc.class).list();
+	}
+
+	@RequestMapping(value="/api/save", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public Map<String, Object> saveSubject(@RequestBody MonHoc monHoc, @RequestParam("mode") String mode) {
+		Map<String, Object> res = new HashMap<>();
+		Session session = factory.openSession();
+		org.hibernate.Transaction t = session.beginTransaction();
+		try {
+			MonHoc existing = session.get(MonHoc.class, monHoc.getMaMH());
+			if (mode.equals("add")) {
+				if (existing != null) {
+					res.put("status", "error");
+					res.put("message", "Mã môn học [" + monHoc.getMaMH() + "] đã tồn tại!");
+					return res;
+				}
+			} else if (mode.equals("edit")) {
+				if (existing == null) {
+					res.put("status", "error");
+					res.put("message", "Không tìm thấy môn học [" + monHoc.getMaMH() + "] để chỉnh sửa!");
+					return res;
+				}
+			}
+
+			session.merge(monHoc);
+			t.commit();
+			res.put("status", "success");
+		} catch (Exception e) {
+			if (t != null) t.rollback();
+			res.put("status", "error");
+			res.put("message", "Lỗi: " + e.getMessage());
+		} finally {
+			session.close();
+		}
+		return res;
+	}
+
+	@RequestMapping(value="/api/delete", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public Map<String, Object> deleteSubject(@RequestParam("maMH") String maMH) {
+		Map<String, Object> res = new HashMap<>();
+		Session session = factory.openSession();
+		org.hibernate.Transaction t = session.beginTransaction();
+		try {
+			// Check dependencies: LOPTINCHI
+			Long count = session.createQuery("SELECT COUNT(*) FROM LopTinChi WHERE maMH = :maMH", Long.class)
+					.setParameter("maMH", maMH)
+					.uniqueResult();
+			
+			if (count > 0) {
+				res.put("status", "error");
+				res.put("message", "Không thể xóa: Môn học đã được mở " + count + " lớp tín chỉ!");
+				return res;
+			}
+
+			MonHoc monHoc = session.get(MonHoc.class, maMH);
+			if (monHoc != null) {
+				session.remove(monHoc);
+				t.commit();
+				res.put("status", "success");
+			} else {
+				res.put("status", "error");
+				res.put("message", "Không tìm thấy môn học để xóa!");
+			}
+		} catch (Exception e) {
+			if (t != null) t.rollback();
+			res.put("status", "error");
+			res.put("message", "Lỗi: " + e.getMessage());
+		} finally {
+			session.close();
+		}
+		return res;
 	}
 }

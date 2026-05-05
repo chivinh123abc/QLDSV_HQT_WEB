@@ -1,27 +1,95 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#2563eb" />
-    <title>Trang chủ - QLDSV_HTC_WEB</title>
+    <title>Bảng điều khiển - QLDSV_HTC_WEB</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Custom CSS (từ dự án cũ) -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css" />
+    <style>
+        .stat-card {
+            border: none;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+        }
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+        }
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .bg-gradient-primary { background: linear-gradient(135deg, #4361ee, #4cc9f0); color: white; }
+        .bg-gradient-success { background: linear-gradient(135deg, #10b981, #34d399); color: white; }
+        .bg-gradient-warning { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; }
+        .bg-gradient-danger { background: linear-gradient(135deg, #ef4444, #f87171); color: white; }
+        
+        .quick-action-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        .quick-action-card:hover {
+            background-color: #f8fafc;
+            border-color: #4361ee;
+            transform: scale(1.02);
+        }
+        .quick-action-icon {
+            font-size: 2rem;
+            color: #4361ee;
+            margin-bottom: 12px;
+        }
+        .welcome-banner {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1523050853064-8521a3998379?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 24px;
+            padding: 60px 40px;
+            color: white;
+            margin-bottom: 40px;
+        }
+        .dashboard-activity-item {
+            border-left: 3px solid #e2e8f0;
+            padding-left: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .dashboard-activity-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background-color: #4361ee;
+        }
+    </style>
 </head>
 
 <body>
-    <a href="#main-content" class="skip-to-main-content">Bỏ qua để đến nội dung chính</a>
     <div class="app-layout">
-        
         <!-- SIDEBAR -->
         <jsp:include page="/WEB-INF/views/shared/sidebar.jsp" />
 
@@ -30,40 +98,174 @@
             <jsp:include page="/WEB-INF/views/shared/header.jsp" />
 
             <!-- MAIN CONTENT -->
-            <main id="main-content" class="app-content" tabindex="-1">
-                <div class="container-fluid p-4">
-                    <h2 class="mb-4">Chào mừng đến với hệ thống Quản lý Điểm Sinh Viên</h2>
+            <main id="main-content" class="app-content p-4 bg-light">
+                <div class="container-fluid max-w-7xl mx-auto">
                     
-                    <div class="row g-4 mb-4">
-                        <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-2 text-muted">Tổng sinh viên</h6>
-                                    <h2 class="card-title mb-0">1,250</h2>
+                    <!-- WELCOME BANNER -->
+                    <div class="welcome-banner shadow-lg">
+                        <h1 class="display-5 fw-bold mb-2">Chào mừng trở lại, Admin!</h1>
+                        <p class="lead opacity-75 mb-4">Hệ thống quản lý điểm sinh viên theo hệ tín chỉ - Phiên bản 2.0</p>
+                        <div class="d-flex gap-3">
+                            <a href="${pageContext.request.contextPath}/student" class="btn btn-primary px-4 py-2 rounded-pill fw-bold">
+                                <i class="bi bi-people-fill me-2"></i> Quản lý Sinh viên
+                            </a>
+                            <a href="${pageContext.request.contextPath}/credit-class" class="btn btn-light px-4 py-2 rounded-pill fw-bold">
+                                <i class="bi bi-calendar-check me-2"></i> Lịch học hôm nay
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- STATISTICS CARDS -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card shadow-sm h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h6 class="text-muted fw-bold small text-uppercase mb-1">Tổng Sinh Viên</h6>
+                                            <h2 class="fw-bold mb-0">${studentCount}</h2>
+                                            <div class="mt-2 small text-success">
+                                                <i class="bi bi-arrow-up"></i> 12%
+                                            </div>
+                                        </div>
+                                        <div class="stat-icon bg-gradient-primary mb-0">
+                                            <i class="bi bi-people"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-2 text-muted">Lớp học mở</h6>
-                                    <h2 class="card-title mb-0">45</h2>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card shadow-sm h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h6 class="text-muted fw-bold small text-uppercase mb-1">Tổng Lớp Học</h6>
+                                            <h2 class="fw-bold mb-0">${classCount}</h2>
+                                            <div class="mt-2 small text-muted">Đào tạo tập trung</div>
+                                        </div>
+                                        <div class="stat-icon bg-gradient-success mb-0">
+                                            <i class="bi bi-building"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-2 text-muted">Giảng viên</h6>
-                                    <h2 class="card-title mb-0">80</h2>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card shadow-sm h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h6 class="text-muted fw-bold small text-uppercase mb-1">Môn Học</h6>
+                                            <h2 class="fw-bold mb-0">${subjectCount}</h2>
+                                            <div class="mt-2 small text-muted">Chuẩn hóa</div>
+                                        </div>
+                                        <div class="stat-icon bg-gradient-warning mb-0">
+                                            <i class="bi bi-journal-bookmark"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-2 text-muted">Khoa</h6>
-                                    <h2 class="card-title mb-0">6</h2>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card shadow-sm h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h6 class="text-muted fw-bold small text-uppercase mb-1">Lớp Tín Chỉ</h6>
+                                            <h2 class="fw-bold mb-0">${creditClassCount}</h2>
+                                            <div class="mt-2 small text-danger">
+                                                Học kỳ II
+                                            </div>
+                                        </div>
+                                        <div class="stat-icon bg-gradient-danger mb-0">
+                                            <i class="bi bi-layers"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- QUICK ACTIONS -->
+                        <div class="col-lg-8">
+                            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                <div class="card-body p-4">
+                                    <h5 class="fw-bold mb-4">Truy cập nhanh</h5>
+                                    <div class="row g-3">
+                                        <div class="col-sm-4">
+                                            <a href="${pageContext.request.contextPath}/student" class="quick-action-card d-block shadow-sm h-100">
+                                                <div class="quick-action-icon"><i class="bi bi-person-plus"></i></div>
+                                                <h6 class="fw-bold mb-1">Thêm Sinh Viên</h6>
+                                                <p class="text-muted small mb-0">Quản lý hồ sơ mới</p>
+                                            </a>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <a href="${pageContext.request.contextPath}/mark" class="quick-action-card d-block shadow-sm h-100">
+                                                <div class="quick-action-icon" style="color: #10b981;"><i class="bi bi-pencil-square"></i></div>
+                                                <h6 class="fw-bold mb-1">Nhập Điểm</h6>
+                                                <p class="text-muted small mb-0">Cập nhật kết quả học tập</p>
+                                            </a>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <a href="${pageContext.request.contextPath}/registration" class="quick-action-card d-block shadow-sm h-100">
+                                                <div class="quick-action-icon" style="color: #f59e0b;"><i class="bi bi-clipboard-check"></i></div>
+                                                <h6 class="fw-bold mb-1">Đăng Ký Môn</h6>
+                                                <p class="text-muted small mb-0">Điều chỉnh lịch học</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h5 class="fw-bold mb-0">Phân tích hệ thống</h5>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">Học kỳ này</button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">Học kỳ trước</a></li>
+                                                <li><a class="dropdown-item" href="#">Năm học trước</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="p-5 text-center bg-light rounded-4 border-dashed">
+                                        <i class="bi bi-bar-chart-line fs-1 text-muted opacity-25 d-block mb-3"></i>
+                                        <p class="text-muted">Tính năng phân tích và biểu đồ đang được phát triển...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RECENT ACTIVITY & INFO -->
+                        <div class="col-lg-4">
+                            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                <div class="card-body p-4">
+                                    <h5 class="fw-bold mb-4">Hoạt động gần đây</h5>
+                                    <div class="dashboard-activity-item">
+                                        <div class="fw-bold text-dark small">Cập nhật điểm thi kết thúc học kỳ</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">10 phút trước • Bởi Admin</div>
+                                    </div>
+                                    <div class="dashboard-activity-item" style="border-left-color: #10b981;">
+                                        <div class="fw-bold text-dark small">Mở thêm lớp tín chỉ môn CTDL</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">2 giờ trước • Bởi Phòng Đào Tạo</div>
+                                    </div>
+                                    <div class="dashboard-activity-item" style="border-left-color: #f59e0b;">
+                                        <div class="fw-bold text-dark small">Sao lưu dữ liệu hệ thống</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">Hôm qua • Tự động</div>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm w-100 rounded-3 fw-bold mt-2">Xem tất cả</button>
+                                </div>
+                            </div>
+
+                            <div class="card bg-primary text-white border-0 shadow-lg rounded-4 overflow-hidden">
+                                <div class="card-body p-4 position-relative">
+                                    <i class="bi bi-lightning-charge-fill position-absolute" style="right: -10px; bottom: -20px; font-size: 8rem; opacity: 0.1;"></i>
+                                    <h5 class="fw-bold mb-3">Hỗ trợ kỹ thuật</h5>
+                                    <p class="small opacity-75 mb-4">Gặp sự cố với hệ thống? Liên hệ ngay với đội ngũ kỹ thuật để được hỗ trợ nhanh nhất.</p>
+                                    <a href="mailto:support@ptithcm.edu.vn" class="btn btn-light btn-sm px-4 fw-bold text-primary">LIÊN HỆ</a>
                                 </div>
                             </div>
                         </div>
@@ -73,22 +275,7 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Sidebar Toggle Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var toggleBtn = document.getElementById('sidebarToggle');
-            var sidebar = document.getElementById('appSidebar');
-
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    sidebar.classList.toggle('show');
-                });
-            }
-        });
-    </script>
 </body>
-
 </html>
