@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ptithcm.entity.GiangVien;
 import com.ptithcm.entity.Khoa;
 import com.ptithcm.entity.LopTinChi;
+import com.ptithcm.entity.MonHoc;
 
 @Controller
 @Transactional
@@ -33,8 +35,12 @@ public class LopTinChiController {
 		Session session = factory.getCurrentSession();
 		List<LopTinChi> ltcList = session.createQuery("FROM LopTinChi", LopTinChi.class).list();
 		List<Khoa> khoaList = session.createQuery("FROM Khoa", Khoa.class).list();
+		List<MonHoc> monHocList = session.createQuery("FROM MonHoc", MonHoc.class).list();
+		List<GiangVien> giangVienList = session.createQuery("FROM GiangVien", GiangVien.class).list();
 		model.addAttribute("ltcList", ltcList);
 		model.addAttribute("khoaList", khoaList);
+		model.addAttribute("monHocList", monHocList);
+		model.addAttribute("giangVienList", giangVienList);
 		return "credit-class/index";
 	}
 	
@@ -134,6 +140,12 @@ public class LopTinChiController {
 					res.put("message", "Lớp tín chỉ này đã tồn tại (trùng Niên khóa, Học kỳ, Môn học, Nhóm)!");
 					return res;
 				}
+
+				// Manual ID generation to fix "Cannot insert NULL into MALTC"
+				Integer maxId = session.createQuery("SELECT MAX(maLTC) FROM LopTinChi", Integer.class).uniqueResult();
+				ltc.setMaLTC(maxId == null ? 1 : maxId + 1);
+				
+				session.persist(ltc);
 			} else if (mode.equals("edit")) {
 				LopTinChi existing = session.get(LopTinChi.class, ltc.getMaLTC());
 				if (existing == null) {
@@ -141,9 +153,9 @@ public class LopTinChiController {
 					res.put("message", "Không tìm thấy lớp tín chỉ để chỉnh sửa!");
 					return res;
 				}
+				session.merge(ltc);
 			}
 
-			session.merge(ltc);
 			t.commit();
 			res.put("status", "success");
 		} catch (Exception e) {
@@ -191,5 +203,23 @@ public class LopTinChiController {
 			session.close();
 		}
 		return res;
+	}
+
+	@RequestMapping(value="/api/monhoc", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public List<MonHoc> listMonHoc() {
+		Session session = factory.getCurrentSession();
+		return session.createQuery("FROM MonHoc", MonHoc.class).list();
+	}
+
+	@RequestMapping(value="/api/gv", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public List<GiangVien> listGiangVien(@RequestParam(value="maKhoa", required=false) String maKhoa) {
+		Session session = factory.getCurrentSession();
+		if (maKhoa == null || maKhoa.isEmpty() || maKhoa.equals("all")) {
+			return session.createQuery("FROM GiangVien", GiangVien.class).list();
+		}
+		return session.createQuery("FROM GiangVien WHERE maKhoa = :maKhoa", GiangVien.class)
+				.setParameter("maKhoa", maKhoa).list();
 	}
 }

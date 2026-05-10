@@ -201,12 +201,22 @@
                             <input type="number" class="form-control" id="inp_nhom" min="1" value="1" required disabled>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted">MÃ MÔN HỌC</label>
-                            <input type="text" class="form-control" id="inp_maMH" placeholder="Mã môn học" required disabled>
+                            <label class="form-label small fw-bold text-muted">MÔN HỌC</label>
+                            <select class="form-select" id="inp_maMH" required disabled>
+                                <option value="">-- Chọn môn học --</option>
+                                <c:forEach var="mh" items="${monHocList}">
+                                    <option value="${mh.maMH}">[${mh.maMH}] ${mh.tenMH}</option>
+                                </c:forEach>
+                            </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted">MÃ GIẢNG VIÊN</label>
-                            <input type="text" class="form-control" id="inp_maGV" placeholder="Mã giảng viên" required disabled>
+                            <label class="form-label small fw-bold text-muted">GIẢNG VIÊN</label>
+                            <select class="form-select" id="inp_maGV" required disabled>
+                                <option value="">-- Chọn giảng viên --</option>
+                                <c:forEach var="gv" items="${giangVienList}">
+                                    <option value="${gv.maGV}">[${gv.maGV}] ${gv.ho} ${gv.ten}</option>
+                                </c:forEach>
+                            </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted">KHOA QUẢN LÝ</label>
@@ -230,7 +240,13 @@
 
                     <!-- MINI TABLE FOR REFERENCE -->
                     <div class="mt-4 pt-3 border-top">
-                        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-list-ul"></i> Lớp tín chỉ đã mở</h6>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-bold text-primary mb-0"><i class="bi bi-list-ul"></i> Lớp tín chỉ đã mở</h6>
+                            <div class="input-group" style="max-width:220px;">
+                                <span class="input-group-text py-1 border-0 bg-white"><i class="bi bi-search small text-muted"></i></span>
+                                <input type="text" id="mini-ltc-search" class="form-control form-control-sm border-0 border-bottom" placeholder="Lọc nhanh..." onkeyup="filterMiniTable()">
+                            </div>
+                        </div>
                         <div class="table-responsive rounded-3 border bg-white" style="max-height: 200px; overflow-y: auto;">
                             <table class="table table-hover table-sm align-middle mb-0">
                                 <thead class="table-light sticky-top">
@@ -513,6 +529,17 @@
                         setMode('none');
                     } else showNotify('Lỗi', result.message, 'error');
                 } catch (e) { showNotify('Lỗi', e.message, 'error'); }
+            });
+        }
+
+        function normalizeVN(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd').replace(/\u0110/g, 'D').toLowerCase();
+        }
+
+        function filterMiniTable() {
+            const val = normalizeVN(document.getElementById('mini-ltc-search').value);
+            document.querySelectorAll('#mini-table-body tr').forEach(row => {
+                row.style.display = normalizeVN(row.innerText).includes(val) ? '' : 'none';
             });
         }
 

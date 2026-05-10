@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ptithcm.entity.DangKy;
+import com.ptithcm.entity.DangKyId;
 import com.ptithcm.entity.LopTinChi;
+import com.ptithcm.entity.SinhVien;
 
 @Controller
 @Transactional
@@ -36,15 +38,60 @@ public class DangKyController {
 	}
 	
 	@RequestMapping(params="btnInsert")
-	@SuppressWarnings({ "deprecation", "rawtypes" })
 	public String insert(ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
-			NativeQuery query = session.createNativeQuery("EXEC sp_DangKyLopTinChi :maSV, :maLTC");
-			query.setParameter("maSV", maSV);
-			query.setParameter("maLTC", maLTC);
-			query.executeUpdate();
+			// 1. Check Student
+			SinhVien sv = session.get(SinhVien.class, maSV);
+			if (sv == null) throw new Exception("Sinh viên không tồn tại!");
+			if (sv.isDangNghiHoc()) throw new Exception("Sinh viên đang trong trạng thái nghỉ học!");
+
+			// 2. Check Class
+			LopTinChi ltc = session.get(LopTinChi.class, maLTC);
+			if (ltc == null) throw new Exception("Lớp tín chỉ không tồn tại!");
+			if (ltc.isHuyLop()) throw new Exception("Lớp tín chỉ đã bị hủy!");
+
+			// 3. Check Subject Constraint: Cannot register same subject in same semester
+			String hqlSubject = "SELECT count(dk) FROM DangKy dk, LopTinChi ltc_ref " +
+							   "WHERE dk.maLTC = ltc_ref.maLTC " +
+							   "AND dk.maSV = :maSV " +
+							   "AND dk.huyDangKy = false " +
+							   "AND ltc_ref.maMH = :maMH " +
+							   "AND ltc_ref.nienKhoa = :nk " +
+							   "AND ltc_ref.hocKy = :hk " +
+							   "AND dk.maLTC != :currentMaLTC";
+			Long countSameSubject = session.createQuery(hqlSubject, Long.class)
+					.setParameter("maSV", maSV)
+					.setParameter("maMH", ltc.getMaMH())
+					.setParameter("nk", ltc.getNienKhoa())
+					.setParameter("hk", ltc.getHocKy())
+					.setParameter("currentMaLTC", maLTC)
+					.uniqueResult();
+			
+			if (countSameSubject > 0) {
+				throw new Exception("Sinh viên đã đăng ký môn học này (" + ltc.getMaMH() + ") trong học kỳ này rồi!");
+			}
+
+			// 4. Check Registration
+			DangKyId id = new DangKyId(maLTC, maSV);
+			DangKy dk = session.get(DangKy.class, id);
+			
+			if (dk != null) {
+				if (!dk.isHuyDangKy()) {
+					throw new Exception("Sinh viên đã đăng ký lớp tín chỉ này rồi!");
+				} else {
+					dk.setHuyDangKy(false);
+					session.merge(dk);
+				}
+			} else {
+				DangKy newDk = new DangKy();
+				newDk.setMaLTC(maLTC);
+				newDk.setMaSV(maSV);
+				newDk.setHuyDangKy(false);
+				session.persist(newDk);
+			}
+			
 			t.commit();
 			model.addAttribute("message", "Đăng ký thành công");
 		} catch (Exception e) {
@@ -76,15 +123,18 @@ public class DangKyController {
 	}
 	
 	@RequestMapping(params="btnDelete")
-	@SuppressWarnings({ "deprecation", "rawtypes" })
 	public String delete(ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
-			NativeQuery query = session.createNativeQuery("EXEC sp_HuyDangKyLopTinChi :maSV, :maLTC");
-			query.setParameter("maSV", maSV);
-			query.setParameter("maLTC", maLTC);
-			query.executeUpdate();
+			DangKyId id = new DangKyId(maLTC, maSV);
+			DangKy dk = session.get(DangKy.class, id);
+			if (dk == null || dk.isHuyDangKy()) {
+				throw new Exception("Không tìm thấy thông tin đăng ký hoặc đã hủy trước đó!");
+			}
+			
+			dk.setHuyDangKy(true);
+			session.merge(dk);
 			t.commit();
 			model.addAttribute("message", "Đã hủy đăng ký thành công");
 		} catch (Exception e) {
@@ -109,16 +159,58 @@ public class DangKyController {
 
 	@RequestMapping(value="/api/register", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	@SuppressWarnings({ "deprecation", "rawtypes" })
 	public Map<String, Object> apiRegister(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
 		Map<String, Object> res = new HashMap<>();
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
-			NativeQuery query = session.createNativeQuery("EXEC sp_DangKyLopTinChi :maSV, :maLTC");
-			query.setParameter("maSV", maSV);
-			query.setParameter("maLTC", maLTC);
-			query.executeUpdate();
+			SinhVien sv = session.get(SinhVien.class, maSV);
+			if (sv == null) throw new Exception("Sinh viên không tồn tại!");
+			if (sv.isDangNghiHoc()) throw new Exception("Sinh viên đang trong trạng thái nghỉ học!");
+
+			LopTinChi ltc = session.get(LopTinChi.class, maLTC);
+			if (ltc == null) throw new Exception("Lớp tín chỉ không tồn tại!");
+			if (ltc.isHuyLop()) throw new Exception("Lớp tín chỉ đã bị hủy!");
+
+			// Check Subject Constraint
+			String hqlSubject = "SELECT count(dk) FROM DangKy dk, LopTinChi ltc_ref " +
+							   "WHERE dk.maLTC = ltc_ref.maLTC " +
+							   "AND dk.maSV = :maSV " +
+							   "AND dk.huyDangKy = false " +
+							   "AND ltc_ref.maMH = :maMH " +
+							   "AND ltc_ref.nienKhoa = :nk " +
+							   "AND ltc_ref.hocKy = :hk " +
+							   "AND dk.maLTC != :currentMaLTC";
+			Long countSameSubject = session.createQuery(hqlSubject, Long.class)
+					.setParameter("maSV", maSV)
+					.setParameter("maMH", ltc.getMaMH())
+					.setParameter("nk", ltc.getNienKhoa())
+					.setParameter("hk", ltc.getHocKy())
+					.setParameter("currentMaLTC", maLTC)
+					.uniqueResult();
+			
+			if (countSameSubject > 0) {
+				throw new Exception("Sinh viên đã đăng ký môn học này (" + ltc.getMaMH() + ") trong học kỳ này rồi!");
+			}
+
+			DangKyId id = new DangKyId(maLTC, maSV);
+			DangKy dk = session.get(DangKy.class, id);
+			
+			if (dk != null) {
+				if (!dk.isHuyDangKy()) {
+					throw new Exception("Sinh viên đã đăng ký lớp tín chỉ này rồi!");
+				} else {
+					dk.setHuyDangKy(false);
+					session.merge(dk);
+				}
+			} else {
+				DangKy newDk = new DangKy();
+				newDk.setMaLTC(maLTC);
+				newDk.setMaSV(maSV);
+				newDk.setHuyDangKy(false);
+				session.persist(newDk);
+			}
+			
 			t.commit();
 			res.put("status", "success");
 			res.put("message", "Đăng ký thành công!");
@@ -136,16 +228,19 @@ public class DangKyController {
 
 	@RequestMapping(value="/api/cancel", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	@SuppressWarnings({ "deprecation", "rawtypes" })
 	public Map<String, Object> apiCancel(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
 		Map<String, Object> res = new HashMap<>();
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
-			NativeQuery query = session.createNativeQuery("EXEC sp_HuyDangKyLopTinChi :maSV, :maLTC");
-			query.setParameter("maSV", maSV);
-			query.setParameter("maLTC", maLTC);
-			query.executeUpdate();
+			DangKyId id = new DangKyId(maLTC, maSV);
+			DangKy dk = session.get(DangKy.class, id);
+			if (dk == null || dk.isHuyDangKy()) {
+				throw new Exception("Không tìm thấy thông tin đăng ký hoặc đã hủy trước đó!");
+			}
+			
+			dk.setHuyDangKy(true);
+			session.merge(dk);
 			t.commit();
 			res.put("status", "success");
 			res.put("message", "Đã hủy đăng ký thành công!");

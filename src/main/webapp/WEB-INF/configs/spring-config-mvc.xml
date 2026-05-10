@@ -31,6 +31,11 @@
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
 		p:prefix="/WEB-INF/views/" p:suffix=".jsp" />
 
+	<!-- Interceptors Configuration -->
+	<mvc:interceptors>
+		<bean class="com.ptithcm.interceptor.AuthInterceptor" />
+	</mvc:interceptors>
+
 	<!-- Resource mapping (CSS, JS, Images) -->
 	<mvc:resources mapping="/resources/**" location="/resources/" />
 

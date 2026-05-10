@@ -1,0 +1,177 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - QLDSV_HTC_WEB</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4361ee, #4895ef);
+            --bg-light: #f8f9fa;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .login-header h2 {
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .login-header p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+        }
+        .form-control:focus {
+            background-color: #fff;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+        .login-btn {
+            background: var(--primary-gradient);
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #fff;
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            transition: all 0.3s;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .role-option {
+            flex: 1;
+            position: relative;
+        }
+        .role-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .role-label {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #64748b;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .role-option input:checked + .role-label {
+            background: rgba(67, 97, 238, 0.08);
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+        .alert-custom {
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card animate__animated animate__zoomIn">
+        <div class="login-header">
+            <div class="mb-3">
+                <i class="bi bi-shield-lock-fill fs-1 text-primary"></i>
+            </div>
+            <h2>Hệ thống Tín chỉ</h2>
+            <p>Vui lòng đăng nhập để tiếp tục</p>
+        </div>
+
+        <c:if test="${not empty error}">
+            <div class="alert alert-danger alert-custom">
+                <i class="bi bi-exclamation-circle me-2"></i> ${error}
+            </div>
+        </c:if>
+
+        <form action="${pageContext.request.contextPath}/login" method="post">
+            <div class="role-selector">
+                <div class="role-option">
+                    <input type="radio" name="type" value="sinhvien" id="type-sv" checked>
+                    <label class="role-label" for="type-sv">Sinh viên</label>
+                </div>
+                <div class="role-option">
+                    <input type="radio" name="type" value="giangvien" id="type-gv">
+                    <label class="role-label" for="type-gv">Giảng viên</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập</label>
+                <input type="text" name="username" class="form-control" placeholder="Nhập mã số hoặc tên..." required>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Mật khẩu</label>
+                <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu..." required>
+            </div>
+
+            <button type="submit" class="login-btn">ĐĂNG NHẬP</button>
+        </form>
+
+        <div class="mt-4 text-center">
+            <span class="text-muted small">Quên mật khẩu? Liên hệ phòng đào tạo</span>
+        </div>
+    </div>
+</body>
+</html>

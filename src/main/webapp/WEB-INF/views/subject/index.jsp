@@ -296,11 +296,14 @@
             } catch (e) { console.error(e); }
         }
 
+        function normalizeVN(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd').replace(/\u0110/g, 'D').toLowerCase();
+        }
+
         function filterLocal() {
-            const val = document.getElementById('search-input').value.toLowerCase();
+            const val = normalizeVN(document.getElementById('search-input').value);
             document.querySelectorAll('#subject-table-body tr').forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(val) ? '' : 'none';
+                row.style.display = normalizeVN(row.innerText).includes(val) ? '' : 'none';
             });
         }
 
