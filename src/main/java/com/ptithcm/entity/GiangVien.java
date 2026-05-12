@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "GIANGVIEN")
@@ -30,6 +31,9 @@ public class GiangVien {
     @Column(name = "CHUYENMON")
     private String chuyenMon;
 
+    @Transient
+    private boolean canDelete = true;
+
     public String getMaGV() { return maGV; }
     public void setMaGV(String maGV) { this.maGV = maGV; }
     public String getMaKhoa() { return maKhoa; }
@@ -44,4 +48,6 @@ public class GiangVien {
     public void setHocHam(String hocHam) { this.hocHam = hocHam; }
     public String getChuyenMon() { return chuyenMon; }
     public void setChuyenMon(String chuyenMon) { this.chuyenMon = chuyenMon; }
+    public boolean isCanDelete() { return canDelete; }
+    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
 }

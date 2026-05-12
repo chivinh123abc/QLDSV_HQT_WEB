@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "SINHVIEN")
@@ -43,6 +44,9 @@ public class SinhVien {
     @Column(name = "PASSWORD")
     private String password;
 
+    @Transient
+    private boolean canDelete = true;
+
     public String getMaSV() { return maSV; }
     public void setMaSV(String maSV) { this.maSV = maSV; }
     public String getHo() { return ho; }
@@ -61,4 +65,6 @@ public class SinhVien {
     public void setDangNghiHoc(boolean dangNghiHoc) { this.dangNghiHoc = dangNghiHoc; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    public boolean isCanDelete() { return canDelete; }
+    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "LOPTINCHI")
@@ -36,6 +37,9 @@ public class LopTinChi {
     @Column(name = "HUYLOP")
     private boolean huyLop;
 
+    @Transient
+    private boolean canDelete = true;
+
     public int getMaLTC() { return maLTC; }
     public void setMaLTC(int maLTC) { this.maLTC = maLTC; }
     public String getNienKhoa() { return nienKhoa; }
@@ -54,4 +58,6 @@ public class LopTinChi {
     public void setSoSVToiThieu(int soSVToiThieu) { this.soSVToiThieu = soSVToiThieu; }
     public boolean isHuyLop() { return huyLop; }
     public void setHuyLop(boolean huyLop) { this.huyLop = huyLop; }
+    public boolean isCanDelete() { return canDelete; }
+    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
 }

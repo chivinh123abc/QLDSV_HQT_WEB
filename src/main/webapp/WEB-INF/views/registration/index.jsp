@@ -55,9 +55,9 @@
                             <div class="card border-0 shadow-sm rounded-4 mb-4">
                                 <div class="card-body p-4">
                                     <h6 class="fw-bold text-primary mb-3">Tra cứu Sinh viên</h6>
-                                    <div class="input-group mb-3 shadow-sm rounded-3 overflow-hidden">
+                                    <div class="input-group mb-3 shadow-sm rounded-3 overflow-hidden" <c:if test="${sessionScope.role == 'SINHVIEN'}">style="display:none;"</c:if>>
                                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge"></i></span>
-                                        <input type="text" id="inp_maSV" class="form-control border-start-0 ps-0" placeholder="Nhập Mã SV...">
+                                        <input type="text" id="inp_maSV" class="form-control border-start-0 ps-0" placeholder="Nhập Mã SV..." value="${sessionScope.role == 'SINHVIEN' ? sessionScope.user.username : ''}">
                                         <button class="btn btn-primary fw-bold" type="button" onclick="loadStudentData()">TÌM</button>
                                     </div>
                                     <div id="student-info-panel" class="bg-light p-3 rounded-3 d-none">
@@ -168,6 +168,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadAvailableLTC();
+            if (document.getElementById('inp_maSV').value) {
+                loadStudentData();
+            }
         });
 
         function showNotify(title, message, type = 'success') {
@@ -195,12 +198,12 @@
             const maSV = document.getElementById('inp_maSV').value;
             if (!maSV) return;
             try {
-                const res = await fetch(contextPath + '/student/api/get?maSV=' + maSV);
+                const res = await fetch(contextPath + '/student/api/get?maSV=' + maSV.trim());
                 const student = await res.json();
                 if (student) {
                     currentStudent = student;
                     updateStudentPanel(student);
-                    await loadRegisteredLTC(maSV);
+                    await loadRegisteredLTC(maSV.trim());
                 } else {
                     showNotify('Thông báo', 'Không tìm thấy sinh viên!', 'info');
                 }
@@ -224,15 +227,18 @@
                     availableLTCList = await res.json();
                 }
                 
-                // Get list of subject IDs already registered
-                const registeredSubjectIds = availableLTCList
-                    .filter(item => registeredLTCIds.includes(item.maLTC))
-                    .map(item => item.maMH);
+                // Helper to get registered subjects in a specific semester
+                const getRegisteredSubjects = (nk, hk) => {
+                    return availableLTCList
+                        .filter(ltc => registeredLTCIds.includes(ltc.maLTC) && ltc.nienKhoa === nk && ltc.hocKy === hk)
+                        .map(ltc => (ltc.maMH || '').trim().toUpperCase());
+                };
 
                 const container = document.getElementById('available-ltc-body');
                 container.innerHTML = availableLTCList.map(item => {
                     const isRegistered = registeredLTCIds.includes(item.maLTC);
-                    const isSameSubjectRegistered = registeredSubjectIds.includes(item.maMH);
+                    const subjectsInSemester = getRegisteredSubjects(item.nienKhoa, item.hocKy);
+                    const isSameSubjectRegistered = subjectsInSemester.includes((item.maMH || '').trim().toUpperCase());
                     
                     let btnHtml = '';
                     if (isRegistered) {
@@ -279,7 +285,7 @@
             try {
                 const res = await fetch(contextPath + '/registration/api/list');
                 const allReg = await res.json();
-                const myReg = allReg.filter(r => r.maSV === maSV && !r.huyDangKy);
+                const myReg = allReg.filter(r => (r.maSV || '').trim().toUpperCase() === maSV.trim().toUpperCase() && !r.huyDangKy);
                 registeredLTCIds = myReg.map(r => r.maLTC);
                 
                 const container = document.getElementById('registered-list');

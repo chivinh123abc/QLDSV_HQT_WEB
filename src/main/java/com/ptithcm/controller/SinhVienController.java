@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -33,15 +36,31 @@ public class SinhVienController {
 	@RequestMapping()
 	public String index(ModelMap model, 
 			@RequestParam(value = "maLop", required = false) String maLop,
-			@RequestParam(value = "maKhoa", required = false) String maKhoa) {
+			@RequestParam(value = "maKhoa", required = false) String maKhoa,
+			HttpSession httpSession) {
 		Session session = factory.getCurrentSession();
+		
+		String sessionRole = (String) httpSession.getAttribute("role");
+		String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
 
 		// Fetch All Departments
 		List<Khoa> khoaList = session.createQuery("FROM Khoa", Khoa.class).list();
+		
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			maKhoa = sessionMaKhoa;
+			khoaList = khoaList.stream()
+					.filter(k -> k.getMaKhoa().equals(sessionMaKhoa))
+					.collect(Collectors.toList());
+		}
 
 		// Fetch Classes (Filter if maKhoa is provided)
 		List<Lop> lopList;
-		if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) {
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			lopList = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
+					.setParameter("maKhoa", sessionMaKhoa)
+					.list();
+			maKhoa = sessionMaKhoa;
+		} else if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) {
 			lopList = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
 					.setParameter("maKhoa", maKhoa)
 					.list();
@@ -112,19 +131,21 @@ public class SinhVienController {
 	}
 
 	@RequestMapping(params = "lnkEdit")
-	public String edit(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop) {
+	public String edit(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop, 
+			HttpSession httpSession) {
 		Session session = factory.getCurrentSession();
 		SinhVien sv = session.get(SinhVien.class, maSV);
 		model.addAttribute("sinhVien", sv);
-		return index(model, maLop, null);
+		return index(model, maLop, null, httpSession);
 	}
 
 	@RequestMapping(params = "lnkDelete")
-	public String deleteInit(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop) {
+	public String deleteInit(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop, 
+			HttpSession httpSession) {
 		Session session = factory.getCurrentSession();
 		SinhVien sv = session.get(SinhVien.class, maSV);
 		model.addAttribute("sinhVien", sv);
-		return index(model, maLop, null);
+		return index(model, maLop, null, httpSession);
 	}
 
 	// --- AJAX API ENDPOINTS ---
@@ -222,13 +243,21 @@ public class SinhVienController {
 
 	@RequestMapping(value = "/api/classes", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public List<Lop> listClasses(@RequestParam(value = "maKhoa", required = false) String maKhoa) {
+	public List<Lop> listClasses(@RequestParam(value = "maKhoa", required = false) String maKhoa, 
+			HttpSession httpSession) {
 		Session session = factory.getCurrentSession();
+		
+		String sessionRole = (String) httpSession.getAttribute("role");
+		String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
+
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			maKhoa = sessionMaKhoa;
+		}
+
 		if (maKhoa == null || maKhoa.isEmpty() || maKhoa.equals("all")) {
 			return session.createQuery("FROM Lop", Lop.class).list();
 		}
-		Query<Lop> query = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class);
-		query.setParameter("maKhoa", maKhoa);
-		return query.list();
+		return session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
+				.setParameter("maKhoa", maKhoa).list();
 	}
 }

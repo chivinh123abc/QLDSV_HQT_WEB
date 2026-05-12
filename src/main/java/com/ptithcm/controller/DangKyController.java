@@ -55,9 +55,9 @@ public class DangKyController {
 			// 3. Check Subject Constraint: Cannot register same subject in same semester
 			String hqlSubject = "SELECT count(dk) FROM DangKy dk, LopTinChi ltc_ref " +
 							   "WHERE dk.maLTC = ltc_ref.maLTC " +
-							   "AND dk.maSV = :maSV " +
+							   "AND upper(trim(dk.maSV)) = upper(trim(:maSV)) " +
 							   "AND dk.huyDangKy = false " +
-							   "AND ltc_ref.maMH = :maMH " +
+							   "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) " +
 							   "AND ltc_ref.nienKhoa = :nk " +
 							   "AND ltc_ref.hocKy = :hk " +
 							   "AND dk.maLTC != :currentMaLTC";
@@ -70,7 +70,7 @@ public class DangKyController {
 					.uniqueResult();
 			
 			if (countSameSubject > 0) {
-				throw new Exception("Sinh viên đã đăng ký môn học này (" + ltc.getMaMH() + ") trong học kỳ này rồi!");
+				throw new Exception("Sinh viên đã đăng ký môn học này (" + ltc.getMaMH().trim().toUpperCase() + ") trong học kỳ này rồi!");
 			}
 
 			// 4. Check Registration
@@ -175,9 +175,9 @@ public class DangKyController {
 			// Check Subject Constraint
 			String hqlSubject = "SELECT count(dk) FROM DangKy dk, LopTinChi ltc_ref " +
 							   "WHERE dk.maLTC = ltc_ref.maLTC " +
-							   "AND dk.maSV = :maSV " +
+							   "AND upper(trim(dk.maSV)) = upper(trim(:maSV)) " +
 							   "AND dk.huyDangKy = false " +
-							   "AND ltc_ref.maMH = :maMH " +
+							   "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) " +
 							   "AND ltc_ref.nienKhoa = :nk " +
 							   "AND ltc_ref.hocKy = :hk " +
 							   "AND dk.maLTC != :currentMaLTC";
@@ -190,7 +190,7 @@ public class DangKyController {
 					.uniqueResult();
 			
 			if (countSameSubject > 0) {
-				throw new Exception("Sinh viên đã đăng ký môn học này (" + ltc.getMaMH() + ") trong học kỳ này rồi!");
+				throw new Exception("Sinh viên đã đăng ký môn học này (" + ltc.getMaMH().trim().toUpperCase() + ") trong học kỳ này rồi!");
 			}
 
 			DangKyId id = new DangKyId(maLTC, maSV);

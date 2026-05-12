@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ptithcm.entity.DangKy;
-import com.ptithcm.entity.DangKyId;
+
+import com.ptithcm.entity.Khoa;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @Transactional
@@ -29,52 +31,109 @@ public class MarkController {
     private SessionFactory factory;
 
     @RequestMapping()
-    public String index(ModelMap model) {
+    public String index(ModelMap model, HttpSession httpSession) {
         Session session = factory.getCurrentSession();
         
+        String sessionRole = (String) httpSession.getAttribute("role");
+        String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
+
         // Get unique School Years
         List<String> nienKhoaList = session.createQuery("SELECT DISTINCT ltc.nienKhoa FROM LopTinChi ltc", String.class).list();
         model.addAttribute("nienKhoaList", nienKhoaList);
+
+        // Get Faculty list for PGV
+        List<Khoa> khoaList = session.createQuery("FROM Khoa", Khoa.class).list();
+        if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+            khoaList = khoaList.stream()
+                    .filter(k -> k.getMaKhoa().equals(sessionMaKhoa))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        model.addAttribute("khoaList", khoaList);
         
         return "mark/index";
     }
 
     @RequestMapping(value = "/get-subjects", method = RequestMethod.GET)
     @ResponseBody
-    public List<Object[]> getSubjects(@RequestParam("nienKhoa") String nienKhoa, @RequestParam("hocKy") int hocKy) {
+    public List<Object[]> getSubjects(@RequestParam("nienKhoa") String nienKhoa, 
+                                     @RequestParam("hocKy") String hocKy,
+                                     @RequestParam(value = "maKhoa", required = false) String maKhoa,
+                                     HttpSession httpSession) {
         Session session = factory.getCurrentSession();
-        String hql = "SELECT DISTINCT mh.maMH, mh.tenMH FROM LopTinChi ltc JOIN MonHoc mh ON ltc.maMH = mh.maMH " +
-                     "WHERE ltc.nienKhoa = :nienKhoa AND ltc.hocKy = :hocKy";
-        Query query = session.createQuery(hql);
-        query.setParameter("nienKhoa", nienKhoa);
-        query.setParameter("hocKy", hocKy);
+        
+        String sessionRole = (String) httpSession.getAttribute("role");
+        String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
+        if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+            maKhoa = sessionMaKhoa;
+        }
+
+        StringBuilder hql = new StringBuilder(
+            "SELECT DISTINCT mh.maMH, mh.tenMH FROM LopTinChi ltc JOIN MonHoc mh ON ltc.maMH = mh.maMH " +
+            "WHERE 1=1 "
+        );
+        
+        if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all")) hql.append("AND ltc.nienKhoa = :nienKhoa ");
+        if (hocKy != null && !hocKy.isEmpty() && !hocKy.equals("all")) hql.append("AND ltc.hocKy = :hocKy ");
+        if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) hql.append("AND ltc.maKhoa = :maKhoa ");
+
+        Query<Object[]> query = session.createQuery(hql.toString(), Object[].class);
+        if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all")) query.setParameter("nienKhoa", nienKhoa);
+        if (hocKy != null && !hocKy.isEmpty() && !hocKy.equals("all")) query.setParameter("hocKy", Integer.parseInt(hocKy));
+        if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) query.setParameter("maKhoa", maKhoa);
+        
         return query.list();
     }
 
     @RequestMapping(value = "/get-groups", method = RequestMethod.GET)
     @ResponseBody
     public List<Integer> getGroups(@RequestParam("nienKhoa") String nienKhoa, 
-                                  @RequestParam("hocKy") int hocKy, 
-                                  @RequestParam("maMH") String maMH) {
+                                  @RequestParam("hocKy") String hocKy, 
+                                  @RequestParam("maMH") String maMH,
+                                  @RequestParam(value = "maKhoa", required = false) String maKhoa,
+                                  HttpSession httpSession) {
         Session session = factory.getCurrentSession();
-        String hql = "SELECT DISTINCT ltc.nhom FROM LopTinChi ltc " +
-                     "WHERE ltc.nienKhoa = :nienKhoa AND ltc.hocKy = :hocKy AND ltc.maMH = :maMH";
-        Query query = session.createQuery(hql);
-        query.setParameter("nienKhoa", nienKhoa);
-        query.setParameter("hocKy", hocKy);
+
+        String sessionRole = (String) httpSession.getAttribute("role");
+        String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
+        if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+            maKhoa = sessionMaKhoa;
+        }
+
+        StringBuilder hql = new StringBuilder(
+            "SELECT DISTINCT ltc.nhom FROM LopTinChi ltc " +
+            "WHERE ltc.maMH = :maMH "
+        );
+
+        if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all")) hql.append("AND ltc.nienKhoa = :nienKhoa ");
+        if (hocKy != null && !hocKy.isEmpty() && !hocKy.equals("all")) hql.append("AND ltc.hocKy = :hocKy ");
+        if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) hql.append("AND ltc.maKhoa = :maKhoa ");
+
+        Query<Integer> query = session.createQuery(hql.toString(), Integer.class);
         query.setParameter("maMH", maMH);
+        if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all")) query.setParameter("nienKhoa", nienKhoa);
+        if (hocKy != null && !hocKy.isEmpty() && !hocKy.equals("all")) query.setParameter("hocKy", Integer.parseInt(hocKy));
+        if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) query.setParameter("maKhoa", maKhoa);
+        
         return query.list();
     }
 
     @RequestMapping(value = "/load-students", method = RequestMethod.GET)
     @ResponseBody
     public List<Object[]> loadStudents(@RequestParam(value="nienKhoa", required=false) String nienKhoa, 
-                                      @RequestParam(value="hocKy", required=false) Integer hocKy, 
+                                      @RequestParam(value="hocKy", required=false) String hocKy, 
                                       @RequestParam(value="maMH", required=false) String maMH, 
                                       @RequestParam(value="nhom", required=false) Integer nhom,
-                                      @RequestParam(value="searchMaSV", required=false) String searchMaSV) {
+                                      @RequestParam(value="searchMaSV", required=false) String searchMaSV,
+                                      @RequestParam(value="maKhoa", required=false) String maKhoa,
+                                      HttpSession httpSession) {
         Session session = factory.getCurrentSession();
         
+        String sessionRole = (String) httpSession.getAttribute("role");
+        String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
+        if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+            maKhoa = sessionMaKhoa;
+        }
+
         StringBuilder hql = new StringBuilder(
             "SELECT sv.maSV, sv.ho, sv.ten, dk.diemCC, dk.diemGK, dk.diemCK, dk.maLTC, ltc.nhom, mh.tenMH " +
             "FROM DangKy dk " +
@@ -87,22 +146,24 @@ public class MarkController {
         if (searchMaSV != null && !searchMaSV.trim().isEmpty()) {
             hql.append("AND TRIM(sv.maSV) = :searchMaSV ");
         } else {
-            if (nienKhoa != null && !nienKhoa.isEmpty()) hql.append("AND ltc.nienKhoa = :nienKhoa ");
-            if (hocKy != null) hql.append("AND ltc.hocKy = :hocKy ");
+            if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all")) hql.append("AND ltc.nienKhoa = :nienKhoa ");
+            if (hocKy != null && !hocKy.isEmpty() && !hocKy.equals("all")) hql.append("AND ltc.hocKy = :hocKy ");
             if (maMH != null && !maMH.isEmpty()) hql.append("AND ltc.maMH = :maMH ");
             if (nhom != null) hql.append("AND ltc.nhom = :nhom ");
+            if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) hql.append("AND ltc.maKhoa = :maKhoa ");
         }
         
         hql.append("ORDER BY ltc.nienKhoa DESC, ltc.hocKy DESC, ltc.nhom, sv.maSV");
 
-        Query query = session.createQuery(hql.toString());
+        Query<Object[]> query = session.createQuery(hql.toString(), Object[].class);
         if (searchMaSV != null && !searchMaSV.trim().isEmpty()) {
             query.setParameter("searchMaSV", searchMaSV.trim());
         } else {
-            if (nienKhoa != null && !nienKhoa.isEmpty()) query.setParameter("nienKhoa", nienKhoa);
-            if (hocKy != null) query.setParameter("hocKy", hocKy);
+            if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all")) query.setParameter("nienKhoa", nienKhoa);
+            if (hocKy != null && !hocKy.isEmpty() && !hocKy.equals("all")) query.setParameter("hocKy", Integer.parseInt(hocKy));
             if (maMH != null && !maMH.isEmpty()) query.setParameter("maMH", maMH);
             if (nhom != null) query.setParameter("nhom", nhom);
+            if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) query.setParameter("maKhoa", maKhoa);
         }
 
         return query.list();

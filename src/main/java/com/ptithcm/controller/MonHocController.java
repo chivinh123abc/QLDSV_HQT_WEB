@@ -30,6 +30,7 @@ public class MonHocController {
 	public String index(ModelMap model) {
 		Session session = factory.getCurrentSession();
 		List<MonHoc> monHocList = session.createQuery("FROM MonHoc", MonHoc.class).list();
+		populateCanDelete(session, monHocList);
 		model.addAttribute("monHocList", monHocList);
 		return "subject/index";
 	}
@@ -109,7 +110,21 @@ public class MonHocController {
 	@ResponseBody
 	public List<MonHoc> listSubjects() {
 		Session session = factory.getCurrentSession();
-		return session.createQuery("FROM MonHoc", MonHoc.class).list();
+		List<MonHoc> list = session.createQuery("FROM MonHoc", MonHoc.class).list();
+		populateCanDelete(session, list);
+		return list;
+	}
+
+	private void populateCanDelete(Session session, List<MonHoc> list) {
+		if (list.isEmpty()) return;
+		List<String> mhWithLTC = session.createQuery("SELECT distinct trim(maMH) FROM LopTinChi", String.class).list();
+		java.util.Set<String> dependentIds = new java.util.HashSet<>();
+		for (String id : mhWithLTC) if (id != null) dependentIds.add(id.trim().toUpperCase());
+
+		for (MonHoc mh : list) {
+			String trimmed = mh.getMaMH() != null ? mh.getMaMH().trim().toUpperCase() : "";
+			mh.setCanDelete(!dependentIds.contains(trimmed));
+		}
 	}
 
 	@RequestMapping(value="/api/save", method=RequestMethod.POST, produces="application/json")

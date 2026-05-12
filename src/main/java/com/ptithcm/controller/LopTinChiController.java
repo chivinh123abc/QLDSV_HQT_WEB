@@ -3,10 +3,12 @@ package com.ptithcm.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,21 +33,48 @@ public class LopTinChiController {
 	private SessionFactory factory;
 
 	@RequestMapping()
-	public String index(ModelMap model) {
+	public String index(ModelMap model, HttpSession httpSession) {
 		Session session = factory.getCurrentSession();
-		List<LopTinChi> ltcList = session.createQuery("FROM LopTinChi", LopTinChi.class).list();
+		
+		String sessionRole = (String) httpSession.getAttribute("role");
+		String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
+
+		List<LopTinChi> ltcList;
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			ltcList = session.createQuery("FROM LopTinChi WHERE maKhoa = :maKhoa", LopTinChi.class)
+					.setParameter("maKhoa", sessionMaKhoa)
+					.list();
+		} else {
+			ltcList = session.createQuery("FROM LopTinChi", LopTinChi.class).list();
+		}
+
+		populateCanDelete(session, ltcList);
+		
 		List<Khoa> khoaList = session.createQuery("FROM Khoa", Khoa.class).list();
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			khoaList = khoaList.stream()
+					.filter(k -> k.getMaKhoa().equals(sessionMaKhoa))
+					.collect(Collectors.toList());
+		}
+
 		List<MonHoc> monHocList = session.createQuery("FROM MonHoc", MonHoc.class).list();
-		List<GiangVien> giangVienList = session.createQuery("FROM GiangVien", GiangVien.class).list();
+		List<GiangVien> giangVienList;
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			giangVienList = session.createQuery("FROM GiangVien WHERE maKhoa = :maKhoa", GiangVien.class)
+					.setParameter("maKhoa", sessionMaKhoa).list();
+		} else {
+			giangVienList = session.createQuery("FROM GiangVien", GiangVien.class).list();
+		}
+
 		model.addAttribute("ltcList", ltcList);
 		model.addAttribute("khoaList", khoaList);
 		model.addAttribute("monHocList", monHocList);
 		model.addAttribute("giangVienList", giangVienList);
 		return "credit-class/index";
 	}
-	
-	@RequestMapping(params="btnInsert")
-	public String insert(ModelMap model, LopTinChi ltc) {
+
+	@RequestMapping(params = "btnInsert")
+	public String insert(ModelMap model, LopTinChi ltc, HttpSession httpSession) {
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
@@ -58,11 +87,11 @@ public class LopTinChiController {
 		} finally {
 			session.close();
 		}
-		return index(model);
+		return index(model, httpSession);
 	}
-	
-	@RequestMapping(params="btnUpdate")
-	public String update(ModelMap model, LopTinChi ltc) {
+
+	@RequestMapping(params = "btnUpdate")
+	public String update(ModelMap model, LopTinChi ltc, HttpSession httpSession) {
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
@@ -75,11 +104,11 @@ public class LopTinChiController {
 		} finally {
 			session.close();
 		}
-		return index(model);
+		return index(model, httpSession);
 	}
-	
-	@RequestMapping(params="btnDelete")
-	public String delete(ModelMap model, @RequestParam("maLTC") int maLTC) {
+
+	@RequestMapping(params = "btnDelete")
+	public String delete(ModelMap model, @RequestParam("maLTC") int maLTC, HttpSession httpSession) {
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
@@ -95,31 +124,59 @@ public class LopTinChiController {
 		} finally {
 			session.close();
 		}
-		return index(model);
+		return index(model, httpSession);
 	}
 
 	// --- AJAX API ENDPOINTS ---
-	
-	@RequestMapping(value="/api/get", method=RequestMethod.GET, produces="application/json")
+
+	@RequestMapping(value = "/api/get", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public LopTinChi getLTC(@RequestParam("maLTC") int maLTC) {
 		Session session = factory.getCurrentSession();
 		return session.get(LopTinChi.class, maLTC);
 	}
 
-	@RequestMapping(value="/api/list", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/list", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public List<LopTinChi> listLTC(@RequestParam(value="maKhoa", required=false) String maKhoa) {
+	public List<LopTinChi> listLTC(@RequestParam(value = "maKhoa", required = false) String maKhoa, 
+			HttpSession httpSession) {
 		Session session = factory.getCurrentSession();
-		if (maKhoa == null || maKhoa.isEmpty() || maKhoa.equals("all")) {
-			return session.createQuery("FROM LopTinChi", LopTinChi.class).list();
+		
+		String sessionRole = (String) httpSession.getAttribute("role");
+		String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
+
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			maKhoa = sessionMaKhoa;
 		}
-		Query<LopTinChi> query = session.createQuery("FROM LopTinChi WHERE maKhoa = :maKhoa", LopTinChi.class);
-		query.setParameter("maKhoa", maKhoa);
-		return query.list();
+
+		List<LopTinChi> list;
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			list = session.createQuery("FROM LopTinChi WHERE maKhoa = :maKhoa", LopTinChi.class)
+					.setParameter("maKhoa", sessionMaKhoa)
+					.list();
+		} else if (maKhoa == null || maKhoa.isEmpty() || maKhoa.equals("all")) {
+			list = session.createQuery("FROM LopTinChi", LopTinChi.class).list();
+		} else {
+			list = session.createQuery("FROM LopTinChi WHERE maKhoa = :maKhoa", LopTinChi.class)
+					.setParameter("maKhoa", maKhoa)
+					.list();
+		}
+		populateCanDelete(session, list);
+		return list;
 	}
 
-	@RequestMapping(value="/api/save", method=RequestMethod.POST, produces="application/json")
+	private void populateCanDelete(Session session, List<LopTinChi> list) {
+		if (list.isEmpty())
+			return;
+		List<Integer> ltcWithReg = session.createQuery("SELECT distinct maLTC FROM DangKy", Integer.class).list();
+		java.util.Set<Integer> dependentIds = new java.util.HashSet<>(ltcWithReg);
+
+		for (LopTinChi ltc : list) {
+			ltc.setCanDelete(!dependentIds.contains(ltc.getMaLTC()));
+		}
+	}
+
+	@RequestMapping(value = "/api/save", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
 	public Map<String, Object> saveLTC(@RequestBody LopTinChi ltc, @RequestParam("mode") String mode) {
 		Map<String, Object> res = new HashMap<>();
@@ -144,7 +201,7 @@ public class LopTinChiController {
 				// Manual ID generation to fix "Cannot insert NULL into MALTC"
 				Integer maxId = session.createQuery("SELECT MAX(maLTC) FROM LopTinChi", Integer.class).uniqueResult();
 				ltc.setMaLTC(maxId == null ? 1 : maxId + 1);
-				
+
 				session.persist(ltc);
 			} else if (mode.equals("edit")) {
 				LopTinChi existing = session.get(LopTinChi.class, ltc.getMaLTC());
@@ -159,7 +216,8 @@ public class LopTinChiController {
 			t.commit();
 			res.put("status", "success");
 		} catch (Exception e) {
-			if (t != null) t.rollback();
+			if (t != null)
+				t.rollback();
 			res.put("status", "error");
 			res.put("message", "Lỗi: " + e.getMessage());
 		} finally {
@@ -168,7 +226,7 @@ public class LopTinChiController {
 		return res;
 	}
 
-	@RequestMapping(value="/api/delete", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
 	public Map<String, Object> deleteLTC(@RequestParam("maLTC") int maLTC) {
 		Map<String, Object> res = new HashMap<>();
@@ -179,7 +237,7 @@ public class LopTinChiController {
 			Long count = session.createQuery("SELECT COUNT(*) FROM DangKy WHERE maLTC = :maLTC", Long.class)
 					.setParameter("maLTC", maLTC)
 					.uniqueResult();
-			
+
 			if (count > 0) {
 				res.put("status", "error");
 				res.put("message", "Không thể xóa: Lớp tín chỉ đã có " + count + " sinh viên đăng ký!");
@@ -196,7 +254,8 @@ public class LopTinChiController {
 				res.put("message", "Không tìm thấy lớp tín chỉ để xóa!");
 			}
 		} catch (Exception e) {
-			if (t != null) t.rollback();
+			if (t != null)
+				t.rollback();
 			res.put("status", "error");
 			res.put("message", "Lỗi: " + e.getMessage());
 		} finally {
@@ -205,17 +264,26 @@ public class LopTinChiController {
 		return res;
 	}
 
-	@RequestMapping(value="/api/monhoc", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/monhoc", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public List<MonHoc> listMonHoc() {
 		Session session = factory.getCurrentSession();
 		return session.createQuery("FROM MonHoc", MonHoc.class).list();
 	}
 
-	@RequestMapping(value="/api/gv", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/gv", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public List<GiangVien> listGiangVien(@RequestParam(value="maKhoa", required=false) String maKhoa) {
+	public List<GiangVien> listGiangVien(@RequestParam(value = "maKhoa", required = false) String maKhoa, 
+			HttpSession httpSession) {
 		Session session = factory.getCurrentSession();
+		
+		String sessionRole = (String) httpSession.getAttribute("role");
+		String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
+
+		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
+			maKhoa = sessionMaKhoa;
+		}
+
 		if (maKhoa == null || maKhoa.isEmpty() || maKhoa.equals("all")) {
 			return session.createQuery("FROM GiangVien", GiangVien.class).list();
 		}

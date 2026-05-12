@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +20,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ptithcm.entity.GiangVien;
 import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.Lop;
 
 @Controller
 @Transactional
-@RequestMapping("/class")
-public class LopController {
+@RequestMapping("/lecturer")
+public class GiangVienController {
 
 	@Autowired
 	private SessionFactory factory;
@@ -47,39 +48,51 @@ public class LopController {
 					.collect(Collectors.toList());
 		}
 
-		List<Lop> lopList;
+		List<GiangVien> gvList;
 		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
-			lopList = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-					.setParameter("maKhoa", sessionMaKhoa)
-					.list();
+			gvList = session.createQuery("FROM GiangVien WHERE maKhoa = :maKhoa", GiangVien.class)
+					.setParameter("maKhoa", sessionMaKhoa).list();
 			maKhoa = sessionMaKhoa;
 		} else if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) {
-			lopList = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-					.setParameter("maKhoa", maKhoa)
-					.list();
+			gvList = session.createQuery("FROM GiangVien WHERE maKhoa = :maKhoa", GiangVien.class)
+					.setParameter("maKhoa", maKhoa).list();
 		} else {
-			lopList = session.createQuery("FROM Lop", Lop.class).list();
+			gvList = session.createQuery("FROM GiangVien", GiangVien.class).list();
 		}
 
-		populateCanDelete(session, lopList);
-		model.addAttribute("lopList", lopList);
+		populateCanDelete(session, gvList);
+
 		model.addAttribute("khoaList", khoaList);
+		model.addAttribute("gvList", gvList);
 		model.addAttribute("maKhoa", maKhoa);
-		return "class/index";
+		return "lecturer/index";
 	}
 
-	// --- AJAX API ENDPOINTS ---
+	private void populateCanDelete(Session session, List<GiangVien> list) {
+		if (list.isEmpty())
+			return;
+		List<String> ltcMaGV = session
+				.createQuery("SELECT distinct maGV FROM LopTinChi WHERE maGV IS NOT NULL", String.class).list();
+		List<String> userMaGV = session
+				.createQuery("SELECT distinct username FROM Users WHERE username IS NOT NULL", String.class).list();
 
-	@RequestMapping(value = "/api/get", method = RequestMethod.GET, produces = "application/json")
-	@ResponseBody
-	public Lop getClass(@RequestParam("maLop") String maLop) {
-		Session session = factory.getCurrentSession();
-		return session.get(Lop.class, maLop);
+		java.util.Set<String> dependentIds = new java.util.HashSet<>();
+		for (String id : ltcMaGV)
+			if (id != null)
+				dependentIds.add(id.trim());
+		for (String id : userMaGV)
+			if (id != null)
+				dependentIds.add(id.trim());
+
+		for (GiangVien gv : list) {
+			String trimmed = gv.getMaGV() != null ? gv.getMaGV().trim() : "";
+			gv.setCanDelete(!dependentIds.contains(trimmed));
+		}
 	}
 
 	@RequestMapping(value = "/api/list", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public List<Lop> listClasses(@RequestParam(value = "maKhoa", required = false) String maKhoa, 
+	public List<GiangVien> listGV(@RequestParam(value = "maKhoa", required = false) String maKhoa, 
 			HttpSession httpSession) {
 		Session session = factory.getCurrentSession();
 		
@@ -90,70 +103,53 @@ public class LopController {
 			maKhoa = sessionMaKhoa;
 		}
 
-		List<Lop> list;
+		List<GiangVien> list;
 		if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
-			list = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-					.setParameter("maKhoa", sessionMaKhoa)
-					.list();
+			list = session.createQuery("FROM GiangVien WHERE maKhoa = :maKhoa", GiangVien.class)
+					.setParameter("maKhoa", sessionMaKhoa).list();
 		} else if (maKhoa == null || maKhoa.isEmpty() || maKhoa.equals("all")) {
-			list = session.createQuery("FROM Lop", Lop.class).list();
+			list = session.createQuery("FROM GiangVien", GiangVien.class).list();
 		} else {
-			list = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-					.setParameter("maKhoa", maKhoa)
-					.list();
+			list = session.createQuery("FROM GiangVien WHERE maKhoa = :maKhoa", GiangVien.class)
+					.setParameter("maKhoa", maKhoa).list();
 		}
 		populateCanDelete(session, list);
 		return list;
 	}
 
-	private void populateCanDelete(Session session, List<Lop> list) {
-		if (list.isEmpty())
-			return;
-
-		// Check for students in class
-		List<String> lopWithSV = session.createQuery("SELECT distinct trim(maLop) FROM SinhVien", String.class).list();
-
-		// Check for registrations from students of the class
-		List<String> lopWithReg = session.createQuery(
-				"SELECT distinct trim(sv.maLop) FROM DangKy dk JOIN SinhVien sv ON dk.maSV = sv.maSV", String.class)
-				.list();
-
-		java.util.Set<String> dependentIds = new java.util.HashSet<>();
-		for (String id : lopWithSV)
-			if (id != null)
-				dependentIds.add(id.trim().toUpperCase());
-		for (String id : lopWithReg)
-			if (id != null)
-				dependentIds.add(id.trim().toUpperCase());
-
-		for (Lop lop : list) {
-			String trimmed = lop.getMaLop() != null ? lop.getMaLop().trim().toUpperCase() : "";
-			lop.setCanDelete(!dependentIds.contains(trimmed));
+	@RequestMapping(value = "/api/get", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public GiangVien getGV(@RequestParam("maGV") String maGV) {
+		Session session = factory.getCurrentSession();
+		GiangVien gv = session.get(GiangVien.class, maGV);
+		if (gv != null) {
+			populateCanDelete(session, java.util.Collections.singletonList(gv));
 		}
+		return gv;
 	}
 
 	@RequestMapping(value = "/api/save", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
-	public Map<String, Object> saveClass(@RequestBody Lop lop, @RequestParam("mode") String mode) {
+	public Map<String, Object> saveGV(@RequestBody GiangVien gv, @RequestParam("mode") String mode) {
 		Map<String, Object> res = new HashMap<>();
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
-			Lop existing = session.get(Lop.class, lop.getMaLop());
+			GiangVien existing = session.get(GiangVien.class, gv.getMaGV());
 			if (mode.equals("add")) {
 				if (existing != null) {
 					res.put("status", "error");
-					res.put("message", "Mã lớp [" + lop.getMaLop() + "] đã tồn tại!");
+					res.put("message", "Mã giảng viên [" + gv.getMaGV() + "] đã tồn tại!");
 					return res;
 				}
-				session.persist(lop);
+				session.persist(gv);
 			} else if (mode.equals("edit")) {
 				if (existing == null) {
 					res.put("status", "error");
-					res.put("message", "Không tìm thấy lớp để chỉnh sửa!");
+					res.put("message", "Không tìm thấy giảng viên để chỉnh sửa!");
 					return res;
 				}
-				session.merge(lop);
+				session.merge(gv);
 			}
 			t.commit();
 			res.put("status", "success");
@@ -170,43 +166,40 @@ public class LopController {
 
 	@RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
-	public Map<String, Object> deleteClass(@RequestParam("maLop") String maLop) {
+	public Map<String, Object> deleteGV(@RequestParam("maGV") String maGV) {
 		Map<String, Object> res = new HashMap<>();
 		Session session = factory.openSession();
 		org.hibernate.Transaction t = session.beginTransaction();
 		try {
-			// Check dependencies: SINHVIEN
-			Long svCount = session.createQuery("SELECT COUNT(*) FROM SinhVien WHERE maLop = :maLop", Long.class)
-					.setParameter("maLop", maLop)
-					.uniqueResult();
-
-			if (svCount > 0) {
-				// Also check if they have registrations for a better error message
-				Long regCount = session.createQuery(
-						"SELECT COUNT(dk) FROM DangKy dk JOIN SinhVien sv ON dk.maSV = sv.maSV WHERE sv.maLop = :maLop",
-						Long.class)
-						.setParameter("maLop", maLop)
-						.uniqueResult();
-
-				if (regCount > 0) {
-					res.put("status", "error");
-					res.put("message", "Không thể xóa: Lớp đã có " + regCount + " lượt đăng ký lớp tín chỉ!");
-					return res;
-				}
-
+			// Check dependencies in LOPTINCHI
+			Long ltcCount = session
+					.createQuery("SELECT COUNT(*) FROM LopTinChi WHERE trim(maGV) = trim(:maGV)", Long.class)
+					.setParameter("maGV", maGV.trim()).uniqueResult();
+			if (ltcCount > 0) {
 				res.put("status", "error");
-				res.put("message", "Không thể xóa: Lớp đang có " + svCount + " sinh viên!");
+				res.put("message", "Không thể xóa: Giảng viên đang phụ trách " + ltcCount + " lớp tín chỉ!");
 				return res;
 			}
 
-			Lop lop = session.get(Lop.class, maLop);
-			if (lop != null) {
-				session.remove(lop);
+			// Check dependencies in USERS
+			Long userCount = session
+					.createQuery("SELECT COUNT(*) FROM Users WHERE trim(username) = trim(:maGV)", Long.class)
+					.setParameter("maGV", maGV.trim()).uniqueResult();
+			if (userCount > 0) {
+				res.put("status", "error");
+				res.put("message", "Không thể xóa: Giảng viên đang được cấp tài khoản đăng nhập trong hệ thống!");
+				return res;
+			}
+
+			List<GiangVien> list = session.createQuery("FROM GiangVien WHERE trim(maGV) = trim(:maGV)", GiangVien.class)
+					.setParameter("maGV", maGV.trim()).list();
+			if (!list.isEmpty()) {
+				session.remove(list.get(0));
 				t.commit();
 				res.put("status", "success");
 			} else {
 				res.put("status", "error");
-				res.put("message", "Không tìm thấy lớp để xóa!");
+				res.put("message", "Không tìm thấy giảng viên để xóa!");
 			}
 		} catch (Exception e) {
 			if (t != null)

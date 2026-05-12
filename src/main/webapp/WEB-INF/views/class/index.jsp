@@ -176,10 +176,12 @@
                                         <p class="text-muted small mb-0">Quản lý thông tin các lớp học theo từng khoa
                                         </p>
                                     </div>
-                                    <button class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm"
-                                        onclick="resetForm()">
-                                        <i class="bi bi-plus-circle-fill me-1"></i> Cập nhật Lớp
-                                    </button>
+                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                        <button class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm"
+                                            onclick="resetForm()">
+                                            <i class="bi bi-plus-circle-fill me-1"></i> Cập nhật Lớp
+                                        </button>
+                                    </c:if>
                                 </div>
 
                                 <div class="card-body px-4 pb-4">
@@ -196,15 +198,26 @@
                                         <div class="d-flex gap-3 align-items-center">
                                             <label class="fw-bold small text-muted text-uppercase mb-0">Lọc theo
                                                 khoa:</label>
-                                            <select id="khoa-filter"
-                                                class="form-select form-select-sm border-0 bg-light text-primary fw-bold"
-                                                style="min-width: 200px;" onchange="filterByKhoa()">
-                                                <option value="all">-- Tất cả khoa --</option>
-                                                <c:forEach var="k" items="${khoaList}">
-                                                    <option value="${k.maKhoa}" ${k.maKhoa==maKhoa ? 'selected' : '' }>
-                                                        ${k.tenKhoa}</option>
-                                                </c:forEach>
-                                            </select>
+                                            <c:choose>
+                                                <c:when test="${sessionScope.role == 'PGV'}">
+                                                    <select id="khoa-filter"
+                                                        class="form-select form-select-sm border-0 bg-light text-primary fw-bold"
+                                                        style="min-width: 200px;" onchange="filterByKhoa()">
+                                                        <option value="all">-- Tất cả khoa --</option>
+                                                        <c:forEach var="k" items="${khoaList}">
+                                                            <option value="${k.maKhoa}" ${k.maKhoa==maKhoa ? 'selected' : '' }>
+                                                                ${k.tenKhoa}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="d-flex align-items-center gap-2 px-3 py-1 bg-light rounded-pill border">
+                                                        <i class="bi bi-building text-primary small"></i>
+                                                        <span class="fw-bold text-dark small">${khoaList[0].tenKhoa}</span>
+                                                        <input type="hidden" id="khoa-filter" value="${sessionScope.maKhoa}">
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                     </div>
 
@@ -217,12 +230,14 @@
                                                     <th>TÊN LỚP</th>
                                                     <th class="text-center">KHÓA HỌC</th>
                                                     <th class="text-center">KHOA</th>
-                                                    <th class="text-center">THAO TÁC</th>
+                                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                                        <th class="text-center">THAO TÁC</th>
+                                                    </c:if>
                                                 </tr>
                                             </thead>
                                             <tbody id="class-table-body">
                                                 <c:forEach var="item" items="${lopList}">
-                                                    <tr onclick="selectClass('${item.maLop}', 'edit')">
+                                                    <tr <c:if test="${sessionScope.role == 'PGV'}">onclick="selectClass('${item.maLop}', 'edit')"</c:if>>
                                                         <td class="px-3">
                                                             <span class="badge-soft-primary">${item.maLop}</span>
                                                         </td>
@@ -239,20 +254,24 @@
                                                             <span
                                                                 class="badge border border-info text-info rounded-pill px-3 py-1 fw-bold small">${item.maKhoa}</span>
                                                         </td>
-                                                        <td class="text-center">
-                                                            <div class="d-flex gap-2 justify-content-center">
-                                                                <button
-                                                                    onclick="event.stopPropagation(); selectClass('${item.maLop}', 'edit', true)"
-                                                                    class="btn btn-sm btn-outline-primary border-0 rounded-3">
-                                                                    <i class="bi bi-pencil-square"></i>
-                                                                </button>
-                                                                <button
-                                                                    onclick="event.stopPropagation(); selectClass('${item.maLop}', 'delete', true)"
-                                                                    class="btn btn-sm btn-outline-danger border-0 rounded-3">
-                                                                    <i class="bi bi-trash3"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
+                                                        <c:if test="${sessionScope.role == 'PGV'}">
+                                                            <td class="text-center">
+                                                                <div class="d-flex gap-2 justify-content-center">
+                                                                    <button
+                                                                        onclick="event.stopPropagation(); selectClass('${item.maLop}', 'edit', true)"
+                                                                        class="btn btn-sm btn-outline-primary border-0 rounded-3">
+                                                                        <i class="bi bi-pencil-square"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        onclick="event.stopPropagation(); selectClass('${item.maLop}', 'delete', true)"
+                                                                        class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}"
+                                                                        ${!item.canDelete ? 'disabled title="Không thể xóa"'
+                                                                        : '' }>
+                                                                        <i class="bi bi-trash3"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </c:if>
                                                     </tr>
                                                 </c:forEach>
                                                 <c:if test="${empty lopList}">
@@ -366,15 +385,23 @@
                                         <i class="bi bi-list-ul"></i> Danh sách lớp hiện có
                                     </h6>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <select id="mini-khoa-filter" class="form-select form-select-sm border-0 bg-light text-muted fw-bold" style="max-width: 180px;" onchange="filterMiniTableByKhoa()">
-                                            <option value="all">-- Tất cả khoa --</option>
-                                            <c:forEach var="k" items="${khoaList}">
-                                                <option value="${k.maKhoa}" ${k.maKhoa == maKhoa ? 'selected' : ''}>${k.tenKhoa}</option>
-                                            </c:forEach>
-                                        </select>
+                                        <c:if test="${sessionScope.role == 'PGV'}">
+                                            <select id="mini-khoa-filter"
+                                                class="form-select form-select-sm border-0 bg-light text-muted fw-bold"
+                                                style="max-width: 180px;" onchange="filterMiniTableByKhoa()">
+                                                <option value="all">-- Tất cả khoa --</option>
+                                                <c:forEach var="k" items="${khoaList}">
+                                                    <option value="${k.maKhoa}" ${k.maKhoa==maKhoa ? 'selected' : '' }>
+                                                        ${k.tenKhoa}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </c:if>
                                         <div class="input-group" style="max-width: 180px;">
-                                            <span class="input-group-text py-1 border-0 bg-white"><i class="bi bi-search small text-muted"></i></span>
-                                            <input type="text" id="mini-class-search" class="form-control form-control-sm border-0 border-bottom" placeholder="Lọc nhanh..." onkeyup="filterMiniTable()">
+                                            <span class="input-group-text py-1 border-0 bg-white"><i
+                                                    class="bi bi-search small text-muted"></i></span>
+                                            <input type="text" id="mini-class-search"
+                                                class="form-control form-control-sm border-0 border-bottom"
+                                                placeholder="Lọc nhanh..." onkeyup="filterMiniTable()">
                                         </div>
                                     </div>
                                 </div>
@@ -391,7 +418,7 @@
                                         </thead>
                                         <tbody id="mini-table-body">
                                             <c:forEach var="l" items="${lopList}">
-                                                <tr onclick="selectClass('${l.maLop}', 'edit')">
+                                                <tr <c:if test="${sessionScope.role == 'PGV'}">onclick="selectClass('${l.maLop}', 'edit')"</c:if>>
                                                     <td class="px-3"><span
                                                             class="badge bg-primary bg-opacity-10 text-primary small">${l.maLop}</span>
                                                     </td>
@@ -408,7 +435,9 @@
                                                             </button>
                                                             <button type="button"
                                                                 onclick="event.stopPropagation(); selectClass('${l.maLop}', 'delete', true)"
-                                                                class="btn btn-xs btn-outline-danger border-0 p-1">
+                                                                class="btn btn-xs btn-outline-danger border-0 p-1 ${!l.canDelete ? 'disabled opacity-25' : ''}"
+                                                                ${!l.canDelete ? 'disabled title="Không thể xóa"' : ''
+                                                                }>
                                                                 <i class="bi bi-trash3"></i>
                                                             </button>
                                                         </div>
@@ -549,9 +578,9 @@
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center">
                             <button onclick="event.stopPropagation(); selectClass('\${item.maLop}', 'edit', true)" class="btn btn-sm btn-outline-primary border-0 rounded-3"><i class="bi bi-pencil-square"></i></button>
-                            <button onclick="event.stopPropagation(); selectClass('\${item.maLop}', 'delete', true)" class="btn btn-sm btn-outline-danger border-0 rounded-3"><i class="bi bi-trash3"></i></button>
-                        </div>
-                    </td>
+                             <button onclick="event.stopPropagation(); selectClass('\${item.maLop}', 'delete', true)" class="btn btn-sm btn-outline-danger border-0 rounded-3 \${!item.canDelete ? 'disabled opacity-25' : ''}" \${!item.canDelete ? 'disabled title="Không thể xóa"' : ''}><i class="bi bi-trash3"></i></button>
+                         </div>
+                     </td>
                 </tr>
             `).join('');
                 }
@@ -568,12 +597,12 @@
                             <button type="button" onclick="event.stopPropagation(); selectClass('\${item.maLop}', 'edit', true)" class="btn btn-xs btn-outline-primary border-0 p-1">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
-                            <button type="button" onclick="event.stopPropagation(); selectClass('\${item.maLop}', 'delete', true)" class="btn btn-xs btn-outline-danger border-0 p-1">
-                                <i class="bi bi-trash3"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                             <button type="button" onclick="event.stopPropagation(); selectClass('\${item.maLop}', 'delete', true)" class="btn btn-xs btn-outline-danger border-0 p-1 \${!item.canDelete ? 'disabled opacity-25' : ''}" \${!item.canDelete ? 'disabled title="Không thể xóa"' : ''}>
+                                 <i class="bi bi-trash3"></i>
+                             </button>
+                         </div>
+                     </td>
+                 </tr>
             `).join('');
                 }
 
@@ -680,9 +709,10 @@
                         });
                         const result = await res.json();
                         if (result.status === 'success') {
-                            showNotify('Thành công', 'Thông tin lớp đã được lưu.');
-                            filterByKhoa();
+                            await filterByKhoa();
                             setMode('none');
+                            bootstrap.Modal.getInstance(document.getElementById('classModal')).hide();
+                            showNotify('Thành công', 'Thông tin lớp đã được lưu.');
                         } else showNotify('Lỗi', result.message, 'error');
                     } catch (e) { showNotify('Lỗi', e.message, 'error'); }
                 }
@@ -694,9 +724,10 @@
                             const res = await fetch(contextPath + '/class/api/delete?maLop=' + maLop, { method: 'POST' });
                             const result = await res.json();
                             if (result.status === 'success') {
-                                showNotify('Thành công', 'Lớp đã được xóa.');
-                                filterByKhoa();
+                                await filterByKhoa();
                                 setMode('none');
+                                bootstrap.Modal.getInstance(document.getElementById('classModal')).hide();
+                                showNotify('Thành công', 'Lớp đã được xóa.');
                             } else showNotify('Lỗi', result.message, 'error');
                         } catch (e) { showNotify('Lỗi', e.message, 'error'); }
                     });

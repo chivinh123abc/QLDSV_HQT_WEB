@@ -147,18 +147,18 @@
         <form action="${pageContext.request.contextPath}/login" method="post">
             <div class="role-selector">
                 <div class="role-option">
-                    <input type="radio" name="type" value="sinhvien" id="type-sv" checked>
+                    <input type="radio" name="type" value="sinhvien" id="type-sv" ${empty type or type == 'sinhvien' ? 'checked' : ''}>
                     <label class="role-label" for="type-sv">Sinh viên</label>
                 </div>
                 <div class="role-option">
-                    <input type="radio" name="type" value="giangvien" id="type-gv">
+                    <input type="radio" name="type" value="giangvien" id="type-gv" ${type == 'giangvien' ? 'checked' : ''}>
                     <label class="role-label" for="type-gv">Giảng viên</label>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Tên đăng nhập</label>
-                <input type="text" name="username" class="form-control" placeholder="Nhập mã số hoặc tên..." required>
+                <input type="text" name="username" class="form-control" placeholder="Nhập mã số hoặc tên..." value="${username}" required>
             </div>
 
             <div class="mb-4">

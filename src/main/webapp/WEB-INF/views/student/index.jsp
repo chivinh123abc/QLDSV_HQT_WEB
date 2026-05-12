@@ -177,14 +177,26 @@
                                                     onkeyup="filterLocalClasses()">
                                             </div>
                                             <div class="d-flex gap-2">
-                                                <select id="khoa-filter"
-                                                    class="form-select form-select-sm border-0 bg-light text-muted fw-bold"
-                                                    onchange="filterByKhoa()">
-                                                    <option value="all">-- Tất cả khoa --</option>
-                                                    <c:forEach var="khoa" items="${khoaList}">
-                                                        <option value="${khoa.maKhoa}" ${khoa.maKhoa == maKhoa ? 'selected' : ''}>${khoa.tenKhoa}</option>
-                                                    </c:forEach>
-                                                </select>
+                                            <c:choose>
+                                                <c:when test="${sessionScope.role == 'PGV'}">
+                                                    <select id="khoa-filter"
+                                                        class="form-select form-select-sm border-0 bg-light text-muted fw-bold"
+                                                        onchange="filterByKhoa()">
+                                                        <option value="all">-- Tất cả khoa --</option>
+                                                        <c:forEach var="khoa" items="${khoaList}">
+                                                            <option value="${khoa.maKhoa}" ${khoa.maKhoa==maKhoa
+                                                                 ? 'selected' : '' }>${khoa.tenKhoa}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="d-flex align-items-center gap-2 px-3 py-1 bg-light rounded-pill border">
+                                                        <i class="bi bi-building text-primary small"></i>
+                                                        <span class="fw-bold text-dark small">${khoaList[0].tenKhoa}</span>
+                                                        <input type="hidden" id="khoa-filter" value="${sessionScope.maKhoa}">
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
                                             </div>
                                         </div>
 
@@ -202,9 +214,11 @@
                                                 </thead>
                                                 <tbody id="class-table-body" class="border-top-0">
                                                     <c:forEach var="lop" items="${lopList}">
-                                                        <c:set var="classUrl" value="${pageContext.request.contextPath}/student?maLop=${lop.maLop}" />
+                                                        <c:set var="classUrl"
+                                                            value="${pageContext.request.contextPath}/student?maLop=${lop.maLop}" />
                                                         <c:if test="${not empty maKhoa && maKhoa != 'all'}">
-                                                            <c:set var="classUrl" value="${classUrl}&maKhoa=${maKhoa}" />
+                                                            <c:set var="classUrl"
+                                                                value="${classUrl}&maKhoa=${maKhoa}" />
                                                         </c:if>
                                                         <tr onclick="window.location.href='${classUrl}'"
                                                             style="cursor: pointer; transition: 0.2s;"
@@ -248,12 +262,14 @@
                                                         Danh sách sinh viên - Lớp: <span
                                                             class="text-dark">${maLop}</span>
                                                     </h6>
-                                                    <button
-                                                        class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm"
-                                                        data-bs-toggle="modal" data-bs-target="#studentModal"
-                                                        onclick="resetForm()">
-                                                        <i class="bi bi-person-plus-fill me-1"></i> Cập nhật Sinh viên
-                                                    </button>
+                                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                                        <button
+                                                            class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm"
+                                                            data-bs-toggle="modal" data-bs-target="#studentModal"
+                                                            onclick="resetForm()">
+                                                            <i class="bi bi-person-plus-fill me-1"></i> Cập nhật Sinh viên
+                                                        </button>
+                                                    </c:if>
                                                 </div>
                                                 <div class="card-body px-4 pb-4">
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -286,9 +302,11 @@
                                                                     <th
                                                                         class="border-0 text-center small fw-bold text-muted">
                                                                         TRẠNG THÁI</th>
-                                                                    <th
-                                                                        class="border-0 text-center small fw-bold text-muted">
-                                                                        THAO TÁC</th>
+                                                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                                                        <th
+                                                                            class="border-0 text-center small fw-bold text-muted">
+                                                                            THAO TÁC</th>
+                                                                    </c:if>
                                                                 </tr>
                                                             </thead>
                                                             <tbody id="main-student-table-body">
@@ -339,21 +357,26 @@
                                                                                 </c:otherwise>
                                                                             </c:choose>
                                                                         </td>
-                                                                        <td class="text-center">
-                                                                            <div
-                                                                                class="d-flex gap-2 justify-content-center">
-                                                                                <button type="button"
-                                                                                    onclick="selectStudent('${sv.maSV}', 'edit')"
-                                                                                    class="btn btn-sm btn-outline-primary border-0 rounded-3">
-                                                                                    <i class="bi bi-pencil-square"></i>
-                                                                                </button>
-                                                                                <button type="button"
-                                                                                    onclick="selectStudent('${sv.maSV}', 'delete')"
-                                                                                    class="btn btn-sm btn-outline-danger border-0 rounded-3">
-                                                                                    <i class="bi bi-trash3"></i>
-                                                                                </button>
-                                                                            </div>
-                                                                        </td>
+                                                                        <c:if test="${sessionScope.role == 'PGV'}">
+                                                                            <td class="text-center">
+                                                                                <div
+                                                                                    class="d-flex gap-2 justify-content-center">
+                                                                                    <button type="button"
+                                                                                        onclick="selectStudent('${sv.maSV}', 'edit')"
+                                                                                        class="btn btn-sm btn-outline-primary border-0 rounded-3">
+                                                                                        <i class="bi bi-pencil-square"></i>
+                                                                                    </button>
+                                                                                    <button type="button"
+                                                                                        onclick="selectStudent('${sv.maSV}', 'delete')"
+                                                                                        class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!sv.canDelete ? 'disabled opacity-25' : ''}"
+                                                                                        ${!sv.canDelete
+                                                                                        ? 'disabled title="Sinh viên này không thể xóa do có dữ liệu liên quan"'
+                                                                                        : '' }>
+                                                                                        <i class="bi bi-trash3"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </td>
+                                                                        </c:if>
                                                                     </tr>
                                                                 </c:forEach>
                                                                 <c:if test="${empty sinhVienList}">
@@ -546,7 +569,9 @@
                                                                     </button>
                                                                     <button type="button"
                                                                         onclick="event.stopPropagation(); selectStudent('${sv_item.maSV}', 'delete', true)"
-                                                                        class="btn btn-xs btn-outline-danger border-0 p-1">
+                                                                        class="btn btn-xs btn-outline-danger border-0 p-1 ${!sv_item.canDelete ? 'disabled opacity-25' : ''}"
+                                                                        ${!sv_item.canDelete
+                                                                        ? 'disabled title="Không thể xóa"' : '' }>
                                                                         <i class="bi bi-trash3"></i>
                                                                     </button>
                                                                 </div>
@@ -695,6 +720,7 @@
                     const inputs = ['inp_maSV', 'inp_ho', 'inp_ten', 'inp_phai', 'inp_ngaySinh', 'inp_diaChi', 'dangNghiHoc'];
                     const contextPath = '${pageContext.request.contextPath}';
                     const currentMaLop = '${maLop}';
+                    const sessionRole = '${sessionScope.role}';
 
                     document.addEventListener('DOMContentLoaded', function () {
                         // Khởi tạo trang: Nếu có mã lớp thì tải danh sách
@@ -774,16 +800,16 @@
                             const date = sv.ngaySinh ? new Date(sv.ngaySinh) : null;
                             const ngaySinhStr = date ? (String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear()) : '';
 
-                            const actionBtns = '<div class="d-flex justify-content-center gap-1">' +
+                            const actionBtns = (sessionRole === 'PGV') ? '<div class="d-flex justify-content-center gap-1">' +
                                 '<button type="button" onclick="event.stopPropagation(); selectStudent(\'' + sv.maSV + '\', \'edit\', true)" class="btn ' + (isMini ? 'btn-xs' : 'btn-sm') + ' btn-outline-primary border-0">' +
                                 '<i class="bi bi-pencil-square"></i>' +
                                 '</button>' +
-                                '<button type="button" onclick="event.stopPropagation(); selectStudent(\'' + sv.maSV + '\', \'delete\', true)" class="btn ' + (isMini ? 'btn-xs' : 'btn-sm') + ' btn-outline-danger border-0">' +
+                                '<button type="button" onclick="event.stopPropagation(); selectStudent(\'' + sv.maSV + '\', \'delete\', true)" class="btn ' + (isMini ? 'btn-xs' : 'btn-sm') + ' btn-outline-danger border-0 ' + (!sv.canDelete ? 'disabled opacity-25' : '') + '" ' + (!sv.canDelete ? 'disabled title="Không thể xóa"' : '') + '>' +
                                 '<i class="bi bi-trash3"></i>' +
                                 '</button>' +
-                                '</div>';
+                                '</div>' : '';
 
-                            let rowHtml = '<tr onclick="selectStudent(\'' + sv.maSV + '\', \'edit\', false)" style="cursor: pointer;">' +
+                            let rowHtml = '<tr ' + (sessionRole === 'PGV' ? 'onclick="selectStudent(\'' + sv.maSV + '\', \'edit\', false)"' : '') + ' style="cursor: pointer;">' +
                                 '<td class="px-3"><span class="badge bg-primary bg-opacity-10 text-primary fw-bold">' + (isMini ? sv.maSV.substring(0, 8) : sv.maSV) + '</span></td>' +
                                 '<td>' +
                                 '<div class="fw-bold text-dark small">' + sv.ho + ' ' + sv.ten + '</div>' +
@@ -807,6 +833,7 @@
                     }
 
                     async function selectStudent(maSV, mode, forceMode = false) {
+                        if(sessionRole !== 'PGV') return;
                         try {
                             const response = await fetch(contextPath + '/student/api/get?maSV=' + maSV);
                             const sv = await response.json();
@@ -1029,7 +1056,7 @@
                             const isActive = lop.maLop === currentMaLop;
                             const activeClass = isActive ? 'table-primary shadow-sm' : '';
                             const badgeClass = isActive ? 'bg-primary' : 'bg-primary bg-opacity-10 text-primary';
-                            return '<tr onclick="navigateToClass(\'' + lop.maLop + '\')" style="cursor: pointer; transition: 0.2s;" class="' + activeClass + ' class-row">' +
+                             return '<tr ' + (sessionRole === 'PGV' ? 'onclick="navigateToClass(\'' + lop.maLop + '\')"' : '') + ' style="cursor: pointer; transition: 0.2s;" class="' + activeClass + ' class-row">' +
                                 '<td class="px-3"><span class="badge ' + badgeClass + ' rounded-2 px-3 py-2">' + lop.maLop + '</span></td>' +
                                 '<td class="fw-semibold text-dark">' + lop.tenLop + '</td>' +
                                 '<td class="text-center"><span class="text-muted small fw-bold">' + lop.khoaHoc + '</span></td>' +
