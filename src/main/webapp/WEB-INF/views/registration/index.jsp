@@ -229,16 +229,21 @@
                 
                 // Helper to get registered subjects in a specific semester
                 const getRegisteredSubjects = (nk, hk) => {
+                    const cleanNk = (nk || '').trim().toUpperCase();
+                    const cleanHk = Number(hk);
                     return availableLTCList
-                        .filter(ltc => registeredLTCIds.includes(ltc.maLTC) && ltc.nienKhoa === nk && ltc.hocKy === hk)
+                        .filter(ltc => registeredLTCIds.map(Number).includes(Number(ltc.maLTC)) && 
+                                       (ltc.nienKhoa || '').trim().toUpperCase() === cleanNk && 
+                                       Number(ltc.hocKy) === cleanHk)
                         .map(ltc => (ltc.maMH || '').trim().toUpperCase());
                 };
 
                 const container = document.getElementById('available-ltc-body');
                 container.innerHTML = availableLTCList.map(item => {
-                    const isRegistered = registeredLTCIds.includes(item.maLTC);
+                    const isRegistered = registeredLTCIds.map(Number).includes(Number(item.maLTC));
                     const subjectsInSemester = getRegisteredSubjects(item.nienKhoa, item.hocKy);
-                    const isSameSubjectRegistered = subjectsInSemester.includes((item.maMH || '').trim().toUpperCase());
+                    const cleanMaMH = (item.maMH || '').trim().toUpperCase();
+                    const isSameSubjectRegistered = subjectsInSemester.includes(cleanMaMH);
                     
                     let btnHtml = '';
                     if (isRegistered) {
@@ -285,8 +290,9 @@
             try {
                 const res = await fetch(contextPath + '/registration/api/list');
                 const allReg = await res.json();
-                const myReg = allReg.filter(r => (r.maSV || '').trim().toUpperCase() === maSV.trim().toUpperCase() && !r.huyDangKy);
-                registeredLTCIds = myReg.map(r => r.maLTC);
+                const myReg = allReg.filter(r => (r.maSV || '').trim().toUpperCase() === maSV.trim().toUpperCase() && 
+                                                 !(r.huyDangKy === true || r.huyDangKy === 1 || String(r.huyDangKy) === 'true'));
+                registeredLTCIds = myReg.map(r => Number(r.maLTC));
                 
                 const container = document.getElementById('registered-list');
                 if (myReg.length === 0) {

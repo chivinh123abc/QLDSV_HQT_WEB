@@ -9,14 +9,21 @@
 
             <nav class="sidebar-nav" aria-label="Main Navigation">
                 <ul>
-                    <%-- Dashboard: All except students (or students too if they have one) --%>
-                        <c:if test="${sessionScope.role != 'SINHVIEN'}">
-                            <li>
-                                <a class="nav-link" href="${pageContext.request.contextPath}/index">
-                                    <i class="bi bi-house-door"></i> Bảng điều khiển
-                                </a>
-                            </li>
-                        </c:if>
+                    <%-- Trang chủ: All users --%>
+                    <li>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/index">
+                            <i class="bi bi-house-door"></i> Trang chủ
+                        </a>
+                    </li>
+
+                    <%-- Student Marks: Students only --%>
+                    <c:if test="${sessionScope.role == 'SINHVIEN'}">
+                        <li>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/mark/student">
+                                <i class="bi bi-bookmark-star"></i> Xem điểm
+                            </a>
+                        </li>
+                    </c:if>
 
                         <%-- Student Management & Classes: PGV and KHOA --%>
                             <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">

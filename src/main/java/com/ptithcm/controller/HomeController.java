@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import jakarta.servlet.http.HttpSession;
+import com.ptithcm.entity.SinhVien;
 
 @Controller
 @Transactional
@@ -16,7 +18,21 @@ public class HomeController {
 	private SessionFactory factory;
 
 	@RequestMapping({"/", "/index"})
-	public String index(ModelMap model) {
+	public String index(ModelMap model, HttpSession httpSession) {
+		String role = (String) httpSession.getAttribute("role");
+		if ("SINHVIEN".equals(role)) {
+			Session session = factory.getCurrentSession();
+			SinhVien profile = (SinhVien) httpSession.getAttribute("studentProfile");
+			if (profile != null) {
+				String hqlCount = "SELECT count(dk) FROM DangKy dk WHERE TRIM(dk.maSV) = :maSV AND (dk.huyDangKy = false OR dk.huyDangKy IS NULL)";
+				Long registeredCount = session.createQuery(hqlCount, Long.class)
+						.setParameter("maSV", profile.getMaSV().trim())
+						.uniqueResult();
+				model.addAttribute("registeredCount", registeredCount);
+			}
+			return "index";
+		}
+
 		Session session = factory.getCurrentSession();
 		
 		Long studentCount = session.createQuery("SELECT COUNT(*) FROM SinhVien", Long.class).uniqueResult();
