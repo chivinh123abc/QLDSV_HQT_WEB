@@ -53,12 +53,12 @@ public class DangKyController {
 			if (ltc.isHuyLop()) throw new Exception("Lớp tín chỉ đã bị hủy!");
 
 			// 3. Check Subject Constraint: Cannot register same subject in same semester
-			String hqlSubject = "SELECT count(dk) FROM DangKy dk, LopTinChi ltc_ref " +
-							   "WHERE dk.maLTC = ltc_ref.maLTC " +
-							   "AND upper(trim(dk.maSV)) = upper(trim(:maSV)) " +
+			String hqlSubject = "SELECT count(dk) FROM DangKy dk " +
+							   "JOIN LopTinChi ltc_ref ON dk.maLTC = ltc_ref.maLTC " +
+							   "WHERE upper(trim(dk.maSV)) = upper(trim(:maSV)) " +
 							   "AND dk.huyDangKy = false " +
 							   "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) " +
-							   "AND ltc_ref.nienKhoa = :nk " +
+							   "AND upper(trim(ltc_ref.nienKhoa)) = upper(trim(:nk)) " +
 							   "AND ltc_ref.hocKy = :hk " +
 							   "AND dk.maLTC != :currentMaLTC";
 			Long countSameSubject = session.createQuery(hqlSubject, Long.class)
@@ -133,6 +133,11 @@ public class DangKyController {
 				throw new Exception("Không tìm thấy thông tin đăng ký hoặc đã hủy trước đó!");
 			}
 			
+			// Constraint: Cannot cancel registration if grades have already been inputted
+			if (dk.getDiemCC() != null || dk.getDiemGK() != null || dk.getDiemCK() != null) {
+				throw new Exception("Không thể hủy đăng ký vì lớp tín chỉ này đã được nhập điểm!");
+			}
+			
 			dk.setHuyDangKy(true);
 			session.merge(dk);
 			t.commit();
@@ -173,12 +178,12 @@ public class DangKyController {
 			if (ltc.isHuyLop()) throw new Exception("Lớp tín chỉ đã bị hủy!");
 
 			// Check Subject Constraint
-			String hqlSubject = "SELECT count(dk) FROM DangKy dk, LopTinChi ltc_ref " +
-							   "WHERE dk.maLTC = ltc_ref.maLTC " +
-							   "AND upper(trim(dk.maSV)) = upper(trim(:maSV)) " +
+			String hqlSubject = "SELECT count(dk) FROM DangKy dk " +
+							   "JOIN LopTinChi ltc_ref ON dk.maLTC = ltc_ref.maLTC " +
+							   "WHERE upper(trim(dk.maSV)) = upper(trim(:maSV)) " +
 							   "AND dk.huyDangKy = false " +
 							   "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) " +
-							   "AND ltc_ref.nienKhoa = :nk " +
+							   "AND upper(trim(ltc_ref.nienKhoa)) = upper(trim(:nk)) " +
 							   "AND ltc_ref.hocKy = :hk " +
 							   "AND dk.maLTC != :currentMaLTC";
 			Long countSameSubject = session.createQuery(hqlSubject, Long.class)
@@ -237,6 +242,11 @@ public class DangKyController {
 			DangKy dk = session.get(DangKy.class, id);
 			if (dk == null || dk.isHuyDangKy()) {
 				throw new Exception("Không tìm thấy thông tin đăng ký hoặc đã hủy trước đó!");
+			}
+			
+			// Constraint: Cannot cancel registration if grades have already been inputted
+			if (dk.getDiemCC() != null || dk.getDiemGK() != null || dk.getDiemCK() != null) {
+				throw new Exception("Không thể hủy đăng ký vì lớp tín chỉ này đã được nhập điểm!");
 			}
 			
 			dk.setHuyDangKy(true);

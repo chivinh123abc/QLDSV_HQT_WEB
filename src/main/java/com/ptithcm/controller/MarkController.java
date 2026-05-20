@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ptithcm.entity.DangKy;
-
+import com.ptithcm.entity.SinhVien;
 import com.ptithcm.entity.Khoa;
 import jakarta.servlet.http.HttpSession;
 
@@ -248,5 +248,50 @@ public class MarkController {
             session.close();
         }
         return response;
+    }
+
+    @RequestMapping(value = "/student", method = RequestMethod.GET)
+    public String studentGrades(ModelMap model, HttpSession httpSession) {
+        String role = (String) httpSession.getAttribute("role");
+        if (!"SINHVIEN".equals(role)) {
+            return "redirect:/login";
+        }
+        
+        SinhVien profile = (SinhVien) httpSession.getAttribute("studentProfile");
+        if (profile == null) {
+            return "redirect:/login";
+        }
+        
+        Session session = factory.getCurrentSession();
+        
+        // Fetch all registered marks with pure HQL JOIN (No Stored Procedure!)
+        String hql = "SELECT ltc.nienKhoa, ltc.hocKy, ltc.maMH, mh.tenMH, ltc.nhom, " +
+                     "dk.diemCC, dk.diemGK, dk.diemCK, mh.soTietLT, mh.soTietTH " +
+                     "FROM DangKy dk " +
+                     "JOIN LopTinChi ltc ON dk.maLTC = ltc.maLTC " +
+                     "JOIN MonHoc mh ON ltc.maMH = mh.maMH " +
+                     "WHERE TRIM(dk.maSV) = :maSV AND (dk.huyDangKy = false OR dk.huyDangKy IS NULL) " +
+                     "ORDER BY ltc.nienKhoa DESC, ltc.hocKy DESC, ltc.maMH ASC";
+                     
+        List<Object[]> marksList = session.createQuery(hql, Object[].class)
+                .setParameter("maSV", profile.getMaSV().trim())
+                .list();
+                
+        // Group grades by semester using LinkedHashMap to preserve query sort order
+        java.util.Map<String, List<Object[]>> groupedMarks = new java.util.LinkedHashMap<>();
+        for (Object[] row : marksList) {
+            String nienKhoa = (String) row[0];
+            Integer hocKy = (Integer) row[1];
+            String semesterKey = "Học kỳ " + hocKy + " - Năm học " + nienKhoa;
+            if (!groupedMarks.containsKey(semesterKey)) {
+                groupedMarks.put(semesterKey, new java.util.ArrayList<>());
+            }
+            groupedMarks.get(semesterKey).add(row);
+        }
+                
+        model.addAttribute("groupedMarks", groupedMarks);
+        model.addAttribute("student", profile);
+        
+        return "mark/student";
     }
 }
