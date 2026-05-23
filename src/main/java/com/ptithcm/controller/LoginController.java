@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Transactional
 public class LoginController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(HttpSession session) {
@@ -34,12 +35,8 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String handleLogin(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam("type") String type,
-            HttpSession session,
-            jakarta.servlet.http.HttpServletResponse response,
+    public String handleLogin(@RequestParam("username") String username, @RequestParam("password") String password,
+            @RequestParam("type") String type, HttpSession session, jakarta.servlet.http.HttpServletResponse response,
             ModelMap model) {
         Session hSession = factory.getCurrentSession();
 
@@ -55,11 +52,9 @@ public class LoginController {
 
             // Set persistent cookie to survive server restarts
             try {
-                String cookieValue =
-                        java.util.Base64.getEncoder()
-                                .encodeToString((username + ":" + password).getBytes("UTF-8"));
-                jakarta.servlet.http.Cookie cookie =
-                        new jakarta.servlet.http.Cookie("remember_me", cookieValue);
+                String cookieValue = java.util.Base64.getEncoder()
+                        .encodeToString((username + ":" + password).getBytes("UTF-8"));
+                jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("remember_me", cookieValue);
                 cookie.setMaxAge(30 * 24 * 60 * 60); // 30 days
                 cookie.setPath("/");
                 response.addCookie(cookie);

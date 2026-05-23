@@ -23,15 +23,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/report")
 public class ReportController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping()
     public String index(ModelMap model) {
         Session session = factory.getCurrentSession();
         List<Lop> lopList = session.createQuery("FROM Lop", Lop.class).list();
-        List<String> nienKhoaList =
-                session.createQuery("SELECT DISTINCT ltc.nienKhoa FROM LopTinChi ltc", String.class)
-                        .list();
+        List<String> nienKhoaList = session.createQuery("SELECT DISTINCT ltc.nienKhoa FROM LopTinChi ltc", String.class)
+                .list();
 
         model.addAttribute("lopList", lopList);
         model.addAttribute("nienKhoaList", nienKhoaList);
@@ -74,18 +74,14 @@ public class ReportController {
     @RequestMapping(value = "/credit-class-students", method = RequestMethod.GET)
     @ResponseBody
     @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
-    public Map<String, Object> getCreditClassStudents(
-            @RequestParam("nienKhoa") String nienKhoa,
-            @RequestParam("hocKy") int hocKy,
-            @RequestParam("maMH") String maMH,
-            @RequestParam("nhom") int nhom) {
+    public Map<String, Object> getCreditClassStudents(@RequestParam("nienKhoa") String nienKhoa,
+            @RequestParam("hocKy") int hocKy, @RequestParam("maMH") String maMH, @RequestParam("nhom") int nhom) {
         Map<String, Object> response = new HashMap<>();
         Session session = factory.getCurrentSession();
 
         try {
-            NativeQuery query =
-                    session.createNativeQuery(
-                            "EXEC sp_LayDanhSachSinhVienDangKyLopTinChi :nk, :hk, :mh, :nhom");
+            NativeQuery query = session
+                    .createNativeQuery("EXEC sp_LayDanhSachSinhVienDangKyLopTinChi :nk, :hk, :mh, :nhom");
             query.setParameter("nk", nienKhoa);
             query.setParameter("hk", hocKy);
             query.setParameter("mh", maMH);

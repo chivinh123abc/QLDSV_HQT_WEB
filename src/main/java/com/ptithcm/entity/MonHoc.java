@@ -22,7 +22,8 @@ public class MonHoc {
     @Column(name = "SOTIET_TH")
     private int soTietTH;
 
-    @Transient private boolean canDelete = true;
+    @Transient
+    private boolean canDelete = true;
 
     public String getMaMH() {
         return maMH;

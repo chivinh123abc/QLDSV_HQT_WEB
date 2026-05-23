@@ -25,7 +25,8 @@ public class Users {
     @Column(name = "ROLEID")
     private int roleId;
 
-    @Transient private String selectedId;
+    @Transient
+    private String selectedId;
 
     public int getUserId() {
         return userId;

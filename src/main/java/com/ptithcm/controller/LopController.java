@@ -24,12 +24,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/class")
 public class LopController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping()
-    public String index(
-            ModelMap model,
-            @RequestParam(value = "maKhoa", required = false) String maKhoa,
+    public String index(ModelMap model, @RequestParam(value = "maKhoa", required = false) String maKhoa,
             HttpSession httpSession) {
         Session session = factory.getCurrentSession();
 
@@ -40,24 +39,17 @@ public class LopController {
 
         if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
             maKhoa = sessionMaKhoa;
-            khoaList =
-                    khoaList.stream()
-                            .filter(k -> k.getMaKhoa().equals(sessionMaKhoa))
-                            .collect(Collectors.toList());
+            khoaList = khoaList.stream().filter(k -> k.getMaKhoa().equals(sessionMaKhoa)).collect(Collectors.toList());
         }
 
         List<Lop> lopList;
         if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
-            lopList =
-                    session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-                            .setParameter("maKhoa", sessionMaKhoa)
-                            .list();
+            lopList = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
+                    .setParameter("maKhoa", sessionMaKhoa).list();
             maKhoa = sessionMaKhoa;
         } else if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) {
-            lopList =
-                    session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-                            .setParameter("maKhoa", maKhoa)
-                            .list();
+            lopList = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class).setParameter("maKhoa", maKhoa)
+                    .list();
         } else {
             lopList = session.createQuery("FROM Lop", Lop.class).list();
         }
@@ -80,8 +72,7 @@ public class LopController {
 
     @RequestMapping(value = "/api/list", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public List<Lop> listClasses(
-            @RequestParam(value = "maKhoa", required = false) String maKhoa,
+    public List<Lop> listClasses(@RequestParam(value = "maKhoa", required = false) String maKhoa,
             HttpSession httpSession) {
         Session session = factory.getCurrentSession();
 
@@ -94,40 +85,38 @@ public class LopController {
 
         List<Lop> list;
         if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
-            list =
-                    session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-                            .setParameter("maKhoa", sessionMaKhoa)
-                            .list();
+            list = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
+                    .setParameter("maKhoa", sessionMaKhoa).list();
         } else if (maKhoa == null || maKhoa.isEmpty() || maKhoa.equals("all")) {
             list = session.createQuery("FROM Lop", Lop.class).list();
         } else {
-            list =
-                    session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-                            .setParameter("maKhoa", maKhoa)
-                            .list();
+            list = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class).setParameter("maKhoa", maKhoa)
+                    .list();
         }
         populateCanDelete(session, list);
         return list;
     }
 
     private void populateCanDelete(Session session, List<Lop> list) {
-        if (list.isEmpty()) return;
+        if (list.isEmpty())
+            return;
 
         // Check for students in class
-        List<String> lopWithSV =
-                session.createQuery("SELECT distinct trim(maLop) FROM SinhVien", String.class)
-                        .list();
+        List<String> lopWithSV = session.createQuery("SELECT distinct trim(maLop) FROM SinhVien", String.class).list();
 
         // Check for registrations from students of the class
-        List<String> lopWithReg =
-                session.createQuery(
-                                "SELECT distinct trim(sv.maLop) FROM DangKy dk JOIN SinhVien sv ON dk.maSV = sv.maSV",
-                                String.class)
-                        .list();
+        List<String> lopWithReg = session
+                .createQuery("SELECT distinct trim(sv.maLop) FROM DangKy dk JOIN SinhVien sv ON dk.maSV = sv.maSV",
+                        String.class)
+                .list();
 
         java.util.Set<String> dependentIds = new java.util.HashSet<>();
-        for (String id : lopWithSV) if (id != null) dependentIds.add(id.trim().toUpperCase());
-        for (String id : lopWithReg) if (id != null) dependentIds.add(id.trim().toUpperCase());
+        for (String id : lopWithSV)
+            if (id != null)
+                dependentIds.add(id.trim().toUpperCase());
+        for (String id : lopWithReg)
+            if (id != null)
+                dependentIds.add(id.trim().toUpperCase());
 
         for (Lop lop : list) {
             String trimmed = lop.getMaLop() != null ? lop.getMaLop().trim().toUpperCase() : "";
@@ -161,7 +150,8 @@ public class LopController {
             t.commit();
             res.put("status", "success");
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             res.put("status", "error");
             res.put("message", "Lỗi: " + e.getMessage());
         } finally {
@@ -170,10 +160,7 @@ public class LopController {
         return res;
     }
 
-    @RequestMapping(
-            value = "/api/delete",
-            method = RequestMethod.POST,
-            produces = "application/json")
+    @RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public Map<String, Object> deleteClass(@RequestParam("maLop") String maLop) {
         Map<String, Object> res = new HashMap<>();
@@ -181,27 +168,18 @@ public class LopController {
         org.hibernate.Transaction t = session.beginTransaction();
         try {
             // Check dependencies: SINHVIEN
-            Long svCount =
-                    session.createQuery(
-                                    "SELECT COUNT(*) FROM SinhVien WHERE maLop = :maLop",
-                                    Long.class)
-                            .setParameter("maLop", maLop)
-                            .uniqueResult();
+            Long svCount = session.createQuery("SELECT COUNT(*) FROM SinhVien WHERE maLop = :maLop", Long.class)
+                    .setParameter("maLop", maLop).uniqueResult();
 
             if (svCount > 0) {
                 // Also check if they have registrations for a better error message
-                Long regCount =
-                        session.createQuery(
-                                        "SELECT COUNT(dk) FROM DangKy dk JOIN SinhVien sv ON dk.maSV = sv.maSV WHERE sv.maLop = :maLop",
-                                        Long.class)
-                                .setParameter("maLop", maLop)
-                                .uniqueResult();
+                Long regCount = session.createQuery(
+                        "SELECT COUNT(dk) FROM DangKy dk JOIN SinhVien sv ON dk.maSV = sv.maSV WHERE sv.maLop = :maLop",
+                        Long.class).setParameter("maLop", maLop).uniqueResult();
 
                 if (regCount > 0) {
                     res.put("status", "error");
-                    res.put(
-                            "message",
-                            "Không thể xóa: Lớp đã có " + regCount + " lượt đăng ký lớp tín chỉ!");
+                    res.put("message", "Không thể xóa: Lớp đã có " + regCount + " lượt đăng ký lớp tín chỉ!");
                     return res;
                 }
 
@@ -220,7 +198,8 @@ public class LopController {
                 res.put("message", "Không tìm thấy lớp để xóa!");
             }
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             res.put("status", "error");
             res.put("message", "Lỗi: " + e.getMessage());
         } finally {

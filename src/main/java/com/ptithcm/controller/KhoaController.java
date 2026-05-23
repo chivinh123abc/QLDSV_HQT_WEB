@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/faculty")
 public class KhoaController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping()
     public String index(ModelMap model) {
@@ -65,7 +66,8 @@ public class KhoaController {
             t.commit();
             res.put("status", "success");
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             res.put("status", "error");
             res.put("message", "Lỗi: " + e.getMessage());
         } finally {
@@ -74,10 +76,7 @@ public class KhoaController {
         return res;
     }
 
-    @RequestMapping(
-            value = "/api/delete",
-            method = RequestMethod.POST,
-            produces = "application/json")
+    @RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public Map<String, Object> deleteKhoa(@RequestParam("maKhoa") String maKhoa) {
         Map<String, Object> res = new HashMap<>();
@@ -85,11 +84,8 @@ public class KhoaController {
         org.hibernate.Transaction t = session.beginTransaction();
         try {
             // Check dependencies in LOP
-            Long lopCount =
-                    session.createQuery(
-                                    "SELECT COUNT(*) FROM Lop WHERE maKhoa = :maKhoa", Long.class)
-                            .setParameter("maKhoa", maKhoa)
-                            .uniqueResult();
+            Long lopCount = session.createQuery("SELECT COUNT(*) FROM Lop WHERE maKhoa = :maKhoa", Long.class)
+                    .setParameter("maKhoa", maKhoa).uniqueResult();
             if (lopCount > 0) {
                 res.put("status", "error");
                 res.put("message", "Không thể xóa: Khoa đang có " + lopCount + " lớp!");
@@ -97,12 +93,8 @@ public class KhoaController {
             }
 
             // Check dependencies in GIANGVIEN
-            Long gvCount =
-                    session.createQuery(
-                                    "SELECT COUNT(*) FROM GiangVien WHERE maKhoa = :maKhoa",
-                                    Long.class)
-                            .setParameter("maKhoa", maKhoa)
-                            .uniqueResult();
+            Long gvCount = session.createQuery("SELECT COUNT(*) FROM GiangVien WHERE maKhoa = :maKhoa", Long.class)
+                    .setParameter("maKhoa", maKhoa).uniqueResult();
             if (gvCount > 0) {
                 res.put("status", "error");
                 res.put("message", "Không thể xóa: Khoa đang có " + gvCount + " giảng viên!");
@@ -110,12 +102,8 @@ public class KhoaController {
             }
 
             // Check dependencies in LOPTINCHI
-            Long ltcCount =
-                    session.createQuery(
-                                    "SELECT COUNT(*) FROM LopTinChi WHERE maKhoa = :maKhoa",
-                                    Long.class)
-                            .setParameter("maKhoa", maKhoa)
-                            .uniqueResult();
+            Long ltcCount = session.createQuery("SELECT COUNT(*) FROM LopTinChi WHERE maKhoa = :maKhoa", Long.class)
+                    .setParameter("maKhoa", maKhoa).uniqueResult();
             if (ltcCount > 0) {
                 res.put("status", "error");
                 res.put("message", "Không thể xóa: Khoa đang mở " + ltcCount + " lớp tín chỉ!");
@@ -132,7 +120,8 @@ public class KhoaController {
                 res.put("message", "Không tìm thấy khoa để xóa!");
             }
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             res.put("status", "error");
             res.put("message", "Lỗi: " + e.getMessage());
         } finally {
@@ -142,20 +131,24 @@ public class KhoaController {
     }
 
     private void populateCanDelete(Session session, List<Khoa> list) {
-        if (list.isEmpty()) return;
-        List<String> khoaWithLop =
-                session.createQuery("SELECT distinct trim(maKhoa) FROM Lop", String.class).list();
-        List<String> khoaWithGV =
-                session.createQuery("SELECT distinct trim(maKhoa) FROM GiangVien", String.class)
-                        .list();
-        List<String> khoaWithLTC =
-                session.createQuery("SELECT distinct trim(maKhoa) FROM LopTinChi", String.class)
-                        .list();
+        if (list.isEmpty())
+            return;
+        List<String> khoaWithLop = session.createQuery("SELECT distinct trim(maKhoa) FROM Lop", String.class).list();
+        List<String> khoaWithGV = session.createQuery("SELECT distinct trim(maKhoa) FROM GiangVien", String.class)
+                .list();
+        List<String> khoaWithLTC = session.createQuery("SELECT distinct trim(maKhoa) FROM LopTinChi", String.class)
+                .list();
 
         java.util.Set<String> dependentIds = new java.util.HashSet<>();
-        for (String id : khoaWithLop) if (id != null) dependentIds.add(id.trim().toUpperCase());
-        for (String id : khoaWithGV) if (id != null) dependentIds.add(id.trim().toUpperCase());
-        for (String id : khoaWithLTC) if (id != null) dependentIds.add(id.trim().toUpperCase());
+        for (String id : khoaWithLop)
+            if (id != null)
+                dependentIds.add(id.trim().toUpperCase());
+        for (String id : khoaWithGV)
+            if (id != null)
+                dependentIds.add(id.trim().toUpperCase());
+        for (String id : khoaWithLTC)
+            if (id != null)
+                dependentIds.add(id.trim().toUpperCase());
 
         for (Khoa k : list) {
             String trimmed = k.getMaKhoa() != null ? k.getMaKhoa().trim().toUpperCase() : "";

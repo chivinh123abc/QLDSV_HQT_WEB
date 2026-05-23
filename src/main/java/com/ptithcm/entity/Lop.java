@@ -22,7 +22,8 @@ public class Lop {
     @Column(name = "MAKHOA")
     private String maKhoa;
 
-    @Transient private boolean canDelete = true;
+    @Transient
+    private boolean canDelete = true;
 
     public String getMaLop() {
         return maLop;

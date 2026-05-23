@@ -11,16 +11,17 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 public class AuthInterceptor implements HandlerInterceptor {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @Override
-    public boolean preHandle(
-            HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull Object handler) throws Exception {
         HttpSession session = request.getSession();
 
         // Try to restore session from cookie if null
@@ -30,9 +31,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 for (Cookie cookie : cookies) {
                     if ("remember_me".equals(cookie.getName())) {
                         try {
-                            String decoded =
-                                    new String(
-                                            Base64.getDecoder().decode(cookie.getValue()), "UTF-8");
+                            String decoded = new String(Base64.getDecoder().decode(cookie.getValue()), "UTF-8");
                             String[] parts = decoded.split(":");
                             if (parts.length == 2 && factory != null) {
                                 String username = parts[0];
@@ -40,8 +39,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
                                 Session hSession = factory.openSession();
                                 try {
-                                    String hql =
-                                            "FROM Users WHERE username = :username AND password = :password";
+                                    String hql = "FROM Users WHERE username = :username AND password = :password";
                                     Query<Users> query = hSession.createQuery(hql, Users.class);
                                     query.setParameter("username", username);
                                     query.setParameter("password", password);
@@ -56,8 +54,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                                         else if (user.getRoleId() == 3) {
                                             session.setAttribute("role", "SINHVIEN");
                                             String svHql = "FROM SinhVien WHERE TRIM(maSV) = :maSV";
-                                            Query<SinhVien> svQuery =
-                                                    hSession.createQuery(svHql, SinhVien.class);
+                                            Query<SinhVien> svQuery = hSession.createQuery(svHql, SinhVien.class);
                                             svQuery.setParameter("maSV", user.getUsername());
                                             SinhVien svProfile = svQuery.uniqueResult();
                                             if (svProfile != null)

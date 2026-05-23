@@ -31,7 +31,8 @@ public class GiangVien {
     @Column(name = "CHUYENMON")
     private String chuyenMon;
 
-    @Transient private boolean canDelete = true;
+    @Transient
+    private boolean canDelete = true;
 
     public String getMaGV() {
         return maGV;

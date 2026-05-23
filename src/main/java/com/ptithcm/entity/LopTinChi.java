@@ -37,7 +37,8 @@ public class LopTinChi {
     @Column(name = "HUYLOP")
     private boolean huyLop;
 
-    @Transient private boolean canDelete = true;
+    @Transient
+    private boolean canDelete = true;
 
     public int getMaLTC() {
         return maLTC;

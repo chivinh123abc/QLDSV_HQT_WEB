@@ -27,14 +27,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/student")
 public class SinhVienController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping()
-    public String index(
-            ModelMap model,
-            @RequestParam(value = "maLop", required = false) String maLop,
-            @RequestParam(value = "maKhoa", required = false) String maKhoa,
-            HttpSession httpSession) {
+    public String index(ModelMap model, @RequestParam(value = "maLop", required = false) String maLop,
+            @RequestParam(value = "maKhoa", required = false) String maKhoa, HttpSession httpSession) {
         Session session = factory.getCurrentSession();
 
         String sessionRole = (String) httpSession.getAttribute("role");
@@ -45,33 +43,25 @@ public class SinhVienController {
 
         if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
             maKhoa = sessionMaKhoa;
-            khoaList =
-                    khoaList.stream()
-                            .filter(k -> k.getMaKhoa().equals(sessionMaKhoa))
-                            .collect(Collectors.toList());
+            khoaList = khoaList.stream().filter(k -> k.getMaKhoa().equals(sessionMaKhoa)).collect(Collectors.toList());
         }
 
         // Fetch Classes (Filter if maKhoa is provided)
         List<Lop> lopList;
         if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
-            lopList =
-                    session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-                            .setParameter("maKhoa", sessionMaKhoa)
-                            .list();
+            lopList = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
+                    .setParameter("maKhoa", sessionMaKhoa).list();
             maKhoa = sessionMaKhoa;
         } else if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all")) {
-            lopList =
-                    session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-                            .setParameter("maKhoa", maKhoa)
-                            .list();
+            lopList = session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class).setParameter("maKhoa", maKhoa)
+                    .list();
         } else {
             lopList = session.createQuery("FROM Lop", Lop.class).list();
         }
 
         List<SinhVien> filteredList = new ArrayList<>();
         if (maLop != null && !maLop.isEmpty()) {
-            Query<SinhVien> querySV =
-                    session.createQuery("FROM SinhVien WHERE maLop = :maLop", SinhVien.class);
+            Query<SinhVien> querySV = session.createQuery("FROM SinhVien WHERE maLop = :maLop", SinhVien.class);
             querySV.setParameter("maLop", maLop);
             filteredList = querySV.list();
         }
@@ -115,15 +105,13 @@ public class SinhVienController {
     }
 
     @RequestMapping(params = "btnDelete")
-    public String delete(
-            ModelMap model,
-            @RequestParam("maSV") String maSV,
-            @RequestParam("maLop") String maLop) {
+    public String delete(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop) {
         Session session = factory.openSession();
         org.hibernate.Transaction t = session.beginTransaction();
         try {
             SinhVien sv = session.get(SinhVien.class, maSV);
-            if (sv != null) session.remove(sv);
+            if (sv != null)
+                session.remove(sv);
             t.commit();
         } catch (Exception e) {
             t.rollback();
@@ -134,10 +122,7 @@ public class SinhVienController {
     }
 
     @RequestMapping(params = "lnkEdit")
-    public String edit(
-            ModelMap model,
-            @RequestParam("maSV") String maSV,
-            @RequestParam("maLop") String maLop,
+    public String edit(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop,
             HttpSession httpSession) {
         Session session = factory.getCurrentSession();
         SinhVien sv = session.get(SinhVien.class, maSV);
@@ -146,10 +131,7 @@ public class SinhVienController {
     }
 
     @RequestMapping(params = "lnkDelete")
-    public String deleteInit(
-            ModelMap model,
-            @RequestParam("maSV") String maSV,
-            @RequestParam("maLop") String maLop,
+    public String deleteInit(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop,
             HttpSession httpSession) {
         Session session = factory.getCurrentSession();
         SinhVien sv = session.get(SinhVien.class, maSV);
@@ -170,16 +152,14 @@ public class SinhVienController {
     @ResponseBody
     public List<SinhVien> listStudents(@RequestParam("maLop") String maLop) {
         Session session = factory.getCurrentSession();
-        Query<SinhVien> query =
-                session.createQuery("FROM SinhVien WHERE maLop = :maLop", SinhVien.class);
+        Query<SinhVien> query = session.createQuery("FROM SinhVien WHERE maLop = :maLop", SinhVien.class);
         query.setParameter("maLop", maLop);
         return query.list();
     }
 
     @RequestMapping(value = "/api/save", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> saveStudent(
-            @RequestBody SinhVien sv, @RequestParam("mode") String mode) {
+    public Map<String, Object> saveStudent(@RequestBody SinhVien sv, @RequestParam("mode") String mode) {
         Map<String, Object> res = new HashMap<>();
         Session session = factory.openSession();
         org.hibernate.Transaction t = session.beginTransaction();
@@ -204,7 +184,8 @@ public class SinhVienController {
             t.commit();
             res.put("status", "success");
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             res.put("status", "error");
             res.put("message", "Lỗi: " + e.getMessage());
         } finally {
@@ -213,10 +194,7 @@ public class SinhVienController {
         return res;
     }
 
-    @RequestMapping(
-            value = "/api/delete",
-            method = RequestMethod.POST,
-            produces = "application/json")
+    @RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public Map<String, Object> deleteStudent(@RequestParam("maSV") String maSV) {
         Map<String, Object> res = new HashMap<>();
@@ -224,17 +202,12 @@ public class SinhVienController {
         org.hibernate.Transaction t = session.beginTransaction();
         try {
             // Check dependencies: DANGKY
-            Long count =
-                    session.createQuery(
-                                    "SELECT COUNT(*) FROM DangKy WHERE maSV = :maSV", Long.class)
-                            .setParameter("maSV", maSV)
-                            .uniqueResult();
+            Long count = session.createQuery("SELECT COUNT(*) FROM DangKy WHERE maSV = :maSV", Long.class)
+                    .setParameter("maSV", maSV).uniqueResult();
 
             if (count > 0) {
                 res.put("status", "error");
-                res.put(
-                        "message",
-                        "Không thể xóa: Sinh viên đã có " + count + " bản ghi đăng ký môn học!");
+                res.put("message", "Không thể xóa: Sinh viên đã có " + count + " bản ghi đăng ký môn học!");
                 return res;
             }
 
@@ -248,7 +221,8 @@ public class SinhVienController {
                 res.put("message", "Không tìm thấy sinh viên để xóa!");
             }
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             res.put("status", "error");
             res.put("message", "Lỗi: " + e.getMessage());
         } finally {
@@ -257,13 +231,9 @@ public class SinhVienController {
         return res;
     }
 
-    @RequestMapping(
-            value = "/api/classes",
-            method = RequestMethod.GET,
-            produces = "application/json")
+    @RequestMapping(value = "/api/classes", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public List<Lop> listClasses(
-            @RequestParam(value = "maKhoa", required = false) String maKhoa,
+    public List<Lop> listClasses(@RequestParam(value = "maKhoa", required = false) String maKhoa,
             HttpSession httpSession) {
         Session session = factory.getCurrentSession();
 
@@ -277,8 +247,6 @@ public class SinhVienController {
         if (maKhoa == null || maKhoa.isEmpty() || maKhoa.equals("all")) {
             return session.createQuery("FROM Lop", Lop.class).list();
         }
-        return session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class)
-                .setParameter("maKhoa", maKhoa)
-                .list();
+        return session.createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class).setParameter("maKhoa", maKhoa).list();
     }
 }

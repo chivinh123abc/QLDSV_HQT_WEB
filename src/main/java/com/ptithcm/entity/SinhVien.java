@@ -43,7 +43,8 @@ public class SinhVien {
     @Column(name = "PASSWORD")
     private String password;
 
-    @Transient private boolean canDelete = true;
+    @Transient
+    private boolean canDelete = true;
 
     public String getMaSV() {
         return maSV;

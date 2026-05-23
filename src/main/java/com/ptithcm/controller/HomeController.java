@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Transactional
 public class HomeController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping({"/", "/index"})
     public String index(ModelMap model, HttpSession httpSession) {
@@ -23,12 +24,9 @@ public class HomeController {
             Session session = factory.getCurrentSession();
             SinhVien profile = (SinhVien) httpSession.getAttribute("studentProfile");
             if (profile != null) {
-                String hqlCount =
-                        "SELECT count(dk) FROM DangKy dk WHERE TRIM(dk.maSV) = :maSV AND (dk.huyDangKy = false OR dk.huyDangKy IS NULL)";
-                Long registeredCount =
-                        session.createQuery(hqlCount, Long.class)
-                                .setParameter("maSV", profile.getMaSV().trim())
-                                .uniqueResult();
+                String hqlCount = "SELECT count(dk) FROM DangKy dk WHERE TRIM(dk.maSV) = :maSV AND (dk.huyDangKy = false OR dk.huyDangKy IS NULL)";
+                Long registeredCount = session.createQuery(hqlCount, Long.class)
+                        .setParameter("maSV", profile.getMaSV().trim()).uniqueResult();
                 model.addAttribute("registeredCount", registeredCount);
             }
             return "index";
@@ -36,14 +34,10 @@ public class HomeController {
 
         Session session = factory.getCurrentSession();
 
-        Long studentCount =
-                session.createQuery("SELECT COUNT(*) FROM SinhVien", Long.class).uniqueResult();
-        Long classCount =
-                session.createQuery("SELECT COUNT(*) FROM Lop", Long.class).uniqueResult();
-        Long subjectCount =
-                session.createQuery("SELECT COUNT(*) FROM MonHoc", Long.class).uniqueResult();
-        Long creditClassCount =
-                session.createQuery("SELECT COUNT(*) FROM LopTinChi", Long.class).uniqueResult();
+        Long studentCount = session.createQuery("SELECT COUNT(*) FROM SinhVien", Long.class).uniqueResult();
+        Long classCount = session.createQuery("SELECT COUNT(*) FROM Lop", Long.class).uniqueResult();
+        Long subjectCount = session.createQuery("SELECT COUNT(*) FROM MonHoc", Long.class).uniqueResult();
+        Long creditClassCount = session.createQuery("SELECT COUNT(*) FROM LopTinChi", Long.class).uniqueResult();
 
         model.addAttribute("studentCount", studentCount);
         model.addAttribute("classCount", classCount);

@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/registration")
 public class DangKyController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping()
     public String index(ModelMap model) {
@@ -34,46 +35,38 @@ public class DangKyController {
     }
 
     @RequestMapping(params = "btnInsert")
-    public String insert(
-            ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public String insert(ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
         Session session = factory.openSession();
         org.hibernate.Transaction t = session.beginTransaction();
         try {
             // 1. Check Student
             SinhVien sv = session.get(SinhVien.class, maSV);
-            if (sv == null) throw new Exception("Sinh viên không tồn tại!");
+            if (sv == null)
+                throw new Exception("Sinh viên không tồn tại!");
             if (sv.isDangNghiHoc())
                 throw new Exception("Sinh viên đang trong trạng thái nghỉ học!");
 
             // 2. Check Class
             LopTinChi ltc = session.get(LopTinChi.class, maLTC);
-            if (ltc == null) throw new Exception("Lớp tín chỉ không tồn tại!");
-            if (ltc.isHuyLop()) throw new Exception("Lớp tín chỉ đã bị hủy!");
+            if (ltc == null)
+                throw new Exception("Lớp tín chỉ không tồn tại!");
+            if (ltc.isHuyLop())
+                throw new Exception("Lớp tín chỉ đã bị hủy!");
 
             // 3. Check Subject Constraint: Cannot register same subject in same semester
-            String hqlSubject =
-                    "SELECT count(dk) FROM DangKy dk "
-                            + "JOIN LopTinChi ltc_ref ON dk.maLTC = ltc_ref.maLTC "
-                            + "WHERE upper(trim(dk.maSV)) = upper(trim(:maSV)) "
-                            + "AND dk.huyDangKy = false "
-                            + "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) "
-                            + "AND upper(trim(ltc_ref.nienKhoa)) = upper(trim(:nk)) "
-                            + "AND ltc_ref.hocKy = :hk "
-                            + "AND dk.maLTC != :currentMaLTC";
-            Long countSameSubject =
-                    session.createQuery(hqlSubject, Long.class)
-                            .setParameter("maSV", maSV)
-                            .setParameter("maMH", ltc.getMaMH())
-                            .setParameter("nk", ltc.getNienKhoa())
-                            .setParameter("hk", ltc.getHocKy())
-                            .setParameter("currentMaLTC", maLTC)
-                            .uniqueResult();
+            String hqlSubject = "SELECT count(dk) FROM DangKy dk "
+                    + "JOIN LopTinChi ltc_ref ON dk.maLTC = ltc_ref.maLTC "
+                    + "WHERE upper(trim(dk.maSV)) = upper(trim(:maSV)) " + "AND dk.huyDangKy = false "
+                    + "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) "
+                    + "AND upper(trim(ltc_ref.nienKhoa)) = upper(trim(:nk)) " + "AND ltc_ref.hocKy = :hk "
+                    + "AND dk.maLTC != :currentMaLTC";
+            Long countSameSubject = session.createQuery(hqlSubject, Long.class).setParameter("maSV", maSV)
+                    .setParameter("maMH", ltc.getMaMH()).setParameter("nk", ltc.getNienKhoa())
+                    .setParameter("hk", ltc.getHocKy()).setParameter("currentMaLTC", maLTC).uniqueResult();
 
             if (countSameSubject > 0) {
-                throw new Exception(
-                        "Sinh viên đã đăng ký môn học này ("
-                                + ltc.getMaMH().trim().toUpperCase()
-                                + ") trong học kỳ này rồi!");
+                throw new Exception("Sinh viên đã đăng ký môn học này (" + ltc.getMaMH().trim().toUpperCase()
+                        + ") trong học kỳ này rồi!");
             }
 
             // 4. Check Registration
@@ -100,7 +93,8 @@ public class DangKyController {
         } catch (Exception e) {
             t.rollback();
             String errorMsg = e.getMessage();
-            if (e.getCause() != null) errorMsg = e.getCause().getMessage();
+            if (e.getCause() != null)
+                errorMsg = e.getCause().getMessage();
             model.addAttribute("message", "Lỗi: " + errorMsg);
         } finally {
             session.close();
@@ -126,8 +120,7 @@ public class DangKyController {
     }
 
     @RequestMapping(params = "btnDelete")
-    public String delete(
-            ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public String delete(ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
         Session session = factory.openSession();
         org.hibernate.Transaction t = session.beginTransaction();
         try {
@@ -149,7 +142,8 @@ public class DangKyController {
         } catch (Exception e) {
             t.rollback();
             String errorMsg = e.getMessage();
-            if (e.getCause() != null) errorMsg = e.getCause().getMessage();
+            if (e.getCause() != null)
+                errorMsg = e.getCause().getMessage();
             model.addAttribute("message", "Lỗi: " + errorMsg);
         } finally {
             session.close();
@@ -166,50 +160,39 @@ public class DangKyController {
         return session.createQuery("FROM DangKy", DangKy.class).list();
     }
 
-    @RequestMapping(
-            value = "/api/register",
-            method = RequestMethod.POST,
-            produces = "application/json")
+    @RequestMapping(value = "/api/register", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> apiRegister(
-            @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public Map<String, Object> apiRegister(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
         Map<String, Object> res = new HashMap<>();
         Session session = factory.openSession();
         org.hibernate.Transaction t = session.beginTransaction();
         try {
             SinhVien sv = session.get(SinhVien.class, maSV);
-            if (sv == null) throw new Exception("Sinh viên không tồn tại!");
+            if (sv == null)
+                throw new Exception("Sinh viên không tồn tại!");
             if (sv.isDangNghiHoc())
                 throw new Exception("Sinh viên đang trong trạng thái nghỉ học!");
 
             LopTinChi ltc = session.get(LopTinChi.class, maLTC);
-            if (ltc == null) throw new Exception("Lớp tín chỉ không tồn tại!");
-            if (ltc.isHuyLop()) throw new Exception("Lớp tín chỉ đã bị hủy!");
+            if (ltc == null)
+                throw new Exception("Lớp tín chỉ không tồn tại!");
+            if (ltc.isHuyLop())
+                throw new Exception("Lớp tín chỉ đã bị hủy!");
 
             // Check Subject Constraint
-            String hqlSubject =
-                    "SELECT count(dk) FROM DangKy dk "
-                            + "JOIN LopTinChi ltc_ref ON dk.maLTC = ltc_ref.maLTC "
-                            + "WHERE upper(trim(dk.maSV)) = upper(trim(:maSV)) "
-                            + "AND dk.huyDangKy = false "
-                            + "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) "
-                            + "AND upper(trim(ltc_ref.nienKhoa)) = upper(trim(:nk)) "
-                            + "AND ltc_ref.hocKy = :hk "
-                            + "AND dk.maLTC != :currentMaLTC";
-            Long countSameSubject =
-                    session.createQuery(hqlSubject, Long.class)
-                            .setParameter("maSV", maSV)
-                            .setParameter("maMH", ltc.getMaMH())
-                            .setParameter("nk", ltc.getNienKhoa())
-                            .setParameter("hk", ltc.getHocKy())
-                            .setParameter("currentMaLTC", maLTC)
-                            .uniqueResult();
+            String hqlSubject = "SELECT count(dk) FROM DangKy dk "
+                    + "JOIN LopTinChi ltc_ref ON dk.maLTC = ltc_ref.maLTC "
+                    + "WHERE upper(trim(dk.maSV)) = upper(trim(:maSV)) " + "AND dk.huyDangKy = false "
+                    + "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) "
+                    + "AND upper(trim(ltc_ref.nienKhoa)) = upper(trim(:nk)) " + "AND ltc_ref.hocKy = :hk "
+                    + "AND dk.maLTC != :currentMaLTC";
+            Long countSameSubject = session.createQuery(hqlSubject, Long.class).setParameter("maSV", maSV)
+                    .setParameter("maMH", ltc.getMaMH()).setParameter("nk", ltc.getNienKhoa())
+                    .setParameter("hk", ltc.getHocKy()).setParameter("currentMaLTC", maLTC).uniqueResult();
 
             if (countSameSubject > 0) {
-                throw new Exception(
-                        "Sinh viên đã đăng ký môn học này ("
-                                + ltc.getMaMH().trim().toUpperCase()
-                                + ") trong học kỳ này rồi!");
+                throw new Exception("Sinh viên đã đăng ký môn học này (" + ltc.getMaMH().trim().toUpperCase()
+                        + ") trong học kỳ này rồi!");
             }
 
             DangKyId id = new DangKyId(maLTC, maSV);
@@ -234,9 +217,11 @@ public class DangKyController {
             res.put("status", "success");
             res.put("message", "Đăng ký thành công!");
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             String errorMsg = e.getMessage();
-            if (e.getCause() != null) errorMsg = e.getCause().getMessage();
+            if (e.getCause() != null)
+                errorMsg = e.getCause().getMessage();
             res.put("status", "error");
             res.put("message", "Lỗi: " + errorMsg);
         } finally {
@@ -245,13 +230,9 @@ public class DangKyController {
         return res;
     }
 
-    @RequestMapping(
-            value = "/api/cancel",
-            method = RequestMethod.POST,
-            produces = "application/json")
+    @RequestMapping(value = "/api/cancel", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> apiCancel(
-            @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public Map<String, Object> apiCancel(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
         Map<String, Object> res = new HashMap<>();
         Session session = factory.openSession();
         org.hibernate.Transaction t = session.beginTransaction();
@@ -273,9 +254,11 @@ public class DangKyController {
             res.put("status", "success");
             res.put("message", "Đã hủy đăng ký thành công!");
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             String errorMsg = e.getMessage();
-            if (e.getCause() != null) errorMsg = e.getCause().getMessage();
+            if (e.getCause() != null)
+                errorMsg = e.getCause().getMessage();
             res.put("status", "error");
             res.put("message", "Lỗi: " + errorMsg);
         } finally {
@@ -284,10 +267,7 @@ public class DangKyController {
         return res;
     }
 
-    @RequestMapping(
-            value = "/api/available-classes",
-            method = RequestMethod.GET,
-            produces = "application/json")
+    @RequestMapping(value = "/api/available-classes", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<LopTinChi> availableClasses() {
         Session session = factory.getCurrentSession();

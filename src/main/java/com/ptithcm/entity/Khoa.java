@@ -16,7 +16,8 @@ public class Khoa {
     @Column(name = "TENKHOA")
     private String tenKhoa;
 
-    @Transient private boolean canDelete = true;
+    @Transient
+    private boolean canDelete = true;
 
     public String getMaKhoa() {
         return maKhoa;

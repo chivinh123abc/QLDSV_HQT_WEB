@@ -25,7 +25,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/mark")
 public class MarkController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping()
     public String index(ModelMap model, HttpSession httpSession) {
@@ -35,18 +36,15 @@ public class MarkController {
         String sessionMaKhoa = (String) httpSession.getAttribute("maKhoa");
 
         // Get unique School Years
-        List<String> nienKhoaList =
-                session.createQuery("SELECT DISTINCT ltc.nienKhoa FROM LopTinChi ltc", String.class)
-                        .list();
+        List<String> nienKhoaList = session.createQuery("SELECT DISTINCT ltc.nienKhoa FROM LopTinChi ltc", String.class)
+                .list();
         model.addAttribute("nienKhoaList", nienKhoaList);
 
         // Get Faculty list for PGV
         List<Khoa> khoaList = session.createQuery("FROM Khoa", Khoa.class).list();
         if ("KHOA".equals(sessionRole) && sessionMaKhoa != null) {
-            khoaList =
-                    khoaList.stream()
-                            .filter(k -> k.getMaKhoa().equals(sessionMaKhoa))
-                            .collect(java.util.stream.Collectors.toList());
+            khoaList = khoaList.stream().filter(k -> k.getMaKhoa().equals(sessionMaKhoa))
+                    .collect(java.util.stream.Collectors.toList());
         }
         model.addAttribute("khoaList", khoaList);
 
@@ -55,11 +53,8 @@ public class MarkController {
 
     @RequestMapping(value = "/get-subjects", method = RequestMethod.GET)
     @ResponseBody
-    public List<Object[]> getSubjects(
-            @RequestParam("nienKhoa") String nienKhoa,
-            @RequestParam("hocKy") String hocKy,
-            @RequestParam(value = "maKhoa", required = false) String maKhoa,
-            HttpSession httpSession) {
+    public List<Object[]> getSubjects(@RequestParam("nienKhoa") String nienKhoa, @RequestParam("hocKy") String hocKy,
+            @RequestParam(value = "maKhoa", required = false) String maKhoa, HttpSession httpSession) {
         Session session = factory.getCurrentSession();
 
         String sessionRole = (String) httpSession.getAttribute("role");
@@ -68,10 +63,9 @@ public class MarkController {
             maKhoa = sessionMaKhoa;
         }
 
-        StringBuilder hql =
-                new StringBuilder(
-                        "SELECT DISTINCT mh.maMH, mh.tenMH FROM LopTinChi ltc JOIN MonHoc mh ON ltc.maMH = mh.maMH "
-                                + "WHERE 1=1 ");
+        StringBuilder hql = new StringBuilder(
+                "SELECT DISTINCT mh.maMH, mh.tenMH FROM LopTinChi ltc JOIN MonHoc mh ON ltc.maMH = mh.maMH "
+                        + "WHERE 1=1 ");
 
         if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all"))
             hql.append("AND ltc.nienKhoa = :nienKhoa ");
@@ -93,11 +87,8 @@ public class MarkController {
 
     @RequestMapping(value = "/get-groups", method = RequestMethod.GET)
     @ResponseBody
-    public List<Integer> getGroups(
-            @RequestParam("nienKhoa") String nienKhoa,
-            @RequestParam("hocKy") String hocKy,
-            @RequestParam("maMH") String maMH,
-            @RequestParam(value = "maKhoa", required = false) String maKhoa,
+    public List<Integer> getGroups(@RequestParam("nienKhoa") String nienKhoa, @RequestParam("hocKy") String hocKy,
+            @RequestParam("maMH") String maMH, @RequestParam(value = "maKhoa", required = false) String maKhoa,
             HttpSession httpSession) {
         Session session = factory.getCurrentSession();
 
@@ -107,9 +98,8 @@ public class MarkController {
             maKhoa = sessionMaKhoa;
         }
 
-        StringBuilder hql =
-                new StringBuilder(
-                        "SELECT DISTINCT ltc.nhom FROM LopTinChi ltc " + "WHERE ltc.maMH = :maMH ");
+        StringBuilder hql = new StringBuilder(
+                "SELECT DISTINCT ltc.nhom FROM LopTinChi ltc " + "WHERE ltc.maMH = :maMH ");
 
         if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all"))
             hql.append("AND ltc.nienKhoa = :nienKhoa ");
@@ -132,14 +122,12 @@ public class MarkController {
 
     @RequestMapping(value = "/load-students", method = RequestMethod.GET)
     @ResponseBody
-    public List<Object[]> loadStudents(
-            @RequestParam(value = "nienKhoa", required = false) String nienKhoa,
+    public List<Object[]> loadStudents(@RequestParam(value = "nienKhoa", required = false) String nienKhoa,
             @RequestParam(value = "hocKy", required = false) String hocKy,
             @RequestParam(value = "maMH", required = false) String maMH,
             @RequestParam(value = "nhom", required = false) Integer nhom,
             @RequestParam(value = "searchMaSV", required = false) String searchMaSV,
-            @RequestParam(value = "maKhoa", required = false) String maKhoa,
-            HttpSession httpSession) {
+            @RequestParam(value = "maKhoa", required = false) String maKhoa, HttpSession httpSession) {
         Session session = factory.getCurrentSession();
 
         String sessionRole = (String) httpSession.getAttribute("role");
@@ -148,14 +136,11 @@ public class MarkController {
             maKhoa = sessionMaKhoa;
         }
 
-        StringBuilder hql =
-                new StringBuilder(
-                        "SELECT sv.maSV, sv.ho, sv.ten, dk.diemCC, dk.diemGK, dk.diemCK, dk.maLTC, ltc.nhom, mh.tenMH "
-                                + "FROM DangKy dk "
-                                + "JOIN SinhVien sv ON dk.maSV = sv.maSV "
-                                + "JOIN LopTinChi ltc ON dk.maLTC = ltc.maLTC "
-                                + "JOIN MonHoc mh ON ltc.maMH = mh.maMH "
-                                + "WHERE (dk.huyDangKy = false OR dk.huyDangKy IS NULL) ");
+        StringBuilder hql = new StringBuilder(
+                "SELECT sv.maSV, sv.ho, sv.ten, dk.diemCC, dk.diemGK, dk.diemCK, dk.maLTC, ltc.nhom, mh.tenMH "
+                        + "FROM DangKy dk " + "JOIN SinhVien sv ON dk.maSV = sv.maSV "
+                        + "JOIN LopTinChi ltc ON dk.maLTC = ltc.maLTC " + "JOIN MonHoc mh ON ltc.maMH = mh.maMH "
+                        + "WHERE (dk.huyDangKy = false OR dk.huyDangKy IS NULL) ");
 
         if (searchMaSV != null && !searchMaSV.trim().isEmpty()) {
             hql.append("AND TRIM(sv.maSV) = :searchMaSV ");
@@ -164,8 +149,10 @@ public class MarkController {
                 hql.append("AND ltc.nienKhoa = :nienKhoa ");
             if (hocKy != null && !hocKy.isEmpty() && !hocKy.equals("all"))
                 hql.append("AND ltc.hocKy = :hocKy ");
-            if (maMH != null && !maMH.isEmpty()) hql.append("AND ltc.maMH = :maMH ");
-            if (nhom != null) hql.append("AND ltc.nhom = :nhom ");
+            if (maMH != null && !maMH.isEmpty())
+                hql.append("AND ltc.maMH = :maMH ");
+            if (nhom != null)
+                hql.append("AND ltc.nhom = :nhom ");
             if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all"))
                 hql.append("AND ltc.maKhoa = :maKhoa ");
         }
@@ -180,8 +167,10 @@ public class MarkController {
                 query.setParameter("nienKhoa", nienKhoa);
             if (hocKy != null && !hocKy.isEmpty() && !hocKy.equals("all"))
                 query.setParameter("hocKy", Integer.parseInt(hocKy));
-            if (maMH != null && !maMH.isEmpty()) query.setParameter("maMH", maMH);
-            if (nhom != null) query.setParameter("nhom", nhom);
+            if (maMH != null && !maMH.isEmpty())
+                query.setParameter("maMH", maMH);
+            if (nhom != null)
+                query.setParameter("nhom", nhom);
             if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all"))
                 query.setParameter("maKhoa", maKhoa);
         }
@@ -191,9 +180,7 @@ public class MarkController {
 
     @RequestMapping(value = "/save-marks", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> saveMarks(
-            @RequestParam("maLTC") int maLTC,
-            @RequestParam("maSV") String maSV,
+    public Map<String, Object> saveMarks(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV,
             @RequestParam(value = "diemCC", required = false) Float diemCC,
             @RequestParam(value = "diemGK", required = false) Float diemGK,
             @RequestParam(value = "diemCK", required = false) Float diemCK) {
@@ -218,9 +205,7 @@ public class MarkController {
                 response.put("message", "Đã lưu điểm cho sinh viên " + maSV);
             } else {
                 response.put("success", false);
-                response.put(
-                        "message",
-                        "Không tìm thấy thông tin đăng ký cho SV: " + maSV + " tại lớp: " + maLTC);
+                response.put("message", "Không tìm thấy thông tin đăng ký cho SV: " + maSV + " tại lớp: " + maLTC);
             }
         } catch (Exception e) {
             t.rollback();
@@ -243,18 +228,15 @@ public class MarkController {
                 int maLTC = (int) mark.get("maLTC");
                 String maSV = (String) mark.get("maSV");
 
-                Float diemCC =
-                        mark.get("diemCC") != null && !mark.get("diemCC").toString().isEmpty()
-                                ? Float.valueOf(mark.get("diemCC").toString())
-                                : null;
-                Float diemGK =
-                        mark.get("diemGK") != null && !mark.get("diemGK").toString().isEmpty()
-                                ? Float.valueOf(mark.get("diemGK").toString())
-                                : null;
-                Float diemCK =
-                        mark.get("diemCK") != null && !mark.get("diemCK").toString().isEmpty()
-                                ? Float.valueOf(mark.get("diemCK").toString())
-                                : null;
+                Float diemCC = mark.get("diemCC") != null && !mark.get("diemCC").toString().isEmpty()
+                        ? Float.valueOf(mark.get("diemCC").toString())
+                        : null;
+                Float diemGK = mark.get("diemGK") != null && !mark.get("diemGK").toString().isEmpty()
+                        ? Float.valueOf(mark.get("diemGK").toString())
+                        : null;
+                Float diemCK = mark.get("diemCK") != null && !mark.get("diemCK").toString().isEmpty()
+                        ? Float.valueOf(mark.get("diemCK").toString())
+                        : null;
 
                 String hql = "FROM DangKy dk WHERE dk.maLTC = :maLTC AND TRIM(dk.maSV) = :maSV";
                 Query<DangKy> query = session.createQuery(hql, DangKy.class);
@@ -273,7 +255,8 @@ public class MarkController {
             response.put("success", true);
             response.put("message", "Đã lưu tất cả điểm thành công!");
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             response.put("success", false);
             response.put("message", "Lỗi: " + e.getMessage());
         } finally {
@@ -297,19 +280,14 @@ public class MarkController {
         Session session = factory.getCurrentSession();
 
         // Fetch all registered marks with pure HQL JOIN (No Stored Procedure!)
-        String hql =
-                "SELECT ltc.nienKhoa, ltc.hocKy, ltc.maMH, mh.tenMH, ltc.nhom, "
-                        + "dk.diemCC, dk.diemGK, dk.diemCK, mh.soTietLT, mh.soTietTH "
-                        + "FROM DangKy dk "
-                        + "JOIN LopTinChi ltc ON dk.maLTC = ltc.maLTC "
-                        + "JOIN MonHoc mh ON ltc.maMH = mh.maMH "
-                        + "WHERE TRIM(dk.maSV) = :maSV AND (dk.huyDangKy = false OR dk.huyDangKy IS NULL) "
-                        + "ORDER BY ltc.nienKhoa DESC, ltc.hocKy DESC, ltc.maMH ASC";
+        String hql = "SELECT ltc.nienKhoa, ltc.hocKy, ltc.maMH, mh.tenMH, ltc.nhom, "
+                + "dk.diemCC, dk.diemGK, dk.diemCK, mh.soTietLT, mh.soTietTH " + "FROM DangKy dk "
+                + "JOIN LopTinChi ltc ON dk.maLTC = ltc.maLTC " + "JOIN MonHoc mh ON ltc.maMH = mh.maMH "
+                + "WHERE TRIM(dk.maSV) = :maSV AND (dk.huyDangKy = false OR dk.huyDangKy IS NULL) "
+                + "ORDER BY ltc.nienKhoa DESC, ltc.hocKy DESC, ltc.maMH ASC";
 
-        List<Object[]> marksList =
-                session.createQuery(hql, Object[].class)
-                        .setParameter("maSV", profile.getMaSV().trim())
-                        .list();
+        List<Object[]> marksList = session.createQuery(hql, Object[].class)
+                .setParameter("maSV", profile.getMaSV().trim()).list();
 
         // Group grades by semester using LinkedHashMap to preserve query sort order
         java.util.Map<String, List<Object[]>> groupedMarks = new java.util.LinkedHashMap<>();

@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/subject")
 public class MonHocController {
 
-    @Autowired private SessionFactory factory;
+    @Autowired
+    private SessionFactory factory;
 
     @RequestMapping()
     public String index(ModelMap model) {
@@ -113,12 +114,13 @@ public class MonHocController {
     }
 
     private void populateCanDelete(Session session, List<MonHoc> list) {
-        if (list.isEmpty()) return;
-        List<String> mhWithLTC =
-                session.createQuery("SELECT distinct trim(maMH) FROM LopTinChi", String.class)
-                        .list();
+        if (list.isEmpty())
+            return;
+        List<String> mhWithLTC = session.createQuery("SELECT distinct trim(maMH) FROM LopTinChi", String.class).list();
         java.util.Set<String> dependentIds = new java.util.HashSet<>();
-        for (String id : mhWithLTC) if (id != null) dependentIds.add(id.trim().toUpperCase());
+        for (String id : mhWithLTC)
+            if (id != null)
+                dependentIds.add(id.trim().toUpperCase());
 
         for (MonHoc mh : list) {
             String trimmed = mh.getMaMH() != null ? mh.getMaMH().trim().toUpperCase() : "";
@@ -128,8 +130,7 @@ public class MonHocController {
 
     @RequestMapping(value = "/api/save", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> saveSubject(
-            @RequestBody MonHoc monHoc, @RequestParam("mode") String mode) {
+    public Map<String, Object> saveSubject(@RequestBody MonHoc monHoc, @RequestParam("mode") String mode) {
         Map<String, Object> res = new HashMap<>();
         Session session = factory.openSession();
         org.hibernate.Transaction t = session.beginTransaction();
@@ -144,9 +145,7 @@ public class MonHocController {
             } else if (mode.equals("edit")) {
                 if (existing == null) {
                     res.put("status", "error");
-                    res.put(
-                            "message",
-                            "Không tìm thấy môn học [" + monHoc.getMaMH() + "] để chỉnh sửa!");
+                    res.put("message", "Không tìm thấy môn học [" + monHoc.getMaMH() + "] để chỉnh sửa!");
                     return res;
                 }
             }
@@ -155,7 +154,8 @@ public class MonHocController {
             t.commit();
             res.put("status", "success");
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             res.put("status", "error");
             res.put("message", "Lỗi: " + e.getMessage());
         } finally {
@@ -164,10 +164,7 @@ public class MonHocController {
         return res;
     }
 
-    @RequestMapping(
-            value = "/api/delete",
-            method = RequestMethod.POST,
-            produces = "application/json")
+    @RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public Map<String, Object> deleteSubject(@RequestParam("maMH") String maMH) {
         Map<String, Object> res = new HashMap<>();
@@ -175,11 +172,8 @@ public class MonHocController {
         org.hibernate.Transaction t = session.beginTransaction();
         try {
             // Check dependencies: LOPTINCHI
-            Long count =
-                    session.createQuery(
-                                    "SELECT COUNT(*) FROM LopTinChi WHERE maMH = :maMH", Long.class)
-                            .setParameter("maMH", maMH)
-                            .uniqueResult();
+            Long count = session.createQuery("SELECT COUNT(*) FROM LopTinChi WHERE maMH = :maMH", Long.class)
+                    .setParameter("maMH", maMH).uniqueResult();
 
             if (count > 0) {
                 res.put("status", "error");
@@ -197,7 +191,8 @@ public class MonHocController {
                 res.put("message", "Không tìm thấy môn học để xóa!");
             }
         } catch (Exception e) {
-            if (t != null) t.rollback();
+            if (t != null)
+                t.rollback();
             res.put("status", "error");
             res.put("message", "Lỗi: " + e.getMessage());
         } finally {
