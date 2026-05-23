@@ -49,3 +49,5 @@ Thumbs.db
 
 # Bỏ qua file môi trường chứa thông tin nhạy cảm
 *.properties
+
+*.dbdiagram

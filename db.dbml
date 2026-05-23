@@ -1,0 +1,87 @@
+// Sơ đồ cơ sở dữ liệu hệ thống quản lý điểm sinh viên (QLDSV)
+// Hỗ trợ kết nối và vẽ lược đồ quan hệ trên dbdiagram.io
+
+Table KHOA {
+  MAKHOA varchar [primary key, note: 'Mã khoa']
+  TENKHOA nvarchar [note: 'Tên khoa']
+}
+
+Table LOP {
+  MALOP varchar [primary key, note: 'Mã lớp hành chính']
+  TENLOP nvarchar [note: 'Tên lớp']
+  KHOAHOC varchar [note: 'Khóa học (Ví dụ: 2015-2019)']
+  MAKHOA varchar [note: 'Mã khoa quản lý lớp']
+}
+
+Table SINHVIEN {
+  MASV varchar [primary key, note: 'Mã số sinh viên']
+  HO nvarchar [note: 'Họ và tên đệm']
+  TEN nvarchar [note: 'Tên sinh viên']
+  PHAI nvarchar [note: 'Giới tính']
+  DIACHI nvarchar [note: 'Địa chỉ thường trú']
+  NGAYSINH date [note: 'Ngày sinh']
+  MALOP varchar [note: 'Lớp hành chính']
+  DANGHIHOC bit [note: 'Trạng thái nghỉ học']
+  PASSWORD varchar [note: 'Mật khẩu đăng nhập của SV']
+}
+
+Table GIANGVIEN {
+  MAGV varchar [primary key, note: 'Mã giảng viên']
+  MAKHOA varchar [note: 'Mã khoa công tác']
+  HO nvarchar [note: 'Họ và tên đệm']
+  TEN nvarchar [note: 'Tên giảng viên']
+  HOCVI nvarchar [note: 'Học vị (ThS, TS,...)']
+  HOCHAM nvarchar [note: 'Học hàm (PGS, GS)']
+  CHUYENMON nvarchar [note: 'Chuyên môn đào tạo']
+}
+
+Table MONHOC {
+  MAMH varchar [primary key, note: 'Mã môn học']
+  TENMH nvarchar [note: 'Tên môn học']
+  SOTIET_LT int [note: 'Số tiết lý thuyết']
+  SOTIET_TH int [note: 'Số tiết thực hành']
+}
+
+Table LOPTINCHI {
+  MALTC int [primary key, note: 'Mã lớp tín chỉ (Tự tăng)']
+  NIENKHOA varchar [note: 'Niên khóa học']
+  HOCKY int [note: 'Học kỳ']
+  MAMH varchar [note: 'Mã môn học']
+  NHOM int [note: 'Nhóm học']
+  MAGV varchar [note: 'Giảng viên giảng dạy']
+  MAKHOA varchar [note: 'Khoa mở lớp']
+  SOSVTOITHIEU int [note: 'Số sinh viên tối thiểu để mở lớp']
+  HUYLOP bit [note: 'Trạng thái hủy lớp']
+}
+
+Table DANGKY {
+  MALTC int [primary key, note: 'Mã lớp tín chỉ']
+  MASV varchar [primary key, note: 'Mã sinh viên']
+  DIEM_CC float [note: 'Điểm chuyên cần']
+  DIEM_GK float [note: 'Điểm giữa kỳ']
+  DIEM_CK float [note: 'Điểm cuối kỳ']
+  HUYDANGKY bit [note: 'Trạng thái hủy đăng ký']
+}
+
+Table USERS {
+  USERID int [primary key, increment, note: 'Mã tài khoản (Tự tăng)']
+  USERNAME varchar [note: 'Tên đăng nhập (Trùng mã GV/SV hoặc tên viết tắt PGV)']
+  PASSWORD varchar [note: 'Mật khẩu đã mã hóa']
+  ROLEID int [note: 'Vai trò tài khoản']
+}
+
+Table ROLES {
+  ROLEID int [primary key, note: 'Mã vai trò']
+  ROLENAME nvarchar [note: 'Tên vai trò (PGV, KHOA, SINHVIEN)']
+}
+
+// Định nghĩa các mối quan hệ (Ràng buộc khóa ngoại)
+Ref: KHOA.MAKHOA < LOP.MAKHOA [delete: cascade]
+Ref: LOP.MALOP < SINHVIEN.MALOP
+Ref: KHOA.MAKHOA < GIANGVIEN.MAKHOA
+Ref: KHOA.MAKHOA < LOPTINCHI.MAKHOA
+Ref: GIANGVIEN.MAGV < LOPTINCHI.MAGV
+Ref: MONHOC.MAMH < LOPTINCHI.MAMH
+Ref: LOPTINCHI.MALTC < DANGKY.MALTC
+Ref: SINHVIEN.MASV < DANGKY.MASV
+Ref: ROLES.ROLEID < USERS.ROLEID
