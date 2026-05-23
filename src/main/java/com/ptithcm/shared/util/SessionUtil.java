@@ -41,6 +41,18 @@ public final class SessionUtil {
     }
 
     /**
+     * Lấy tên đăng nhập (username) của người dùng từ session.
+     *
+     * @param session
+     *            Đối tượng HttpSession hiện tại
+     * @return Tên đăng nhập dạng chuỗi, hoặc null nếu không tồn tại
+     */
+    public static String getCurrentUsername(HttpSession session) {
+        Users user = getUser(session);
+        return user != null ? user.getUsername() : null;
+    }
+
+    /**
      * Lấy vai trò (role) của người dùng từ session.
      *
      * @param session

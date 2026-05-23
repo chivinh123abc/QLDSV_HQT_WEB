@@ -2,13 +2,26 @@ package com.ptithcm.shared.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public final class DateUtil {
 
+    public static final ZoneId ZONE_VN = ZoneId.of("Asia/Ho_Chi_Minh");
+
     private static final String DEFAULT_PATTERN = "yyyy-MM-dd";
 
     private DateUtil() {
+    }
+
+    /**
+     * Lấy thời gian hiện tại theo múi giờ Việt Nam (Asia/Ho_Chi_Minh).
+     *
+     * @return Đối tượng OffsetDateTime hiện tại ở múi giờ Việt Nam
+     */
+    public static OffsetDateTime nowVn() {
+        return OffsetDateTime.now(ZONE_VN);
     }
 
     /**

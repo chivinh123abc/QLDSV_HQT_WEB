@@ -6,12 +6,15 @@ import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ptithcm.entity.base.AuditWithTimezone;
 import com.ptithcm.shared.dto.FindOptions;
 import com.ptithcm.shared.dto.PaginationDTO;
 import com.ptithcm.shared.dto.PaginationResult;
+import com.ptithcm.shared.util.DateUtil;
 
 /**
  * Lớp cơ sở Abstract cho tất cả các DAO trong hệ thống. Cung cấp các thao tác
@@ -139,7 +142,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
     }
 
     /**
-     * Chức năng: Xóa một thực thể khỏi database (Delete).
+     * Chức năng: Xóa một thực thể khỏi database (Hỗ trợ tự động Soft Delete).
      * <p>
      * Cách dùng:
      * 
@@ -154,11 +157,24 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      *            Đối tượng thực thể cần xóa
      */
     public void delete(T entity) {
-        getSession().remove(entity);
+        // Kiểm tra xem Entity này có kế thừa class Audit (có hỗ trợ xóa mềm) không
+        if (entity instanceof AuditWithTimezone) {
+            AuditWithTimezone softDeletableEntity = (AuditWithTimezone) entity;
+
+            // Cập nhật thời điểm xóa (Múi giờ VN)
+            softDeletableEntity.setDeletedAt(DateUtil.nowVn());
+
+            // Biến lệnh Remove thành lệnh Update
+            getSession().merge(softDeletableEntity);
+        } else {
+            // Nếu là bảng bình thường (như bảng trung gian), tiến hành Hard Delete
+            getSession().remove(entity);
+        }
     }
 
     /**
-     * Chức năng: Xóa thực thể khỏi database dựa trên khóa chính (ID).
+     * Chức năng: Xóa thực thể khỏi database dựa trên khóa chính (ID) - TỐI ƯU HÓA
+     * HQL.
      * <p>
      * Cách dùng:
      * 
@@ -170,10 +186,30 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      *            Giá trị khóa chính của thực thể cần xóa
      */
     public void deleteById(ID id) {
-        T entity = findById(id);
-        if (entity != null) {
-            delete(entity);
+        if (id == null)
+            return;
+
+        // Tự động tìm tên cột khóa chính (ID) của Entity hiện tại bằng Metamodel
+        String idName = getSession().getEntityManagerFactory().getMetamodel().entity(entityClass).getId(Object.class)
+                .getName();
+
+        String hql;
+        MutationQuery query;
+
+        // 1. Nếu là Entity có hỗ trợ Xóa mềm (Soft Delete)
+        if (AuditWithTimezone.class.isAssignableFrom(entityClass)) {
+            hql = "UPDATE " + entityClass.getName() + " e SET e.deletedAt = :deletedAt WHERE e." + idName + " = :id";
+            query = getSession().createMutationQuery(hql).setParameter("deletedAt", DateUtil.nowVn()).setParameter("id",
+                    id);
         }
+        // 2. Nếu là Entity bình thường (Hard Delete)
+        else {
+            hql = "DELETE FROM " + entityClass.getName() + " e WHERE e." + idName + " = :id";
+            query = getSession().createMutationQuery(hql).setParameter("id", id);
+        }
+
+        // Thực thi ngay lập tức dưới DB (Bỏ qua bước SELECT tốn thời gian)
+        query.executeUpdate();
     }
 
     /**
