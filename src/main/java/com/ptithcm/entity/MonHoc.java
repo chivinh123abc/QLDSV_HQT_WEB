@@ -22,17 +22,45 @@ public class MonHoc {
     @Column(name = "SOTIET_TH")
     private int soTietTH;
 
-    @Transient
-    private boolean canDelete = true;
+    @Transient private boolean canDelete = true;
 
-    public String getMaMH() { return maMH; }
-    public void setMaMH(String maMH) { this.maMH = maMH; }
-    public String getTenMH() { return tenMH; }
-    public void setTenMH(String tenMH) { this.tenMH = tenMH; }
-    public int getSoTietLT() { return soTietLT; }
-    public void setSoTietLT(int soTietLT) { this.soTietLT = soTietLT; }
-    public int getSoTietTH() { return soTietTH; }
-    public void setSoTietTH(int soTietTH) { this.soTietTH = soTietTH; }
-    public boolean isCanDelete() { return canDelete; }
-    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
+    public String getMaMH() {
+        return maMH;
+    }
+
+    public void setMaMH(String maMH) {
+        this.maMH = maMH;
+    }
+
+    public String getTenMH() {
+        return tenMH;
+    }
+
+    public void setTenMH(String tenMH) {
+        this.tenMH = tenMH;
+    }
+
+    public int getSoTietLT() {
+        return soTietLT;
+    }
+
+    public void setSoTietLT(int soTietLT) {
+        this.soTietLT = soTietLT;
+    }
+
+    public int getSoTietTH() {
+        return soTietTH;
+    }
+
+    public void setSoTietTH(int soTietTH) {
+        this.soTietTH = soTietTH;
+    }
+
+    public boolean isCanDelete() {
+        return canDelete;
+    }
+
+    public void setCanDelete(boolean canDelete) {
+        this.canDelete = canDelete;
+    }
 }

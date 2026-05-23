@@ -31,23 +31,69 @@ public class GiangVien {
     @Column(name = "CHUYENMON")
     private String chuyenMon;
 
-    @Transient
-    private boolean canDelete = true;
+    @Transient private boolean canDelete = true;
 
-    public String getMaGV() { return maGV; }
-    public void setMaGV(String maGV) { this.maGV = maGV; }
-    public String getMaKhoa() { return maKhoa; }
-    public void setMaKhoa(String maKhoa) { this.maKhoa = maKhoa; }
-    public String getHo() { return ho; }
-    public void setHo(String ho) { this.ho = ho; }
-    public String getTen() { return ten; }
-    public void setTen(String ten) { this.ten = ten; }
-    public String getHocVi() { return hocVi; }
-    public void setHocVi(String hocVi) { this.hocVi = hocVi; }
-    public String getHocHam() { return hocHam; }
-    public void setHocHam(String hocHam) { this.hocHam = hocHam; }
-    public String getChuyenMon() { return chuyenMon; }
-    public void setChuyenMon(String chuyenMon) { this.chuyenMon = chuyenMon; }
-    public boolean isCanDelete() { return canDelete; }
-    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
+    public String getMaGV() {
+        return maGV;
+    }
+
+    public void setMaGV(String maGV) {
+        this.maGV = maGV;
+    }
+
+    public String getMaKhoa() {
+        return maKhoa;
+    }
+
+    public void setMaKhoa(String maKhoa) {
+        this.maKhoa = maKhoa;
+    }
+
+    public String getHo() {
+        return ho;
+    }
+
+    public void setHo(String ho) {
+        this.ho = ho;
+    }
+
+    public String getTen() {
+        return ten;
+    }
+
+    public void setTen(String ten) {
+        this.ten = ten;
+    }
+
+    public String getHocVi() {
+        return hocVi;
+    }
+
+    public void setHocVi(String hocVi) {
+        this.hocVi = hocVi;
+    }
+
+    public String getHocHam() {
+        return hocHam;
+    }
+
+    public void setHocHam(String hocHam) {
+        this.hocHam = hocHam;
+    }
+
+    public String getChuyenMon() {
+        return chuyenMon;
+    }
+
+    public void setChuyenMon(String chuyenMon) {
+        this.chuyenMon = chuyenMon;
+    }
+
+    public boolean isCanDelete() {
+        return canDelete;
+    }
+
+    public void setCanDelete(boolean canDelete) {
+        this.canDelete = canDelete;
+    }
 }

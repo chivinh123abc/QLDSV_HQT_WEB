@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo "⏳ [Git Hook] Đang tự động format code bằng Spotless..."
+
+# Chạy lệnh make format của bạn
+make format
+
+# Quan trọng: Sau khi format, file sẽ bị thay đổi nội dung. 
+# Cần add lại những file đang được track (đã thay đổi) vào staging area để commit.
+git add -u
+
+echo "✅ [Git Hook] Format hoàn tất. Đang tiến hành commit!"

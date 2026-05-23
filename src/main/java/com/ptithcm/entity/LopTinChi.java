@@ -37,27 +37,85 @@ public class LopTinChi {
     @Column(name = "HUYLOP")
     private boolean huyLop;
 
-    @Transient
-    private boolean canDelete = true;
+    @Transient private boolean canDelete = true;
 
-    public int getMaLTC() { return maLTC; }
-    public void setMaLTC(int maLTC) { this.maLTC = maLTC; }
-    public String getNienKhoa() { return nienKhoa; }
-    public void setNienKhoa(String nienKhoa) { this.nienKhoa = nienKhoa; }
-    public int getHocKy() { return hocKy; }
-    public void setHocKy(int hocKy) { this.hocKy = hocKy; }
-    public String getMaMH() { return maMH; }
-    public void setMaMH(String maMH) { this.maMH = maMH; }
-    public int getNhom() { return nhom; }
-    public void setNhom(int nhom) { this.nhom = nhom; }
-    public String getMaGV() { return maGV; }
-    public void setMaGV(String maGV) { this.maGV = maGV; }
-    public String getMaKhoa() { return maKhoa; }
-    public void setMaKhoa(String maKhoa) { this.maKhoa = maKhoa; }
-    public int getSoSVToiThieu() { return soSVToiThieu; }
-    public void setSoSVToiThieu(int soSVToiThieu) { this.soSVToiThieu = soSVToiThieu; }
-    public boolean isHuyLop() { return huyLop; }
-    public void setHuyLop(boolean huyLop) { this.huyLop = huyLop; }
-    public boolean isCanDelete() { return canDelete; }
-    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
+    public int getMaLTC() {
+        return maLTC;
+    }
+
+    public void setMaLTC(int maLTC) {
+        this.maLTC = maLTC;
+    }
+
+    public String getNienKhoa() {
+        return nienKhoa;
+    }
+
+    public void setNienKhoa(String nienKhoa) {
+        this.nienKhoa = nienKhoa;
+    }
+
+    public int getHocKy() {
+        return hocKy;
+    }
+
+    public void setHocKy(int hocKy) {
+        this.hocKy = hocKy;
+    }
+
+    public String getMaMH() {
+        return maMH;
+    }
+
+    public void setMaMH(String maMH) {
+        this.maMH = maMH;
+    }
+
+    public int getNhom() {
+        return nhom;
+    }
+
+    public void setNhom(int nhom) {
+        this.nhom = nhom;
+    }
+
+    public String getMaGV() {
+        return maGV;
+    }
+
+    public void setMaGV(String maGV) {
+        this.maGV = maGV;
+    }
+
+    public String getMaKhoa() {
+        return maKhoa;
+    }
+
+    public void setMaKhoa(String maKhoa) {
+        this.maKhoa = maKhoa;
+    }
+
+    public int getSoSVToiThieu() {
+        return soSVToiThieu;
+    }
+
+    public void setSoSVToiThieu(int soSVToiThieu) {
+        this.soSVToiThieu = soSVToiThieu;
+    }
+
+    public boolean isHuyLop() {
+        return huyLop;
+    }
+
+    public void setHuyLop(boolean huyLop) {
+        this.huyLop = huyLop;
+    }
+
+    public boolean isCanDelete() {
+        return canDelete;
+    }
+
+    public void setCanDelete(boolean canDelete) {
+        this.canDelete = canDelete;
+    }
 }

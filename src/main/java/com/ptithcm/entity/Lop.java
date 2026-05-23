@@ -22,17 +22,45 @@ public class Lop {
     @Column(name = "MAKHOA")
     private String maKhoa;
 
-    @Transient
-    private boolean canDelete = true;
+    @Transient private boolean canDelete = true;
 
-    public String getMaLop() { return maLop; }
-    public void setMaLop(String maLop) { this.maLop = maLop; }
-    public String getTenLop() { return tenLop; }
-    public void setTenLop(String tenLop) { this.tenLop = tenLop; }
-    public String getKhoaHoc() { return khoaHoc; }
-    public void setKhoaHoc(String khoaHoc) { this.khoaHoc = khoaHoc; }
-    public String getMaKhoa() { return maKhoa; }
-    public void setMaKhoa(String maKhoa) { this.maKhoa = maKhoa; }
-    public boolean isCanDelete() { return canDelete; }
-    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
+    public String getMaLop() {
+        return maLop;
+    }
+
+    public void setMaLop(String maLop) {
+        this.maLop = maLop;
+    }
+
+    public String getTenLop() {
+        return tenLop;
+    }
+
+    public void setTenLop(String tenLop) {
+        this.tenLop = tenLop;
+    }
+
+    public String getKhoaHoc() {
+        return khoaHoc;
+    }
+
+    public void setKhoaHoc(String khoaHoc) {
+        this.khoaHoc = khoaHoc;
+    }
+
+    public String getMaKhoa() {
+        return maKhoa;
+    }
+
+    public void setMaKhoa(String maKhoa) {
+        this.maKhoa = maKhoa;
+    }
+
+    public boolean isCanDelete() {
+        return canDelete;
+    }
+
+    public void setCanDelete(boolean canDelete) {
+        this.canDelete = canDelete;
+    }
 }

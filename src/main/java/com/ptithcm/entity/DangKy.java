@@ -30,16 +30,51 @@ public class DangKy {
     @Column(name = "HUYDANGKY")
     private boolean huyDangKy;
 
-    public int getMaLTC() { return maLTC; }
-    public void setMaLTC(int maLTC) { this.maLTC = maLTC; }
-    public String getMaSV() { return maSV; }
-    public void setMaSV(String maSV) { this.maSV = maSV; }
-    public Float getDiemCC() { return diemCC; }
-    public void setDiemCC(Float diemCC) { this.diemCC = diemCC; }
-    public Float getDiemGK() { return diemGK; }
-    public void setDiemGK(Float diemGK) { this.diemGK = diemGK; }
-    public Float getDiemCK() { return diemCK; }
-    public void setDiemCK(Float diemCK) { this.diemCK = diemCK; }
-    public boolean isHuyDangKy() { return huyDangKy; }
-    public void setHuyDangKy(boolean huyDangKy) { this.huyDangKy = huyDangKy; }
+    public int getMaLTC() {
+        return maLTC;
+    }
+
+    public void setMaLTC(int maLTC) {
+        this.maLTC = maLTC;
+    }
+
+    public String getMaSV() {
+        return maSV;
+    }
+
+    public void setMaSV(String maSV) {
+        this.maSV = maSV;
+    }
+
+    public Float getDiemCC() {
+        return diemCC;
+    }
+
+    public void setDiemCC(Float diemCC) {
+        this.diemCC = diemCC;
+    }
+
+    public Float getDiemGK() {
+        return diemGK;
+    }
+
+    public void setDiemGK(Float diemGK) {
+        this.diemGK = diemGK;
+    }
+
+    public Float getDiemCK() {
+        return diemCK;
+    }
+
+    public void setDiemCK(Float diemCK) {
+        this.diemCK = diemCK;
+    }
+
+    public boolean isHuyDangKy() {
+        return huyDangKy;
+    }
+
+    public void setHuyDangKy(boolean huyDangKy) {
+        this.huyDangKy = huyDangKy;
+    }
 }

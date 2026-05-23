@@ -1,5 +1,9 @@
 package com.ptithcm.controller;
 
+import com.ptithcm.entity.GiangVien;
+import com.ptithcm.entity.SinhVien;
+import com.ptithcm.entity.Users;
+import jakarta.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -11,18 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.ptithcm.entity.GiangVien;
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.entity.Users;
-
-import jakarta.servlet.http.HttpSession;
-
 @Controller
 @Transactional
 public class LoginController {
 
-    @Autowired
-    private SessionFactory factory;
+    @Autowired private SessionFactory factory;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(HttpSession session) {
@@ -37,7 +34,8 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String handleLogin(@RequestParam("username") String username,
+    public String handleLogin(
+            @RequestParam("username") String username,
             @RequestParam("password") String password,
             @RequestParam("type") String type,
             HttpSession session,
@@ -57,9 +55,11 @@ public class LoginController {
 
             // Set persistent cookie to survive server restarts
             try {
-                String cookieValue = java.util.Base64.getEncoder()
-                        .encodeToString((username + ":" + password).getBytes("UTF-8"));
-                jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("remember_me", cookieValue);
+                String cookieValue =
+                        java.util.Base64.getEncoder()
+                                .encodeToString((username + ":" + password).getBytes("UTF-8"));
+                jakarta.servlet.http.Cookie cookie =
+                        new jakarta.servlet.http.Cookie("remember_me", cookieValue);
                 cookie.setMaxAge(30 * 24 * 60 * 60); // 30 days
                 cookie.setPath("/");
                 response.addCookie(cookie);
