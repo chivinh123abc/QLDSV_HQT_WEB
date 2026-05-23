@@ -8,12 +8,15 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
+    <!-- Load external properties file -->
+    <context:property-placeholder location="classpath:database.properties" />
+
     <!-- DataSource Configuration -->
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
-        <property name="url" value="jdbc:sqlserver://localhost:1433;databaseName=QLDSV_HTC_WEB;encrypt=true;trustServerCertificate=true;" />
-        <property name="username" value="sa" />
-        <property name="password" value="123456" />
+        <property name="driverClassName" value="${db.driver}" />
+        <property name="url" value="${db.url}" />
+        <property name="username" value="${db.username}" />
+        <property name="password" value="${db.password}" />
     </bean>
 
     <!-- Hibernate SessionFactory Configuration -->
@@ -22,8 +25,8 @@
         <property name="packagesToScan" value="com.ptithcm.entity" />
         <property name="hibernateProperties">
             <props>
-                <prop key="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</prop>
-                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
                 <prop key="hibernate.format_sql">true</prop>
             </props>
         </property>

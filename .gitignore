@@ -47,5 +47,5 @@ Thumbs.db
 *.swp
 *~
 
-# Hibernate generated files
-hibernate.properties
+# Bỏ qua file môi trường chứa thông tin nhạy cảm
+*.properties

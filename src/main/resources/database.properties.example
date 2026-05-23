@@ -1,0 +1,12 @@
+# ĐÂY LÀ FILE MẪU - KHÔNG ĐIỀN MẬT KHẨU THẬT VÀO ĐÂY
+db.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+db.url=jdbc:sqlserver://localhost:1433;databaseName=QLDSV_HTC_WEB;encrypt=true;trustServerCertificate=true;
+
+# Điền username của bạn (Mặc định thường là sa)
+db.username=sa
+
+# Điền mật khẩu SQL Server của máy bạn vào đây
+db.password=your_sql_password_here
+
+hibernate.dialect=org.hibernate.dialect.SQLServerDialect
+hibernate.show_sql=true
