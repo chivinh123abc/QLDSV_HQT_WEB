@@ -87,38 +87,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
         }
-        .role-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-        .role-option {
-            flex: 1;
-            position: relative;
-        }
-        .role-option input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-        }
-        .role-label {
-            display: block;
-            text-align: center;
-            padding: 10px;
-            background: #f1f5f9;
-            border-radius: 10px;
-            font-weight: 500;
-            font-size: 0.85rem;
-            color: #64748b;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .role-option input:checked + .role-label {
-            background: rgba(67, 97, 238, 0.08);
-            border-color: #4361ee;
-            color: #4361ee;
-        }
+
         .alert-custom {
             border-radius: 12px;
             padding: 12px;
@@ -145,16 +114,6 @@
         </c:if>
 
         <form action="${pageContext.request.contextPath}/login" method="post">
-            <div class="role-selector">
-                <div class="role-option">
-                    <input type="radio" name="type" value="sinhvien" id="type-sv" ${empty type or type == 'sinhvien' ? 'checked' : ''}>
-                    <label class="role-label" for="type-sv">Sinh viên</label>
-                </div>
-                <div class="role-option">
-                    <input type="radio" name="type" value="giangvien" id="type-gv" ${type == 'giangvien' ? 'checked' : ''}>
-                    <label class="role-label" for="type-gv">Giảng viên</label>
-                </div>
-            </div>
 
             <div class="mb-3">
                 <label class="form-label">Tên đăng nhập</label>

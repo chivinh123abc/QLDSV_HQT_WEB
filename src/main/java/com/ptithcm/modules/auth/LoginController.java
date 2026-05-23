@@ -36,8 +36,7 @@ public class LoginController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String handleLogin(@RequestParam("username") String username, @RequestParam("password") String password,
-            @RequestParam("type") String type, HttpSession session, jakarta.servlet.http.HttpServletResponse response,
-            ModelMap model) {
+            HttpSession session, jakarta.servlet.http.HttpServletResponse response, ModelMap model) {
 
         Users user = authService.login(username, password);
 
@@ -84,7 +83,6 @@ public class LoginController {
         }
 
         model.addAttribute("error", MessageConstant.LOGIN_FAILED);
-        model.addAttribute("type", type);
         model.addAttribute("username", username);
         return "login";
     }
