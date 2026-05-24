@@ -90,7 +90,7 @@ public class LopTinChiController {
     }
 
     @RequestMapping(params = "btnDelete")
-    public String delete(ModelMap model, @RequestParam("maLTC") int maLTC, HttpSession httpSession) {
+    public String delete(ModelMap model, @RequestParam("maLTC") String maLTC, HttpSession httpSession) {
         try {
             lopTinChiService.deleteLtc(maLTC);
             model.addAttribute("message", "Đã xóa lớp tín chỉ: " + maLTC);
@@ -105,7 +105,7 @@ public class LopTinChiController {
 
     @RequestMapping(value = "/api/get", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public LopTinChi getLTC(@RequestParam("maLTC") int maLTC) {
+    public LopTinChi getLTC(@RequestParam("maLTC") String maLTC) {
         return lopTinChiService.getLtcById(maLTC);
     }
 
@@ -136,8 +136,8 @@ public class LopTinChiController {
     private void populateCanDelete(List<LopTinChi> list) {
         if (list.isEmpty())
             return;
-        List<Integer> ltcWithReg = lopTinChiService.listLtcIdsWithRegistrations();
-        java.util.Set<Integer> dependentIds = new java.util.HashSet<>(ltcWithReg);
+        List<String> ltcWithReg = lopTinChiService.listLtcIdsWithRegistrations();
+        java.util.Set<String> dependentIds = new java.util.HashSet<>(ltcWithReg);
 
         for (LopTinChi ltc : list) {
             ltc.setCanDelete(!dependentIds.contains(ltc.getMaLTC()));
@@ -170,7 +170,7 @@ public class LopTinChiController {
 
     @RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> deleteLTC(@RequestParam("maLTC") int maLTC) {
+    public Map<String, Object> deleteLTC(@RequestParam("maLTC") String maLTC) {
         Map<String, Object> res = new HashMap<>();
         try {
             lopTinChiService.deleteLtcApi(maLTC);

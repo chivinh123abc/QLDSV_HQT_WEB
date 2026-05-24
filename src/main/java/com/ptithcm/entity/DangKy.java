@@ -4,46 +4,59 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import com.ptithcm.entity.base.LuuVetThoiGian;
 
 @Entity
-@Table(name = "DANGKY")
+@Table(name = "dang_ky")
 @IdClass(DangKyId.class)
-public class DangKy {
+public class DangKy extends LuuVetThoiGian {
     @Id
-    @Column(name = "MALTC")
-    private int maLTC;
+    @ManyToOne
+    @JoinColumn(name = "lop_tin_chi_id")
+    private LopTinChi lopTinChi;
 
     @Id
-    @Column(name = "MASV")
-    private String maSV;
+    @ManyToOne
+    @JoinColumn(name = "sinh_vien_id")
+    private SinhVien sinhVien;
 
-    @Column(name = "DIEM_CC")
+    @Column(name = "diem_chuyen_can")
     private Float diemCC;
 
-    @Column(name = "DIEM_GK")
+    @Column(name = "diem_giua_ky")
     private Float diemGK;
 
-    @Column(name = "DIEM_CK")
+    @Column(name = "diem_cuoi_ky")
     private Float diemCK;
 
-    @Column(name = "HUYDANGKY")
+    @Column(name = "is_huy_dang_ky")
     private boolean huyDangKy;
 
-    public int getMaLTC() {
-        return maLTC;
+    public LopTinChi getLopTinChi() {
+        return lopTinChi;
     }
 
-    public void setMaLTC(int maLTC) {
-        this.maLTC = maLTC;
+    public void setLopTinChi(LopTinChi lopTinChi) {
+        this.lopTinChi = lopTinChi;
+    }
+
+    public SinhVien getSinhVien() {
+        return sinhVien;
+    }
+
+    public void setSinhVien(SinhVien sinhVien) {
+        this.sinhVien = sinhVien;
+    }
+
+    public String getMaLTC() {
+        return lopTinChi != null ? lopTinChi.getMaLTC() : null;
     }
 
     public String getMaSV() {
-        return maSV;
-    }
-
-    public void setMaSV(String maSV) {
-        this.maSV = maSV;
+        return sinhVien != null ? sinhVien.getMaSV() : null;
     }
 
     public Float getDiemCC() {

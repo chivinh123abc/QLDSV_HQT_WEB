@@ -1,8 +1,8 @@
 package com.ptithcm.shared.util;
 
 import com.ptithcm.entity.SinhVien;
-import com.ptithcm.entity.Users;
 import com.ptithcm.shared.constant.SessionConstant;
+import com.ptithcm.shared.dto.UserSession;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -16,14 +16,14 @@ public final class SessionUtil {
      *
      * @param session
      *            Đối tượng HttpSession hiện tại
-     * @return Đối tượng Users, hoặc null nếu không tồn tại
+     * @return Đối tượng UserSession, hoặc null nếu không tồn tại
      */
-    public static Users getUser(HttpSession session) {
+    public static UserSession getUser(HttpSession session) {
         if (session == null) {
             return null;
         }
         Object user = session.getAttribute(SessionConstant.USER);
-        return user instanceof Users ? (Users) user : null;
+        return user instanceof UserSession ? (UserSession) user : null;
     }
 
     /**
@@ -32,9 +32,9 @@ public final class SessionUtil {
      * @param session
      *            Đối tượng HttpSession hiện tại
      * @param user
-     *            Đối tượng Users cần lưu
+     *            Đối tượng UserSession cần lưu
      */
-    public static void setUser(HttpSession session, Users user) {
+    public static void setUser(HttpSession session, UserSession user) {
         if (session != null) {
             session.setAttribute(SessionConstant.USER, user);
         }
@@ -48,7 +48,7 @@ public final class SessionUtil {
      * @return Tên đăng nhập dạng chuỗi, hoặc null nếu không tồn tại
      */
     public static String getCurrentUsername(HttpSession session) {
-        Users user = getUser(session);
+        UserSession user = getUser(session);
         return user != null ? user.getUsername() : null;
     }
 

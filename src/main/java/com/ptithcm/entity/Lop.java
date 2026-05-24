@@ -2,28 +2,52 @@ package com.ptithcm.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.List;
+import com.ptithcm.entity.base.LuuVetThoiGian;
 
 @Entity
-@Table(name = "LOP")
-public class Lop {
+@Table(name = "lop")
+public class Lop extends LuuVetThoiGian {
     @Id
-    @Column(name = "MALOP")
+    @Column(name = "id")
     private String maLop;
 
-    @Column(name = "TENLOP")
+    @Column(name = "ten_lop")
     private String tenLop;
 
-    @Column(name = "KHOAHOC")
+    @Column(name = "khoa_hoc")
     private String khoaHoc;
 
-    @Column(name = "MAKHOA")
-    private String maKhoa;
+    @ManyToOne
+    @JoinColumn(name = "khoa_id", nullable = false)
+    private Khoa khoa;
+
+    @OneToMany(mappedBy = "lop", fetch = FetchType.LAZY)
+    private List<SinhVien> dsSinhVien;
 
     @Transient
     private boolean canDelete = true;
+
+    @Transient
+    private String maKhoa;
+
+    public String getMaKhoa() {
+        if (maKhoa != null) {
+            return maKhoa;
+        }
+        return khoa != null ? khoa.getMaKhoa() : null;
+    }
+
+    public void setMaKhoa(String maKhoa) {
+        this.maKhoa = maKhoa;
+    }
 
     public String getMaLop() {
         return maLop;
@@ -49,12 +73,20 @@ public class Lop {
         this.khoaHoc = khoaHoc;
     }
 
-    public String getMaKhoa() {
-        return maKhoa;
+    public Khoa getKhoa() {
+        return khoa;
     }
 
-    public void setMaKhoa(String maKhoa) {
-        this.maKhoa = maKhoa;
+    public void setKhoa(Khoa khoa) {
+        this.khoa = khoa;
+    }
+
+    public List<SinhVien> getDsSinhVien() {
+        return dsSinhVien;
+    }
+
+    public void setDsSinhVien(List<SinhVien> dsSinhVien) {
+        this.dsSinhVien = dsSinhVien;
     }
 
     public boolean isCanDelete() {

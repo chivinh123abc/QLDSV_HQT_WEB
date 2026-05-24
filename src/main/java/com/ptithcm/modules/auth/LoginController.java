@@ -2,8 +2,8 @@ package com.ptithcm.modules.auth;
 
 import com.ptithcm.entity.GiangVien;
 import com.ptithcm.entity.SinhVien;
-import com.ptithcm.entity.Users;
 import com.ptithcm.shared.constant.MessageConstant;
+import com.ptithcm.shared.dto.UserSession;
 import com.ptithcm.shared.enumtype.RoleEnum;
 import com.ptithcm.shared.util.SecurityUtil;
 import com.ptithcm.shared.util.SessionUtil;
@@ -38,7 +38,7 @@ public class LoginController {
     public String handleLogin(@RequestParam("username") String username, @RequestParam("password") String password,
             HttpSession session, jakarta.servlet.http.HttpServletResponse response, ModelMap model) {
 
-        Users user = authService.login(username, password);
+        UserSession user = authService.login(username, password);
 
         if (user != null) {
             SessionUtil.setUser(session, user);
@@ -56,10 +56,10 @@ public class LoginController {
                 // Bỏ qua lỗi lưu cookie
             }
 
-            if (user.getRoleId() == RoleEnum.PGV.getId()) {
+            if (RoleEnum.PGV.getCode().equals(user.getRole())) {
                 SessionUtil.setRole(session, RoleEnum.PGV.getCode());
                 return "redirect:/index";
-            } else if (user.getRoleId() == RoleEnum.KHOA.getId()) {
+            } else if (RoleEnum.KHOA.getCode().equals(user.getRole())) {
                 SessionUtil.setRole(session, RoleEnum.KHOA.getCode());
 
                 // Với vai trò KHOA, lấy mã khoa tương ứng từ bảng GIANGVIEN
@@ -69,7 +69,7 @@ public class LoginController {
                 }
 
                 return "redirect:/index";
-            } else if (user.getRoleId() == RoleEnum.SINHVIEN.getId()) {
+            } else if (RoleEnum.SINHVIEN.getCode().equals(user.getRole())) {
                 SessionUtil.setRole(session, RoleEnum.SINHVIEN.getCode());
 
                 // Với vai trò SINHVIEN, lấy hồ sơ sinh viên tương ứng từ bảng SINHVIEN

@@ -4,15 +4,31 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class DangKyId implements Serializable {
-    private int maLTC;
-    private String maSV;
+    private String lopTinChi;
+    private String sinhVien;
 
     public DangKyId() {
     }
 
-    public DangKyId(int maLTC, String maSV) {
-        this.maLTC = maLTC;
-        this.maSV = maSV;
+    public DangKyId(String lopTinChi, String sinhVien) {
+        this.lopTinChi = lopTinChi;
+        this.sinhVien = sinhVien;
+    }
+
+    public String getLopTinChi() {
+        return lopTinChi;
+    }
+
+    public void setLopTinChi(String lopTinChi) {
+        this.lopTinChi = lopTinChi;
+    }
+
+    public String getSinhVien() {
+        return sinhVien;
+    }
+
+    public void setSinhVien(String sinhVien) {
+        this.sinhVien = sinhVien;
     }
 
     @Override
@@ -22,11 +38,11 @@ public class DangKyId implements Serializable {
         if (o == null || getClass() != o.getClass())
             return false;
         DangKyId dangKyId = (DangKyId) o;
-        return maLTC == dangKyId.maLTC && Objects.equals(maSV, dangKyId.maSV);
+        return Objects.equals(lopTinChi, dangKyId.lopTinChi) && Objects.equals(sinhVien, dangKyId.sinhVien);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(maLTC, maSV);
+        return Objects.hash(lopTinChi, sinhVien);
     }
 }

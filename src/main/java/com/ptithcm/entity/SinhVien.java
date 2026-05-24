@@ -2,49 +2,73 @@ package com.ptithcm.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 import java.util.Date;
+import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import com.ptithcm.entity.base.LuuVetThoiGian;
 
 @Entity
-@Table(name = "SINHVIEN")
-public class SinhVien {
+@Table(name = "sinh_vien")
+public class SinhVien extends LuuVetThoiGian {
     @Id
-    @Column(name = "MASV")
+    @Column(name = "id")
     private String maSV;
 
-    @Column(name = "HO")
+    @Column(name = "ho")
     private String ho;
 
-    @Column(name = "TEN")
+    @Column(name = "ten")
     private String ten;
 
-    @Column(name = "PHAI")
+    @Column(name = "phai")
     private String phai;
 
-    @Column(name = "DIACHI")
+    @Column(name = "dia_chi")
     private String diaChi;
 
-    @Column(name = "NGAYSINH")
+    @Column(name = "ngay_sinh")
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date ngaySinh;
 
-    @Column(name = "MALOP")
-    private String maLop;
+    @ManyToOne
+    @JoinColumn(name = "lop_id", nullable = false)
+    private Lop lop;
 
-    @Column(name = "DANGHIHOC")
+    @OneToMany(mappedBy = "sinhVien", fetch = FetchType.LAZY)
+    private List<DangKy> dsDangKy;
+
+    @Column(name = "is_dang_nghi_hoc")
     private boolean dangNghiHoc;
 
-    @Column(name = "PASSWORD")
+    @Column(name = "mat_khau")
     private String password;
 
     @Transient
     private boolean canDelete = true;
+
+    @Transient
+    private String maLop;
+
+    public String getMaLop() {
+        if (maLop != null) {
+            return maLop;
+        }
+        return lop != null ? lop.getMaLop() : null;
+    }
+
+    public void setMaLop(String maLop) {
+        this.maLop = maLop;
+    }
 
     public String getMaSV() {
         return maSV;
@@ -94,12 +118,20 @@ public class SinhVien {
         this.ngaySinh = ngaySinh;
     }
 
-    public String getMaLop() {
-        return maLop;
+    public Lop getLop() {
+        return lop;
     }
 
-    public void setMaLop(String maLop) {
-        this.maLop = maLop;
+    public void setLop(Lop lop) {
+        this.lop = lop;
+    }
+
+    public List<DangKy> getDsDangKy() {
+        return dsDangKy;
+    }
+
+    public void setDsDangKy(List<DangKy> dsDangKy) {
+        this.dsDangKy = dsDangKy;
     }
 
     public boolean isDangNghiHoc() {

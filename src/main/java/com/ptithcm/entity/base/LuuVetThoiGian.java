@@ -13,49 +13,49 @@ import jakarta.persistence.PreUpdate;
 // Báo cho Hibernate biết đây không phải là 1 bảng độc lập
 @MappedSuperclass
 @SQLRestriction("deleted_at IS NULL")
-public abstract class AuditWithTimezone {
+public abstract class LuuVetThoiGian {
 
     @Column(name = "created_at", updatable = false)
-    private OffsetDateTime createdAt;
+    private OffsetDateTime ngayTao;
 
     @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
+    private OffsetDateTime ngayCapNhat;
 
     @Column(name = "deleted_at")
-    private OffsetDateTime deletedAt;
+    private OffsetDateTime ngayXoa;
 
     @PrePersist // Chạy ngay trước khi DAO gọi hàm save() / insert
     protected void onCreate() {
-        this.createdAt = DateUtil.nowVn();
-        this.updatedAt = this.createdAt;
+        this.ngayTao = DateUtil.nowVn();
+        this.ngayCapNhat = this.ngayTao;
     }
 
     @PreUpdate // Chạy ngay trước khi DAO gọi hàm update() / merge()
     protected void onUpdate() {
-        this.updatedAt = DateUtil.nowVn();
+        this.ngayCapNhat = DateUtil.nowVn();
     }
 
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
+    public OffsetDateTime getNgayTao() {
+        return ngayTao;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setNgayTao(OffsetDateTime ngayTao) {
+        this.ngayTao = ngayTao;
     }
 
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
+    public OffsetDateTime getNgayCapNhat() {
+        return ngayCapNhat;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setNgayCapNhat(OffsetDateTime ngayCapNhat) {
+        this.ngayCapNhat = ngayCapNhat;
     }
 
-    public OffsetDateTime getDeletedAt() {
-        return deletedAt;
+    public OffsetDateTime getNgayXoa() {
+        return ngayXoa;
     }
 
-    public void setDeletedAt(OffsetDateTime deletedAt) {
-        this.deletedAt = deletedAt;
+    public void setNgayXoa(OffsetDateTime ngayXoa) {
+        this.ngayXoa = ngayXoa;
     }
 }

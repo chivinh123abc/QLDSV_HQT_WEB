@@ -10,7 +10,7 @@ import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ptithcm.entity.base.AuditWithTimezone;
+import com.ptithcm.entity.base.LuuVetThoiGian;
 import com.ptithcm.shared.dto.FindOptions;
 import com.ptithcm.shared.dto.PaginationDTO;
 import com.ptithcm.shared.dto.PaginationResult;
@@ -66,7 +66,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      *
      * @return Hibernate Session hiện tại liên kết với Transaction đang hoạt động
      */
-    protected Session getSession() {
+    public Session getSession() {
         return sessionFactory.getCurrentSession();
     }
 
@@ -157,12 +157,13 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      *            Đối tượng thực thể cần xóa
      */
     public void delete(T entity) {
-        // Kiểm tra xem Entity này có kế thừa class Audit (có hỗ trợ xóa mềm) không
-        if (entity instanceof AuditWithTimezone) {
-            AuditWithTimezone softDeletableEntity = (AuditWithTimezone) entity;
+        // Kiểm tra xem Entity này có kế thừa class LuuVetThoiGian (có hỗ trợ xóa mềm)
+        // không
+        if (entity instanceof LuuVetThoiGian) {
+            LuuVetThoiGian softDeletableEntity = (LuuVetThoiGian) entity;
 
             // Cập nhật thời điểm xóa (Múi giờ VN)
-            softDeletableEntity.setDeletedAt(DateUtil.nowVn());
+            softDeletableEntity.setNgayXoa(DateUtil.nowVn());
 
             // Biến lệnh Remove thành lệnh Update
             getSession().merge(softDeletableEntity);
@@ -197,9 +198,9 @@ public abstract class BaseDAO<T, ID extends Serializable> {
         MutationQuery query;
 
         // 1. Nếu là Entity có hỗ trợ Xóa mềm (Soft Delete)
-        if (AuditWithTimezone.class.isAssignableFrom(entityClass)) {
-            hql = "UPDATE " + entityClass.getName() + " e SET e.deletedAt = :deletedAt WHERE e." + idName + " = :id";
-            query = getSession().createMutationQuery(hql).setParameter("deletedAt", DateUtil.nowVn()).setParameter("id",
+        if (LuuVetThoiGian.class.isAssignableFrom(entityClass)) {
+            hql = "UPDATE " + entityClass.getName() + " e SET e.ngayXoa = :ngayXoa WHERE e." + idName + " = :id";
+            query = getSession().createMutationQuery(hql).setParameter("ngayXoa", DateUtil.nowVn()).setParameter("id",
                     id);
         }
         // 2. Nếu là Entity bình thường (Hard Delete)

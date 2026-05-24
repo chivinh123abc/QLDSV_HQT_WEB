@@ -2,37 +2,67 @@ package com.ptithcm.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.List;
+import com.ptithcm.entity.base.LuuVetThoiGian;
 
 @Entity
-@Table(name = "GIANGVIEN")
-public class GiangVien {
+@Table(name = "giang_vien")
+public class GiangVien extends LuuVetThoiGian {
     @Id
-    @Column(name = "MAGV")
+    @Column(name = "id")
     private String maGV;
 
-    @Column(name = "MAKHOA")
-    private String maKhoa;
+    @ManyToOne
+    @JoinColumn(name = "khoa_id", nullable = false)
+    private Khoa khoa;
 
-    @Column(name = "HO")
+    @OneToMany(mappedBy = "giangVien", fetch = FetchType.LAZY)
+    private List<LopTinChi> dsLopTinChi;
+
+    @Column(name = "ho")
     private String ho;
 
-    @Column(name = "TEN")
+    @Column(name = "ten")
     private String ten;
 
-    @Column(name = "HOCVI")
+    @Column(name = "hoc_vi")
     private String hocVi;
 
-    @Column(name = "HOCHAM")
+    @Column(name = "hoc_ham")
     private String hocHam;
 
-    @Column(name = "CHUYENMON")
+    @Column(name = "chuyen_mon")
     private String chuyenMon;
+
+    @Column(name = "mat_khau")
+    private String password;
+
+    @Column(name = "vai_tro")
+    private String role = "KHOA";
 
     @Transient
     private boolean canDelete = true;
+
+    @Transient
+    private String maKhoa;
+
+    public String getMaKhoa() {
+        if (maKhoa != null) {
+            return maKhoa;
+        }
+        return khoa != null ? khoa.getMaKhoa() : null;
+    }
+
+    public void setMaKhoa(String maKhoa) {
+        this.maKhoa = maKhoa;
+    }
 
     public String getMaGV() {
         return maGV;
@@ -42,12 +72,20 @@ public class GiangVien {
         this.maGV = maGV;
     }
 
-    public String getMaKhoa() {
-        return maKhoa;
+    public Khoa getKhoa() {
+        return khoa;
     }
 
-    public void setMaKhoa(String maKhoa) {
-        this.maKhoa = maKhoa;
+    public void setKhoa(Khoa khoa) {
+        this.khoa = khoa;
+    }
+
+    public List<LopTinChi> getDsLopTinChi() {
+        return dsLopTinChi;
+    }
+
+    public void setDsLopTinChi(List<LopTinChi> dsLopTinChi) {
+        this.dsLopTinChi = dsLopTinChi;
     }
 
     public String getHo() {
@@ -88,6 +126,22 @@ public class GiangVien {
 
     public void setChuyenMon(String chuyenMon) {
         this.chuyenMon = chuyenMon;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public boolean isCanDelete() {

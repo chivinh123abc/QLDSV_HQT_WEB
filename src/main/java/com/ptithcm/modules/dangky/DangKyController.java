@@ -30,7 +30,7 @@ public class DangKyController {
     }
 
     @RequestMapping(params = "btnInsert")
-    public String insert(ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public String insert(ModelMap model, @RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV) {
         try {
             dangKyService.registerClass(maLTC, maSV);
             model.addAttribute("message", MessageConstant.SUCCESS_REGISTER);
@@ -55,7 +55,7 @@ public class DangKyController {
     }
 
     @RequestMapping(params = "btnDelete")
-    public String delete(ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public String delete(ModelMap model, @RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV) {
         try {
             dangKyService.cancelRegistration(maLTC, maSV);
             model.addAttribute("message", "Đã hủy đăng ký thành công");
@@ -79,7 +79,7 @@ public class DangKyController {
 
     @RequestMapping(value = "/api/register", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> apiRegister(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public Map<String, Object> apiRegister(@RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV) {
         Map<String, Object> res = new HashMap<>();
         try {
             dangKyService.registerClass(maLTC, maSV);
@@ -97,7 +97,7 @@ public class DangKyController {
 
     @RequestMapping(value = "/api/cancel", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> apiCancel(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public Map<String, Object> apiCancel(@RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV) {
         Map<String, Object> res = new HashMap<>();
         try {
             dangKyService.cancelRegistration(maLTC, maSV);

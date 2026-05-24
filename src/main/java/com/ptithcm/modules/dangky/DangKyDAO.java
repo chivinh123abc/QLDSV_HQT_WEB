@@ -23,17 +23,17 @@ public class DangKyDAO extends BaseDAO<DangKy, DangKyId> {
         return getSession().get(SinhVien.class, maSV);
     }
 
-    public LopTinChi getLtcById(int maLTC) {
+    public LopTinChi getLtcById(String maLTC) {
         return getSession().get(LopTinChi.class, maLTC);
     }
 
     public Long countSubjectRegisteredInSemester(String maSV, String maMH, String nienKhoa, int hocKy,
-            int currentMaLTC) {
-        String hqlSubject = "SELECT count(dk) FROM DangKy dk " + "JOIN LopTinChi ltc_ref ON dk.maLTC = ltc_ref.maLTC "
-                + "WHERE upper(trim(dk.maSV)) = upper(trim(:maSV)) " + "AND dk.huyDangKy = false "
-                + "AND upper(trim(ltc_ref.maMH)) = upper(trim(:maMH)) "
-                + "AND upper(trim(ltc_ref.nienKhoa)) = upper(trim(:nk)) " + "AND ltc_ref.hocKy = :hk "
-                + "AND dk.maLTC != :currentMaLTC";
+            String currentMaLTC) {
+        String hqlSubject = "SELECT count(dk) FROM DangKy dk "
+                + "WHERE upper(trim(dk.sinhVien.maSV)) = upper(trim(:maSV)) " + "AND dk.huyDangKy = false "
+                + "AND upper(trim(dk.lopTinChi.monHoc.maMH)) = upper(trim(:maMH)) "
+                + "AND upper(trim(dk.lopTinChi.nienKhoa)) = upper(trim(:nk)) " + "AND dk.lopTinChi.hocKy = :hk "
+                + "AND dk.lopTinChi.maLTC != :currentMaLTC";
         return getSession().createQuery(hqlSubject, Long.class).setParameter("maSV", maSV).setParameter("maMH", maMH)
                 .setParameter("nk", nienKhoa).setParameter("hk", hocKy).setParameter("currentMaLTC", currentMaLTC)
                 .uniqueResult();

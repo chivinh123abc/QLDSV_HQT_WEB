@@ -22,7 +22,7 @@ public class DangKyService {
         return dangKyDAO.findAll();
     }
 
-    public void registerClass(int maLTC, String maSV) throws Exception {
+    public void registerClass(String maLTC, String maSV) throws Exception {
         // 1. Kiểm tra Sinh viên
         SinhVien sv = dangKyDAO.getStudentById(maSV);
         if (sv == null) {
@@ -43,8 +43,8 @@ public class DangKyService {
 
         // 3. Kiểm tra ràng buộc môn học: Không thể đăng ký cùng một môn học trong cùng
         // học kỳ
-        Long countSameSubject = dangKyDAO.countSubjectRegisteredInSemester(maSV, ltc.getMaMH(), ltc.getNienKhoa(),
-                ltc.getHocKy(), maLTC);
+        Long countSameSubject = dangKyDAO.countSubjectRegisteredInSemester(maSV, ltc.getMonHoc().getMaMH(),
+                ltc.getNienKhoa(), ltc.getHocKy(), maLTC);
         if (countSameSubject > 0) {
             throw new Exception(MessageConstant.ALREADY_REGISTERED_SUBJECT);
         }
@@ -60,8 +60,8 @@ public class DangKyService {
             }
         } else {
             DangKy newDk = new DangKy();
-            newDk.setMaLTC(maLTC);
-            newDk.setMaSV(maSV);
+            newDk.setLopTinChi(ltc);
+            newDk.setSinhVien(sv);
             newDk.setHuyDangKy(false);
             dangKyDAO.save(newDk);
         }
@@ -71,7 +71,7 @@ public class DangKyService {
         dangKyDAO.update(dangKy);
     }
 
-    public void cancelRegistration(int maLTC, String maSV) throws Exception {
+    public void cancelRegistration(String maLTC, String maSV) throws Exception {
         DangKy dk = dangKyDAO.findById(new DangKyId(maLTC, maSV));
         if (dk == null || dk.isHuyDangKy()) {
             throw new Exception("Không tìm thấy thông tin đăng ký hoặc đã hủy trước đó!");

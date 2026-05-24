@@ -18,8 +18,8 @@ public class LopDAO extends BaseDAO<Lop, String> {
     }
 
     public List<Lop> listLopByKhoa(String maKhoa) {
-        return getSession().createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class).setParameter("maKhoa", maKhoa)
-                .list();
+        return getSession().createQuery("FROM Lop WHERE khoa.maKhoa = :maKhoa", Lop.class)
+                .setParameter("maKhoa", maKhoa).list();
     }
 
     public List<Lop> listAllLop() {
@@ -27,24 +27,22 @@ public class LopDAO extends BaseDAO<Lop, String> {
     }
 
     public List<String> listTrimmedLopFromStudents() {
-        return getSession().createQuery("SELECT distinct trim(maLop) FROM SinhVien", String.class).list();
+        return getSession().createQuery("SELECT distinct trim(lop.maLop) FROM SinhVien", String.class).list();
     }
 
     public List<String> listTrimmedLopFromRegistrations() {
-        return getSession()
-                .createQuery("SELECT distinct trim(sv.maLop) FROM DangKy dk JOIN SinhVien sv ON dk.maSV = sv.maSV",
-                        String.class)
+        return getSession().createQuery("SELECT distinct trim(dk.sinhVien.lop.maLop) FROM DangKy dk", String.class)
                 .list();
     }
 
     public Long countStudentsByLop(String maLop) {
-        return getSession().createQuery("SELECT COUNT(*) FROM SinhVien WHERE maLop = :maLop", Long.class)
+        return getSession().createQuery("SELECT COUNT(*) FROM SinhVien WHERE lop.maLop = :maLop", Long.class)
                 .setParameter("maLop", maLop).uniqueResult();
     }
 
     public Long countRegistrationsByLop(String maLop) {
-        return getSession().createQuery(
-                "SELECT COUNT(dk) FROM DangKy dk JOIN SinhVien sv ON dk.maSV = sv.maSV WHERE sv.maLop = :maLop",
-                Long.class).setParameter("maLop", maLop).uniqueResult();
+        return getSession()
+                .createQuery("SELECT COUNT(dk) FROM DangKy dk WHERE dk.sinhVien.lop.maLop = :maLop", Long.class)
+                .setParameter("maLop", maLop).uniqueResult();
     }
 }

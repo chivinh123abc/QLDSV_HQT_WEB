@@ -1,7 +1,8 @@
 package com.ptithcm.shared.interceptor;
 
+import com.ptithcm.entity.GiangVien;
 import com.ptithcm.entity.SinhVien;
-import com.ptithcm.entity.Users;
+import com.ptithcm.shared.dto.UserSession;
 import com.ptithcm.shared.enumtype.RoleEnum;
 import com.ptithcm.shared.util.SecurityUtil;
 import com.ptithcm.shared.util.SessionUtil;
@@ -41,26 +42,34 @@ public class AuthInterceptor implements HandlerInterceptor {
 
                                 Session hSession = factory.openSession();
                                 try {
-                                    String hql = "FROM Users WHERE username = :username AND password = :password";
-                                    Query<Users> query = hSession.createQuery(hql, Users.class);
-                                    query.setParameter("username", username);
-                                    query.setParameter("password", password);
-                                    Users user = query.uniqueResult();
+                                    // 1. Kiểm tra Sinh viên
+                                    String svHql = "FROM SinhVien WHERE TRIM(maSV) = :username AND password = :password";
+                                    Query<SinhVien> svQuery = hSession.createQuery(svHql, SinhVien.class);
+                                    svQuery.setParameter("username", username);
+                                    svQuery.setParameter("password", password);
+                                    SinhVien sv = svQuery.uniqueResult();
 
-                                    if (user != null) {
+                                    if (sv != null) {
+                                        UserSession user = new UserSession(sv.getMaSV(), "SINHVIEN", null,
+                                                sv.getHo() + " " + sv.getTen());
                                         SessionUtil.setUser(session, user);
-                                        if (user.getRoleId() == RoleEnum.PGV.getId()) {
-                                            SessionUtil.setRole(session, RoleEnum.PGV.getCode());
-                                        } else if (user.getRoleId() == RoleEnum.KHOA.getId()) {
-                                            SessionUtil.setRole(session, RoleEnum.KHOA.getCode());
-                                        } else if (user.getRoleId() == RoleEnum.SINHVIEN.getId()) {
-                                            SessionUtil.setRole(session, RoleEnum.SINHVIEN.getCode());
-                                            String svHql = "FROM SinhVien WHERE TRIM(maSV) = :maSV";
-                                            Query<SinhVien> svQuery = hSession.createQuery(svHql, SinhVien.class);
-                                            svQuery.setParameter("maSV", user.getUsername());
-                                            SinhVien svProfile = svQuery.uniqueResult();
-                                            if (svProfile != null) {
-                                                SessionUtil.setStudentProfile(session, svProfile);
+                                        SessionUtil.setRole(session, RoleEnum.SINHVIEN.getCode());
+                                        SessionUtil.setStudentProfile(session, sv);
+                                    } else {
+                                        // 2. Kiểm tra Giảng viên
+                                        String gvHql = "FROM GiangVien WHERE TRIM(maGV) = :username AND password = :password";
+                                        Query<GiangVien> gvQuery = hSession.createQuery(gvHql, GiangVien.class);
+                                        gvQuery.setParameter("username", username);
+                                        gvQuery.setParameter("password", password);
+                                        GiangVien gv = gvQuery.uniqueResult();
+
+                                        if (gv != null) {
+                                            UserSession user = new UserSession(gv.getMaGV(), gv.getRole(),
+                                                    gv.getMaKhoa(), gv.getHo() + " " + gv.getTen());
+                                            SessionUtil.setUser(session, user);
+                                            SessionUtil.setRole(session, user.getRole());
+                                            if (RoleEnum.KHOA.getCode().equals(user.getRole())) {
+                                                SessionUtil.setMaKhoa(session, gv.getMaKhoa());
                                             }
                                         }
                                     }

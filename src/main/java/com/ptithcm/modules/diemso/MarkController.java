@@ -94,7 +94,7 @@ public class MarkController {
 
     @RequestMapping(value = "/save-marks", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> saveMarks(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV,
+    public Map<String, Object> saveMarks(@RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV,
             @RequestParam(value = "diemCC", required = false) Float diemCC,
             @RequestParam(value = "diemGK", required = false) Float diemGK,
             @RequestParam(value = "diemCK", required = false) Float diemCK) {

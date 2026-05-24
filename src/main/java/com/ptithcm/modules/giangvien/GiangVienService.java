@@ -39,6 +39,9 @@ public class GiangVienService {
     }
 
     public void saveLecturer(GiangVien gv, String mode) throws Exception {
+        if (gv.getMaKhoa() != null) {
+            gv.setKhoa(giangVienDAO.getSession().get(Khoa.class, gv.getMaKhoa()));
+        }
         GiangVien existing = giangVienDAO.findById(gv.getMaGV());
         if ("add".equals(mode)) {
             if (existing != null) {
@@ -57,11 +60,6 @@ public class GiangVienService {
         Long ltcCount = giangVienDAO.countLtcByLecturer(maGV);
         if (ltcCount > 0) {
             throw new Exception("Không thể xóa: Giảng viên đang phụ trách " + ltcCount + " lớp tín chỉ!");
-        }
-
-        Long userCount = giangVienDAO.countUserByLecturer(maGV);
-        if (userCount > 0) {
-            throw new Exception("Không thể xóa: Giảng viên đang được cấp tài khoản đăng nhập trong hệ thống!");
         }
 
         List<GiangVien> list = giangVienDAO.getLecturerByTrimmedId(maGV);

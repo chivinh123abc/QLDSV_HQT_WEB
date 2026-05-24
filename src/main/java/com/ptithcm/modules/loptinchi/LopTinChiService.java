@@ -40,23 +40,43 @@ public class LopTinChiService {
         return lopTinChiDAO.listAllGiangVien();
     }
 
-    public List<Integer> listLtcIdsWithRegistrations() {
+    public List<String> listLtcIdsWithRegistrations() {
         return lopTinChiDAO.listLtcIdsWithRegistrations();
     }
 
-    public LopTinChi getLtcById(int maLTC) {
+    public LopTinChi getLtcById(String maLTC) {
         return lopTinChiDAO.findById(maLTC);
     }
 
     public void insertLtc(LopTinChi ltc) {
+        org.hibernate.Session session = lopTinChiDAO.getSession();
+        if (ltc.getMaMH() != null) {
+            ltc.setMonHoc(session.get(MonHoc.class, ltc.getMaMH()));
+        }
+        if (ltc.getMaGV() != null) {
+            ltc.setGiangVien(session.get(GiangVien.class, ltc.getMaGV()));
+        }
+        if (ltc.getMaKhoa() != null) {
+            ltc.setKhoa(session.get(Khoa.class, ltc.getMaKhoa()));
+        }
         lopTinChiDAO.save(ltc);
     }
 
     public void updateLtc(LopTinChi ltc) {
+        org.hibernate.Session session = lopTinChiDAO.getSession();
+        if (ltc.getMaMH() != null) {
+            ltc.setMonHoc(session.get(MonHoc.class, ltc.getMaMH()));
+        }
+        if (ltc.getMaGV() != null) {
+            ltc.setGiangVien(session.get(GiangVien.class, ltc.getMaGV()));
+        }
+        if (ltc.getMaKhoa() != null) {
+            ltc.setKhoa(session.get(Khoa.class, ltc.getMaKhoa()));
+        }
         lopTinChiDAO.update(ltc);
     }
 
-    public void deleteLtc(int maLTC) throws Exception {
+    public void deleteLtc(String maLTC) throws Exception {
         LopTinChi ltc = lopTinChiDAO.findById(maLTC);
         if (ltc != null) {
             lopTinChiDAO.delete(ltc);
@@ -66,6 +86,17 @@ public class LopTinChiService {
     }
 
     public String saveLtcApi(LopTinChi ltc, String mode) throws Exception {
+        org.hibernate.Session session = lopTinChiDAO.getSession();
+        if (ltc.getMaMH() != null) {
+            ltc.setMonHoc(session.get(MonHoc.class, ltc.getMaMH()));
+        }
+        if (ltc.getMaGV() != null) {
+            ltc.setGiangVien(session.get(GiangVien.class, ltc.getMaGV()));
+        }
+        if (ltc.getMaKhoa() != null) {
+            ltc.setKhoa(session.get(Khoa.class, ltc.getMaKhoa()));
+        }
+
         if ("add".equals(mode)) {
             // Kiểm tra trùng lặp logic: nienKhoa, hocKy, maMH, nhom
             Long count = lopTinChiDAO.countDuplicateLtc(ltc.getNienKhoa(), ltc.getHocKy(), ltc.getMaMH(),
@@ -73,10 +104,6 @@ public class LopTinChiService {
             if (count > 0) {
                 throw new Exception("Lớp tín chỉ này đã tồn tại (trùng Niên khóa, Học kỳ, Môn học, Nhóm)!");
             }
-
-            // Tự sinh ID thủ công để tránh lỗi "Cannot insert NULL into MALTC"
-            Integer maxId = lopTinChiDAO.getMaxLtcId();
-            ltc.setMaLTC(maxId == null ? 1 : maxId + 1);
 
             lopTinChiDAO.save(ltc);
         } else if ("edit".equals(mode)) {
@@ -89,7 +116,7 @@ public class LopTinChiService {
         return "success";
     }
 
-    public void deleteLtcApi(int maLTC) throws Exception {
+    public void deleteLtcApi(String maLTC) throws Exception {
         // Kiểm tra các ràng buộc phụ thuộc: DANGKY (Đăng ký)
         Long count = lopTinChiDAO.countRegistrationsByLtc(maLTC);
         if (count > 0) {

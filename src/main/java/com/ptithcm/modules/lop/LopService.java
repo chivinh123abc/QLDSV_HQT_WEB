@@ -39,6 +39,9 @@ public class LopService {
     }
 
     public String saveClass(Lop lop, String mode) throws Exception {
+        if (lop.getMaKhoa() != null) {
+            lop.setKhoa(lopDAO.getSession().get(Khoa.class, lop.getMaKhoa()));
+        }
         Lop existing = lopDAO.findById(lop.getMaLop());
         if ("add".equals(mode)) {
             if (existing != null) {

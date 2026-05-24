@@ -18,7 +18,7 @@ public class GiangVienDAO extends BaseDAO<GiangVien, String> {
     }
 
     public List<GiangVien> listGiangVienByKhoa(String maKhoa) {
-        return getSession().createQuery("FROM GiangVien WHERE maKhoa = :maKhoa", GiangVien.class)
+        return getSession().createQuery("FROM GiangVien WHERE khoa.maKhoa = :maKhoa", GiangVien.class)
                 .setParameter("maKhoa", maKhoa).list();
     }
 
@@ -27,13 +27,13 @@ public class GiangVienDAO extends BaseDAO<GiangVien, String> {
     }
 
     public List<String> listLtcMaGV() {
-        return getSession().createQuery("SELECT distinct maGV FROM LopTinChi WHERE maGV IS NOT NULL", String.class)
+        return getSession()
+                .createQuery("SELECT distinct giangVien.maGV FROM LopTinChi WHERE giangVien IS NOT NULL", String.class)
                 .list();
     }
 
     public List<String> listUserMaGV() {
-        return getSession().createQuery("SELECT distinct username FROM Users WHERE username IS NOT NULL", String.class)
-                .list();
+        return new java.util.ArrayList<>();
     }
 
     public List<GiangVien> getLecturerByTrimmedId(String maGV) {
@@ -42,12 +42,12 @@ public class GiangVienDAO extends BaseDAO<GiangVien, String> {
     }
 
     public Long countLtcByLecturer(String maGV) {
-        return getSession().createQuery("SELECT COUNT(*) FROM LopTinChi WHERE trim(maGV) = trim(:maGV)", Long.class)
+        return getSession()
+                .createQuery("SELECT COUNT(*) FROM LopTinChi WHERE trim(giangVien.maGV) = trim(:maGV)", Long.class)
                 .setParameter("maGV", maGV.trim()).uniqueResult();
     }
 
     public Long countUserByLecturer(String maGV) {
-        return getSession().createQuery("SELECT COUNT(*) FROM Users WHERE trim(username) = trim(:maGV)", Long.class)
-                .setParameter("maGV", maGV.trim()).uniqueResult();
+        return 0L;
     }
 }

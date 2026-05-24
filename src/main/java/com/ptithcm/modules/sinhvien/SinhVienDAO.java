@@ -19,8 +19,8 @@ public class SinhVienDAO extends BaseDAO<SinhVien, String> {
     }
 
     public List<Lop> listLopByKhoa(String maKhoa) {
-        return getSession().createQuery("FROM Lop WHERE maKhoa = :maKhoa", Lop.class).setParameter("maKhoa", maKhoa)
-                .list();
+        return getSession().createQuery("FROM Lop WHERE khoa.maKhoa = :maKhoa", Lop.class)
+                .setParameter("maKhoa", maKhoa).list();
     }
 
     public List<Lop> listAllLop() {
@@ -28,12 +28,12 @@ public class SinhVienDAO extends BaseDAO<SinhVien, String> {
     }
 
     public List<SinhVien> listStudentsByClass(String maLop) {
-        return getSession().createQuery("FROM SinhVien WHERE maLop = :maLop", SinhVien.class)
+        return getSession().createQuery("FROM SinhVien WHERE lop.maLop = :maLop", SinhVien.class)
                 .setParameter("maLop", maLop).list();
     }
 
     public Long countDangKyByStudent(String maSV) {
-        return getSession().createQuery("SELECT COUNT(*) FROM DangKy WHERE maSV = :maSV", Long.class)
+        return getSession().createQuery("SELECT COUNT(*) FROM DangKy WHERE sinhVien.maSV = :maSV", Long.class)
                 .setParameter("maSV", maSV).uniqueResult();
     }
 }

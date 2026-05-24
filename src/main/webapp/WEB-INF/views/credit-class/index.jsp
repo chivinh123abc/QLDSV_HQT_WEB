@@ -542,61 +542,61 @@
                         return;
                     }
                     container.innerHTML = data.map(item => `
-                <tr onclick="selectLTC(\${item.maLTC}, 'edit', false)">
-                    <td class="px-3"><span class="badge-soft-primary">\${item.maLTC}</span></td>
-                    <td>
-                        <div class="ltc-title">\${item.maMH}</div>
-                        <div class="ltc-subtitle"><i class="bi bi-building"></i> \${item.maKhoa}</div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-dark">\${item.nienKhoa}</div>
-                        <div class="small text-muted">Học kỳ: \${item.hocKy}</div>
-                    </td>
-                    <td class="text-center"><span class="badge-soft-secondary">Nhóm \${item.nhom}</span></td>
-                    <td>
-                        <div class="fw-semibold text-primary">\${item.maGV}</div>
-                        <div class="small text-muted">Tối thiểu: \${item.soSVToiThieu} SV</div>
-                    </td>
-                    <td class="text-center">
-                        \${item.huyLop ? 
-                            '<span class="badge-soft-danger small"><i class="bi bi-x-circle"></i> Đã hủy</span>' : 
-                            '<span class="badge-soft-success small"><i class="bi bi-check-circle"></i> Đang mở</span>'}
-                    </td>
-                    <td class="text-center">
-                        <div class="d-flex gap-2 justify-content-center">
-                            <button onclick="event.stopPropagation(); selectLTC(\${item.maLTC}, 'edit', true)" class="btn btn-sm btn-outline-primary border-0 rounded-3"><i class="bi bi-pencil-square"></i></button>
-                             <button onclick="event.stopPropagation(); selectLTC(\${item.maLTC}, 'delete', true)" class="btn btn-sm btn-outline-danger border-0 rounded-3 \${!item.canDelete ? 'disabled opacity-25' : ''}" \${!item.canDelete ? 'disabled title="Không thể xóa"' : ''}><i class="bi bi-trash3"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+                        <tr onclick="selectLTC('\${item.maLTC}', 'edit', false)">
+                            <td class="px-3"><span class="badge-soft-primary">\${item.maLTC}</span></td>
+                            <td>
+                                <div class="ltc-title">\${item.maMH}</div>
+                                <div class="ltc-subtitle"><i class="bi bi-building"></i> \${item.maKhoa}</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">\${item.nienKhoa}</div>
+                                <div class="small text-muted">Học kỳ: \${item.hocKy}</div>
+                            </td>
+                            <td class="text-center"><span class="badge-soft-secondary">Nhóm \${item.nhom}</span></td>
+                            <td>
+                                <div class="fw-semibold text-primary">\${item.maGV}</div>
+                                <div class="small text-muted">Tối thiểu: \${item.soSVToiThieu} SV</div>
+                            </td>
+                            <td class="text-center">
+                                \${item.huyLop ? 
+                                    '<span class="badge-soft-danger small"><i class="bi bi-x-circle"></i> Đã hủy</span>' : 
+                                    '<span class="badge-soft-success small"><i class="bi bi-check-circle"></i> Đang mở</span>'}
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button onclick="event.stopPropagation(); selectLTC('\${item.maLTC}', 'edit', true)" class="btn btn-sm btn-outline-primary border-0 rounded-3"><i class="bi bi-pencil-square"></i></button>
+                                     <button onclick="event.stopPropagation(); selectLTC('\${item.maLTC}', 'delete', true)" class="btn btn-sm btn-outline-danger border-0 rounded-3 \${!item.canDelete ? 'disabled opacity-25' : ''}" \${!item.canDelete ? 'disabled title="Không thể xóa"' : ''}><i class="bi bi-trash3"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
                 }
 
                 function renderMiniTable(data) {
                     const container = document.getElementById('mini-table-body');
                     container.innerHTML = data.map(item => `
-                <tr onclick="selectLTC(\${item.maLTC}, 'edit', false)">
-                    <td class="px-3 small fw-bold text-primary">\${item.maLTC}</td>
-                    <td class="small">
-                        <div class="fw-bold text-dark">\${item.maMH}</div>
-                        <div class="text-muted">Nhóm \${item.nhom}</div>
-                    </td>
-                    <td class="small">
-                        <div>Kỳ \${item.hocKy}</div>
-                        <div class="text-muted">\${item.nienKhoa}</div>
-                    </td>
-                    <td class="text-center">
-                        <div class="d-flex justify-content-center gap-1">
-                            <button type="button" onclick="event.stopPropagation(); selectLTC(\${item.maLTC}, 'edit', true)" class="btn btn-xs btn-outline-primary border-0 p-1">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                             <button type="button" onclick="event.stopPropagation(); selectLTC(\${item.maLTC}, 'delete', true)" class="btn btn-xs btn-outline-danger border-0 p-1 \${!item.canDelete ? 'disabled opacity-25' : ''}" \${!item.canDelete ? 'disabled title="Không thể xóa"' : ''}>
-                                 <i class="bi bi-trash3"></i>
-                             </button>
-                         </div>
-                    </td>
-                </tr>
-            `).join('');
+                        <tr onclick="selectLTC('\${item.maLTC}', 'edit', false)">
+                            <td class="px-3 small fw-bold text-primary">\${item.maLTC}</td>
+                            <td class="small">
+                                <div class="fw-bold text-dark">\${item.maMH}</div>
+                                <div class="text-muted">Nhóm \${item.nhom}</div>
+                            </td>
+                            <td class="small">
+                                <div>Kỳ \${item.hocKy}</div>
+                                <div class="text-muted">\${item.nienKhoa}</div>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <button type="button" onclick="event.stopPropagation(); selectLTC('\${item.maLTC}', 'edit', true)" class="btn btn-xs btn-outline-primary border-0 p-1">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                     <button type="button" onclick="event.stopPropagation(); selectLTC('\${item.maLTC}', 'delete', true)" class="btn btn-xs btn-outline-danger border-0 p-1 \${!item.canDelete ? 'disabled opacity-25' : ''}" \${!item.canDelete ? 'disabled title="Không thể xóa"' : ''}>
+                                         <i class="bi bi-trash3"></i>
+                                     </button>
+                                  </div>
+                            </td>
+                        </tr>
+                    `).join('');
                 }
 
                 async function selectLTC(maLTC, mode, forceMode = false) {
@@ -623,7 +623,7 @@
                 }
 
                 function clearForm() {
-                    document.getElementById('inp_maLTC').value = '0';
+                    document.getElementById('inp_maLTC').value = '';
                     inputs.forEach(id => {
                         const el = document.getElementById(id);
                         if (el.type === 'checkbox') el.checked = false;
@@ -670,7 +670,7 @@
 
                 async function performSave() {
                     const data = {
-                        maLTC: parseInt(document.getElementById('inp_maLTC').value) || 0,
+                        maLTC: document.getElementById('inp_maLTC').value,
                         nienKhoa: document.getElementById('inp_nienKhoa').value,
                         hocKy: parseInt(document.getElementById('inp_hocKy').value),
                         nhom: parseInt(document.getElementById('inp_nhom').value),

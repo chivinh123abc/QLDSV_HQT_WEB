@@ -232,15 +232,15 @@
                     const cleanNk = (nk || '').trim().toUpperCase();
                     const cleanHk = Number(hk);
                     return availableLTCList
-                        .filter(ltc => registeredLTCIds.map(Number).includes(Number(ltc.maLTC)) && 
+                        .filter(ltc => registeredLTCIds.includes(String(ltc.maLTC)) && 
                                        (ltc.nienKhoa || '').trim().toUpperCase() === cleanNk && 
                                        Number(ltc.hocKy) === cleanHk)
                         .map(ltc => (ltc.maMH || '').trim().toUpperCase());
                 };
-
+ 
                 const container = document.getElementById('available-ltc-body');
                 container.innerHTML = availableLTCList.map(item => {
-                    const isRegistered = registeredLTCIds.map(Number).includes(Number(item.maLTC));
+                    const isRegistered = registeredLTCIds.includes(String(item.maLTC));
                     const subjectsInSemester = getRegisteredSubjects(item.nienKhoa, item.hocKy);
                     const cleanMaMH = (item.maMH || '').trim().toUpperCase();
                     const isSameSubjectRegistered = subjectsInSemester.includes(cleanMaMH);
@@ -248,7 +248,7 @@
                     let btnHtml = '';
                     if (isRegistered) {
                         btnHtml = `
-                            <button class="btn btn-sm btn-outline-danger rounded-3 px-3" onclick="confirmCancel(\${item.maLTC})">
+                            <button class="btn btn-sm btn-outline-danger rounded-3 px-3" onclick="confirmCancel('\${item.maLTC}')">
                                 <i class="bi bi-x-circle me-1"></i> Hủy đăng ký
                             </button>
                         `;
@@ -260,12 +260,12 @@
                         `;
                     } else {
                         btnHtml = `
-                            <button class="btn btn-sm btn-primary rounded-3 px-3" onclick="registerLTC(\${item.maLTC})">
+                            <button class="btn btn-sm btn-primary rounded-3 px-3" onclick="registerLTC('\${item.maLTC}')">
                                 <i class="bi bi-plus-circle me-1"></i> Đăng ký
                             </button>
                         `;
                     }
-
+ 
                     return `
                         <tr>
                             <td class="px-3"><span class="badge-soft-primary">\${item.maLTC}</span></td>
@@ -285,14 +285,14 @@
                 }).join('');
             } catch (e) { console.error(e); }
         }
-
+ 
         async function loadRegisteredLTC(maSV) {
             try {
                 const res = await fetch(contextPath + '/registration/api/list');
                 const allReg = await res.json();
                 const myReg = allReg.filter(r => (r.maSV || '').trim().toUpperCase() === maSV.trim().toUpperCase() && 
                                                  !(r.huyDangKy === true || r.huyDangKy === 1 || String(r.huyDangKy) === 'true'));
-                registeredLTCIds = myReg.map(r => Number(r.maLTC));
+                registeredLTCIds = myReg.map(r => String(r.maLTC));
                 
                 const container = document.getElementById('registered-list');
                 if (myReg.length === 0) {
@@ -304,7 +304,7 @@
                                 <div class="fw-bold text-dark small">Lớp LTC: \${r.maLTC}</div>
                                 <div class="text-muted" style="font-size: 0.75rem;">Trạng thái: Đã đăng ký</div>
                             </div>
-                            <button class="btn btn-xs btn-outline-danger border-0" onclick="confirmCancel(\${r.maLTC})">
+                            <button class="btn btn-xs btn-outline-danger border-0" onclick="confirmCancel('\${r.maLTC}')">
                                 <i class="bi bi-x-circle-fill"></i> Hủy
                             </button>
                         </div>

@@ -2,23 +2,48 @@ package com.ptithcm.modules.auth;
 
 import com.ptithcm.entity.GiangVien;
 import com.ptithcm.entity.SinhVien;
-import com.ptithcm.entity.Users;
-import com.ptithcm.shared.base.BaseDAO;
+import com.ptithcm.shared.dto.UserSession;
 
 import java.util.List;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class AuthDAO extends BaseDAO<Users, Integer> {
+public class AuthDAO {
 
-    public AuthDAO() {
-        super(Users.class);
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    protected Session getSession() {
+        return sessionFactory.getCurrentSession();
     }
 
-    public Users findUserByUsernameAndPassword(String username, String password) {
-        String hql = "FROM Users WHERE username = :username AND password = :password";
-        return getSession().createQuery(hql, Users.class).setParameter("username", username)
+    public UserSession findUserByUsernameAndPassword(String username, String password) {
+        if (username == null || password == null) {
+            return null;
+        }
+        String u = username.trim();
+
+        // 1. Kiểm tra tài khoản Sinh viên
+        String svHql = "FROM SinhVien WHERE TRIM(maSV) = :username AND password = :password";
+        SinhVien sv = getSession().createQuery(svHql, SinhVien.class).setParameter("username", u)
                 .setParameter("password", password).uniqueResult();
+        if (sv != null) {
+            return new UserSession(sv.getMaSV(), "SINHVIEN", null, sv.getHo() + " " + sv.getTen());
+        }
+
+        // 2. Kiểm tra tài khoản Giảng viên / Phòng Giáo Vụ
+        String gvHql = "FROM GiangVien WHERE TRIM(maGV) = :username AND password = :password";
+        GiangVien gv = getSession().createQuery(gvHql, GiangVien.class).setParameter("username", u)
+                .setParameter("password", password).uniqueResult();
+        if (gv != null) {
+            return new UserSession(gv.getMaGV(), gv.getRole(), gv.getKhoa() != null ? gv.getKhoa().getMaKhoa() : null,
+                    gv.getHo() + " " + gv.getTen());
+        }
+
+        return null;
     }
 
     public GiangVien findGiangVienByMaGV(String maGV) {
@@ -40,23 +65,14 @@ public class AuthDAO extends BaseDAO<Users, Integer> {
     }
 
     public List<String> getLecturerUsernamesWithCreditClasses() {
-        return getSession()
-                .createQuery("SELECT distinct trim(maGV) FROM LopTinChi WHERE maGV IS NOT NULL", String.class).list();
+        return getSession().createQuery(
+                "SELECT distinct trim(giangVien.maGV) FROM LopTinChi WHERE giangVien IS NOT NULL", String.class).list();
     }
 
     public List<String> getStudentUsernamesWithRegistrations() {
-        return getSession().createQuery("SELECT distinct trim(maSV) FROM DangKy WHERE maSV IS NOT NULL", String.class)
+        return getSession()
+                .createQuery("SELECT distinct trim(sinhVien.maSV) FROM DangKy WHERE sinhVien IS NOT NULL", String.class)
                 .list();
-    }
-
-    public List<SinhVien> getUnassignedStudents() {
-        String hql = "FROM SinhVien sv WHERE sv.maSV NOT IN (SELECT u.username FROM Users u)";
-        return getSession().createQuery(hql, SinhVien.class).list();
-    }
-
-    public List<GiangVien> getUnassignedLecturers() {
-        String hql = "FROM GiangVien gv WHERE gv.maGV NOT IN (SELECT u.username FROM Users u)";
-        return getSession().createQuery(hql, GiangVien.class).list();
     }
 
     public Long countGiangVienByMaGV(String username) {
@@ -69,26 +85,17 @@ public class AuthDAO extends BaseDAO<Users, Integer> {
                 .setParameter("username", username).uniqueResult();
     }
 
-    public Long countUsersByUsername(String username) {
-        return getSession().createQuery("SELECT COUNT(*) FROM Users WHERE username = :username", Long.class)
-                .setParameter("username", username).uniqueResult();
-    }
-
-    public Long countUsersByUsernameExcludingId(String username, int userId) {
-        return getSession()
-                .createQuery("SELECT COUNT(*) FROM Users WHERE username = :username AND userId != :userId", Long.class)
-                .setParameter("username", username).setParameter("userId", userId).uniqueResult();
-    }
-
     public Long countLtcByLecturerUsername(String username) {
         return getSession()
-                .createQuery("SELECT COUNT(*) FROM LopTinChi WHERE upper(trim(maGV)) = upper(trim(:uname))", Long.class)
+                .createQuery("SELECT COUNT(*) FROM LopTinChi WHERE upper(trim(giangVien.maGV)) = upper(trim(:uname))",
+                        Long.class)
                 .setParameter("uname", username).uniqueResult();
     }
 
     public Long countDangKyByStudentUsername(String username) {
         return getSession()
-                .createQuery("SELECT COUNT(*) FROM DangKy WHERE upper(trim(maSV)) = upper(trim(:uname))", Long.class)
+                .createQuery("SELECT COUNT(*) FROM DangKy WHERE upper(trim(sinhVien.maSV)) = upper(trim(:uname))",
+                        Long.class)
                 .setParameter("uname", username).uniqueResult();
     }
 }

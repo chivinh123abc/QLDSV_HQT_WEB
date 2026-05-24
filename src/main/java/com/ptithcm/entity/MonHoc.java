@@ -2,25 +2,32 @@ package com.ptithcm.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.List;
+import com.ptithcm.entity.base.LuuVetThoiGian;
 
 @Entity
-@Table(name = "MONHOC")
-public class MonHoc {
+@Table(name = "mon_hoc")
+public class MonHoc extends LuuVetThoiGian {
     @Id
-    @Column(name = "MAMH")
+    @Column(name = "id")
     private String maMH;
 
-    @Column(name = "TENMH")
+    @Column(name = "ten_mon_hoc")
     private String tenMH;
 
-    @Column(name = "SOTIET_LT")
+    @Column(name = "so_tiet_ly_thuyet")
     private int soTietLT;
 
-    @Column(name = "SOTIET_TH")
+    @Column(name = "so_tiet_thuc_hanh")
     private int soTietTH;
+
+    @OneToMany(mappedBy = "monHoc", fetch = FetchType.LAZY)
+    private List<LopTinChi> dsLopTinChi;
 
     @Transient
     private boolean canDelete = true;
@@ -55,6 +62,14 @@ public class MonHoc {
 
     public void setSoTietTH(int soTietTH) {
         this.soTietTH = soTietTH;
+    }
+
+    public List<LopTinChi> getDsLopTinChi() {
+        return dsLopTinChi;
+    }
+
+    public void setDsLopTinChi(List<LopTinChi> dsLopTinChi) {
+        this.dsLopTinChi = dsLopTinChi;
     }
 
     public boolean isCanDelete() {

@@ -36,10 +36,16 @@ public class SinhVienService {
     }
 
     public void insertStudent(SinhVien sv) {
+        if (sv.getMaLop() != null) {
+            sv.setLop(sinhVienDAO.getSession().get(Lop.class, sv.getMaLop()));
+        }
         sinhVienDAO.save(sv);
     }
 
     public void updateStudent(SinhVien sv) {
+        if (sv.getMaLop() != null) {
+            sv.setLop(sinhVienDAO.getSession().get(Lop.class, sv.getMaLop()));
+        }
         sinhVienDAO.update(sv);
     }
 
@@ -57,6 +63,9 @@ public class SinhVienService {
     }
 
     public String saveStudentApi(SinhVien sv, String mode) throws Exception {
+        if (sv.getMaLop() != null) {
+            sv.setLop(sinhVienDAO.getSession().get(Lop.class, sv.getMaLop()));
+        }
         SinhVien existing = sinhVienDAO.findById(sv.getMaSV());
         if (mode.equals("add")) {
             if (existing != null) {
