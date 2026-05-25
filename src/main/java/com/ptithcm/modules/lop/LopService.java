@@ -1,11 +1,13 @@
 package com.ptithcm.modules.lop;
 
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.Lop;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.Lop;
 
 @Service
 @Transactional

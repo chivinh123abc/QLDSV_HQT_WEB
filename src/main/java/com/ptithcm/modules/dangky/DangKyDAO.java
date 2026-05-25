@@ -1,12 +1,16 @@
 package com.ptithcm.modules.dangky;
 
-import com.ptithcm.entity.DangKy;
-import com.ptithcm.entity.DangKyId;
-import com.ptithcm.entity.LopTinChi;
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.shared.base.BaseDAO;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.DangKy;
+import com.ptithcm.entities.DangKyId;
+import com.ptithcm.entities.LopTinChi;
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.shared.bases.BaseDAO;
+import com.ptithcm.shared.enums.TrangThaiDangKy;
+import com.ptithcm.shared.enums.TrangThaiLop;
 
 @Repository
 public class DangKyDAO extends BaseDAO<DangKy, DangKyId> {
@@ -30,16 +34,18 @@ public class DangKyDAO extends BaseDAO<DangKy, DangKyId> {
     public Long countSubjectRegisteredInSemester(String maSV, String maMH, String nienKhoa, int hocKy,
             String currentMaLTC) {
         String hqlSubject = "SELECT count(dk) FROM DangKy dk "
-                + "WHERE upper(trim(dk.sinhVien.maSV)) = upper(trim(:maSV)) " + "AND dk.huyDangKy = false "
+                + "WHERE upper(trim(dk.sinhVien.maSV)) = upper(trim(:maSV)) " + "AND dk.trangThaiDangKy = :hieuLuc "
                 + "AND upper(trim(dk.lopTinChi.monHoc.maMH)) = upper(trim(:maMH)) "
                 + "AND upper(trim(dk.lopTinChi.nienKhoa)) = upper(trim(:nk)) " + "AND dk.lopTinChi.hocKy = :hk "
                 + "AND dk.lopTinChi.maLTC != :currentMaLTC";
-        return getSession().createQuery(hqlSubject, Long.class).setParameter("maSV", maSV).setParameter("maMH", maMH)
+        return getSession().createQuery(hqlSubject, Long.class).setParameter("maSV", maSV)
+                .setParameter("hieuLuc", TrangThaiDangKy.HIEU_LUC).setParameter("maMH", maMH)
                 .setParameter("nk", nienKhoa).setParameter("hk", hocKy).setParameter("currentMaLTC", currentMaLTC)
                 .uniqueResult();
     }
 
     public List<LopTinChi> getAvailableClasses() {
-        return getSession().createQuery("FROM LopTinChi WHERE huyLop = false", LopTinChi.class).list();
+        return getSession().createQuery("FROM LopTinChi WHERE trangThaiLop = :hoatDong", LopTinChi.class)
+                .setParameter("hoatDong", TrangThaiLop.HOAT_DONG).list();
     }
 }

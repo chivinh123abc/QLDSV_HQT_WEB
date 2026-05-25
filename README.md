@@ -72,7 +72,7 @@ QLDSV_HQT_WEB
         │       └── ptithcm
         │           ├── entity               # Các Java class ánh xạ trực tiếp sang các bảng CSDL
         │           │   ├── base
-        │           │   │   └── LuuVetThoiGian.java # MappedSuperclass chứa các trường audit (created_at, updated_at, deleted_at)
+        │           │   │   └── LuuVetThoiGian.java # MappedSuperclass chứa các trường audit (ngay_tao, ngay_cap_nhat, ngay_xoa)
         │           │   ├── DangKy.java
         │           │   ├── DangKyId.java     # Khóa chính phức hợp cho bảng Đăng ký
         │           │   ├── GiangVien.java
@@ -157,9 +157,9 @@ QLDSV_HQT_WEB
             │   └── js
             │       └── main.js
             └── WEB-INF
-                ├── configs                  # Cấu hình Spring Beans, MVC, Hibernate Datasource
-                │   ├── spring-config-bean.xml
-                │   └── spring-config-mvc.xml
+                 ├── config                  # Cấu hình Spring Beans, MVC, Hibernate Datasource
+                 │   ├── spring-config-bean.xml
+                 │   └── spring-config-mvc.xml
                 ├── views                    # Các trang hiển thị JSP (được tổ chức theo thực thể)
                 │   ├── class
                 │   ├── credit-class

@@ -1,8 +1,10 @@
 package com.ptithcm.modules.home;
 
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.shared.base.BaseDAO;
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.shared.bases.BaseDAO;
+import com.ptithcm.shared.enums.TrangThaiDangKy;
 
 @Repository
 public class HomeDAO extends BaseDAO<SinhVien, String> {
@@ -12,8 +14,9 @@ public class HomeDAO extends BaseDAO<SinhVien, String> {
     }
 
     public Long getRegisteredCount(String maSV) {
-        String hqlCount = "SELECT count(dk) FROM DangKy dk WHERE TRIM(dk.maSV) = :maSV AND (dk.huyDangKy = false OR dk.huyDangKy IS NULL)";
-        return getSession().createQuery(hqlCount, Long.class).setParameter("maSV", maSV.trim()).uniqueResult();
+        String hqlCount = "SELECT count(dk) FROM DangKy dk WHERE TRIM(dk.sinhVien.maSV) = :maSV AND dk.trangThaiDangKy = :hieuLuc";
+        return getSession().createQuery(hqlCount, Long.class).setParameter("maSV", maSV.trim())
+                .setParameter("hieuLuc", TrangThaiDangKy.HIEU_LUC).uniqueResult();
     }
 
     public Long getStudentCount() {

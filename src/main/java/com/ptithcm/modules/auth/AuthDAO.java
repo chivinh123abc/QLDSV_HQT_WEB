@@ -1,14 +1,18 @@
 package com.ptithcm.modules.auth;
 
-import com.ptithcm.entity.GiangVien;
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.shared.dto.UserSession;
-
 import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.GiangVien;
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.entities.TaiKhoan;
+import com.ptithcm.shared.dtos.UserSession;
+import com.ptithcm.shared.enums.TrangThaiTaiKhoan;
 
 @Repository
 public class AuthDAO {
@@ -26,21 +30,35 @@ public class AuthDAO {
         }
         String u = username.trim();
 
-        // 1. Kiểm tra tài khoản Sinh viên
-        String svHql = "FROM SinhVien WHERE TRIM(maSV) = :username AND password = :password";
-        SinhVien sv = getSession().createQuery(svHql, SinhVien.class).setParameter("username", u)
-                .setParameter("password", password).uniqueResult();
-        if (sv != null) {
-            return new UserSession(sv.getMaSV(), "SINHVIEN", null, sv.getHo() + " " + sv.getTen());
+        // 1. Truy vấn TaiKhoan theo tenDangNhap
+        String hql = "FROM TaiKhoan WHERE TRIM(tenDangNhap) = :username";
+        TaiKhoan taiKhoan = getSession().createQuery(hql, TaiKhoan.class).setParameter("username", u).uniqueResult();
+
+        if (taiKhoan == null) {
+            return null;
         }
 
-        // 2. Kiểm tra tài khoản Giảng viên / Phòng Giáo Vụ
-        String gvHql = "FROM GiangVien WHERE TRIM(maGV) = :username AND password = :password";
-        GiangVien gv = getSession().createQuery(gvHql, GiangVien.class).setParameter("username", u)
-                .setParameter("password", password).uniqueResult();
-        if (gv != null) {
-            return new UserSession(gv.getMaGV(), gv.getRole(), gv.getKhoa() != null ? gv.getKhoa().getMaKhoa() : null,
-                    gv.getHo() + " " + gv.getTen());
+        // 2. Kiểm tra trạng thái và so khớp mật khẩu bằng BCrypt
+        if (taiKhoan.getTrangThai() != TrangThaiTaiKhoan.DA_KICH_HOAT) {
+            return null;
+        }
+
+        if (!BCrypt.checkpw(password, taiKhoan.getMatKhau())) {
+            return null;
+        }
+
+        // 3. Khôi phục thông tin từ SinhVien hoặc GiangVien
+        if ("SINHVIEN".equals(taiKhoan.getPhanQuyen())) {
+            SinhVien sv = findSinhVienByMaSV(u);
+            if (sv != null) {
+                return new UserSession(sv.getMaSV(), "SINHVIEN", null, sv.getHo() + " " + sv.getTen());
+            }
+        } else {
+            GiangVien gv = findGiangVienByMaGV(u);
+            if (gv != null) {
+                return new UserSession(gv.getMaGV(), taiKhoan.getPhanQuyen(),
+                        gv.getKhoa() != null ? gv.getKhoa().getMaKhoa() : null, gv.getHo() + " " + gv.getTen());
+            }
         }
 
         return null;

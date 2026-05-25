@@ -1,20 +1,21 @@
 package com.ptithcm.modules.auth;
 
-import com.ptithcm.entity.GiangVien;
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.shared.constant.MessageConstant;
-import com.ptithcm.shared.dto.UserSession;
-import com.ptithcm.shared.enumtype.RoleEnum;
-import com.ptithcm.shared.util.SecurityUtil;
-import com.ptithcm.shared.util.SessionUtil;
-
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.ptithcm.entities.GiangVien;
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.shared.constants.MessageConstant;
+import com.ptithcm.shared.dtos.UserSession;
+import com.ptithcm.shared.enums.RoleEnum;
+import com.ptithcm.shared.utils.SecurityUtil;
+import com.ptithcm.shared.utils.SessionUtil;
 
 @Controller
 public class LoginController {
@@ -23,13 +24,17 @@ public class LoginController {
     private AuthService authService;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(HttpSession session) {
+    public String login(HttpSession session, @RequestParam(value = "activated", required = false) String activated,
+            ModelMap model) {
         if (SessionUtil.getUser(session) != null) {
             String role = SessionUtil.getRole(session);
             if (RoleEnum.SINHVIEN.getCode().equals(role)) {
                 return "redirect:/registration";
             }
             return "redirect:/index";
+        }
+        if ("true".equals(activated)) {
+            model.addAttribute("success", "Kích hoạt tài khoản thành công! Vui lòng đăng nhập.");
         }
         return "login";
     }

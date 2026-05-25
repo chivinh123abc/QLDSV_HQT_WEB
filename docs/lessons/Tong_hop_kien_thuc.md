@@ -275,7 +275,7 @@ _(Chi tiết xem tại: **[Chương 7: Validation & Interceptor](./Chuong_7_Vali
       <mvc:interceptor>
           <mvc:mapping path="/admin/**" />
           <mvc:exclude-mapping path="/admin/login.htm" />
-          <bean class="com.ptithcm.shared.interceptor.AuthInterceptor" />
+          <bean class="com.ptithcm.shared.interceptors.AuthInterceptor" />
       </mvc:interceptor>
   </mvc:interceptors>
   ```
@@ -313,7 +313,7 @@ _(Chi tiết xem tại: **[Chương 8: Tổ Chức Giao Diện & Tiện Ích Đa
 - Cho phép người dùng upload hình ảnh, tài liệu trực tiếp từ máy tính cá nhân lên thư mục lưu trữ của máy chủ thông qua giao diện CKEditor.
 - **Thực hiện:**
   - Đặt thư viện CKFinder vào `resources/ckfinder/`.
-  - Khai báo `ConnectorServlet` trong `web.xml` để đón các yêu cầu xử lý file và kết nối đến cấu hình `/WEB-INF/config.xml`.
+  - Khai báo `ConnectorServlet` trong `web.xml` để đón các yêu cầu xử lý file và kết nối đến cấu hình `/WEB-INF/configs.xml`.
   - Copy toàn bộ file thư viện `.jar` đi kèm của CKFinder vào thư mục `WEB-INF/lib` để hệ thống Java biên dịch và hỗ trợ xử lý file upload một cách chuẩn xác.
 
 ---

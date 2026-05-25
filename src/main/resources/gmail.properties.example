@@ -1,4 +1,5 @@
 # Cấu hình SMTP Gmail mẫu (Thay đổi thông tin thật trong gmail.properties)
+
 mail.host=smtp.gmail.com
 mail.port=465
 mail.username=your_email@gmail.com

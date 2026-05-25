@@ -1,10 +1,12 @@
 package com.ptithcm.modules.monhoc;
 
-import com.ptithcm.entity.MonHoc;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.MonHoc;
 
 @Service
 @Transactional

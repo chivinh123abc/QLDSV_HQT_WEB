@@ -1,12 +1,14 @@
 package com.ptithcm.modules.loptinchi;
 
-import com.ptithcm.entity.GiangVien;
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.LopTinChi;
-import com.ptithcm.entity.MonHoc;
-import com.ptithcm.shared.base.BaseDAO;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.GiangVien;
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.LopTinChi;
+import com.ptithcm.entities.MonHoc;
+import com.ptithcm.shared.bases.BaseDAO;
 
 @Repository
 public class LopTinChiDAO extends BaseDAO<LopTinChi, String> {

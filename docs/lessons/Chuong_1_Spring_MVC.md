@@ -60,7 +60,7 @@ Spring MVC cung cấp kiến trúc Model-View-Controller để phân tách các 
 
 - **WEB-INF/lib:** Là nơi bắt buộc phải đặt tất cả các file thư viện (`.jar`) của Spring framework và các thư viện liên quan khác.
 
-- **WEB-INF:** Bao gồm file cấu hình ứng dụng (`web.xml`), thư mục cấu hình Spring MVC (`configs/spring-config-mvc.xml`), và thư mục giao diện (`views/hello.jsp`).
+- **WEB-INF:** Bao gồm file cấu hình ứng dụng (`web.xml`), thư mục cấu hình Spring MVC (`config/spring-config-mvc.xml`), và thư mục giao diện (`views/hello.jsp`).
 
 ---
 

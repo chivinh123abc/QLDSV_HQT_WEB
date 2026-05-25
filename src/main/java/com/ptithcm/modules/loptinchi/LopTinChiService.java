@@ -1,13 +1,15 @@
 package com.ptithcm.modules.loptinchi;
 
-import com.ptithcm.entity.GiangVien;
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.LopTinChi;
-import com.ptithcm.entity.MonHoc;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.GiangVien;
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.LopTinChi;
+import com.ptithcm.entities.MonHoc;
 
 @Service
 @Transactional

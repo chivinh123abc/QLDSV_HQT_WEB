@@ -75,7 +75,7 @@ CKFinder thường được tích hợp chung với CKEditor để cho phép ng�
 
 2. Giải nén và copy thư mục `ckfinder` vào trong thư mục `resources` của dự án web.
 
-3. Cấu hình file `web.xml` (trong thư mục `WEB-INF`) bằng cách khai báo một `Servlet` mang tên `ConnectorServlet`. Cấu hình URL Pattern của servlet này trỏ tới: `/resources/ckfinder/core/connector/java/connector.java`. Đồng thời cấp tham số `XMLConfig` trỏ đường dẫn tới file cấu hình là `/WEB-INF/config.xml`.
+3. Cấu hình file `web.xml` (trong thư mục `WEB-INF`) bằng cách khai báo một `Servlet` mang tên `ConnectorServlet`. Cấu hình URL Pattern của servlet này trỏ tới: `/resources/ckfinder/core/connector/java/connector.java`. Đồng thời cấp tham số `XMLConfig` trỏ đường dẫn tới file cấu hình là `/WEB-INF/configs.xml`.
 
 4. Copy file `config.xml` (từ thư mục WEB-INF của file tải về) bỏ vào thư mục `/WEB-INF/` của project.
 

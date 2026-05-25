@@ -11,14 +11,7 @@
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
 			<param-value>
-				/WEB-INF/configs/spring-config-mvc.xml,
-				/WEB-INF/configs/spring-config-hibernate.xml,
-				/WEB-INF/configs/spring-config-bean.xml,
-				/WEB-INF/configs/spring-config-interceptor.xml,
-				/WEB-INF/configs/spring-config-upload.xml,
-				/WEB-INF/configs/spring-config-gmail.xml,
-				/WEB-INF/configs/spring-config-i18n.xml,
-				/WEB-INF/configs/spring-config-resources.xml
+				/WEB-INF/configs/*.xml
 			</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>

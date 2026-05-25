@@ -81,11 +81,11 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th class="px-3" style="width: 10%;">ID</th>
-                                            <th style="width: 20%;">TÊN ĐĂNG NHẬP</th>
-                                            <th style="width: 25%;">HỌ TÊN</th>
+                                            <th style="width: 15%;">TÊN ĐĂNG NHẬP</th>
+                                            <th style="width: 20%;">HỌ TÊN</th>
+                                            <th style="width: 20%;">EMAIL</th>
                                             <th class="text-center" style="width: 15%;">NHÓM QUYỀN</th>
-                                            <th class="text-center" style="width: 15%;">MẬT KHẨU</th>
-                                            <th class="text-center" style="width: 15%;">THAO TÁC</th>
+                                            <th class="text-center" style="width: 20%;">THAO TÁC</th>
                                         </tr>
                                     </thead>
                                     <tbody id="user-table-body">
@@ -94,6 +94,7 @@
                                                 <td class="px-3"><span class="badge-soft-primary">${item.userId}</span></td>
                                                 <td><div class="fw-bold text-dark">${item.username}</div></td>
                                                 <td><div class="text-muted small">${item.fullName}</div></td>
+                                                <td><div class="text-muted small">${item.email}</div></td>
                                                 <td class="text-center">
                                                     <c:choose>
                                                         <c:when test="${item.roleId == 1}"><span class="badge bg-danger">PGV</span></c:when>
@@ -102,7 +103,6 @@
                                                         <c:otherwise><span class="badge bg-secondary">UNKNOWN</span></c:otherwise>
                                                     </c:choose>
                                                 </td>
-                                                <td class="text-center"><span class="text-muted small">******</span></td>
                                                 <td class="text-center">
                                                     <div class="d-flex gap-2 justify-content-center">
                                                         <button onclick="event.stopPropagation(); selectUser('${item.userId}', 'edit', true)" class="btn btn-sm btn-outline-primary border-0 rounded-3"><i class="bi bi-pencil-square"></i></button>
@@ -182,14 +182,18 @@
                             <small class="text-muted fst-italic">Nếu điền, tài khoản sẽ đăng nhập bằng tên này thay vì Mã mặc định.</small>
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-bold text-muted">MẬT KHẨU <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="password" class="form-control rounded-start-3" id="inp_password" placeholder="Nhập mật khẩu..." required disabled>
-                                <button class="btn btn-outline-secondary rounded-end-3" type="button" id="btnTogglePass" onclick="togglePassword()">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                        </div>
+                                                            <label class="form-label small fw-bold text-muted">MẬT KHẨU <span class="text-danger">*</span></label>
+                                                            <div class="input-group">
+                                                                <input type="password" class="form-control rounded-start-3" id="inp_password" placeholder="Nhập mật khẩu..." required disabled>
+                                                                <button class="btn btn-outline-secondary rounded-end-3" type="button" id="btnTogglePass" onclick="togglePassword()">
+                                                                    <i class="bi bi-eye"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label class="form-label small fw-bold text-muted">EMAIL <span class="text-danger">*</span></label>
+                                                            <input type="email" class="form-control rounded-3" id="inp_email" placeholder="Nhập địa chỉ email..." required disabled>
+                                                        </div>
                     </div>
                 </div>
             </div>
@@ -232,7 +236,7 @@
         let currentCanDelete = true;
         let needReload = false;
         const contextPath = '${pageContext.request.contextPath}';
-        const inputs = ['inp_username', 'inp_password', 'inp_roleId', 'inp_custom_username'];
+        const inputs = ['inp_username', 'inp_password', 'inp_roleId', 'inp_custom_username', 'inp_email'];
 
         function showNotify(title, message, type = 'success') {
             document.getElementById('notifyTitle').innerText = title;
@@ -353,6 +357,7 @@
             currentSelectedId = data.username || '';
             document.getElementById('inp_password').value = data.password || '';
             document.getElementById('inp_roleId').value = data.roleId || '';
+            document.getElementById('inp_email').value = data.email || '';
         }
 
         function clearForm() {
@@ -446,13 +451,14 @@
                 username: targetUsername,
                 selectedId: targetSelectedId,
                 password: document.getElementById('inp_password').value,
-                roleId: document.getElementById('inp_roleId').value
+                roleId: document.getElementById('inp_roleId').value,
+                email: document.getElementById('inp_email').value.trim()
             };
             if (currentMode === 'edit') {
                 data.userId = document.getElementById('inp_userId').value;
             }
 
-            if (!data.username || !data.password || !data.roleId) { 
+            if (!data.username || !data.password || !data.roleId || !data.email) { 
                 showNotify('Cảnh báo', 'Vui lòng nhập đầy đủ thông tin!', 'info'); 
                 return; 
             }
@@ -494,3 +500,4 @@
 </body>
 
 </html>
+

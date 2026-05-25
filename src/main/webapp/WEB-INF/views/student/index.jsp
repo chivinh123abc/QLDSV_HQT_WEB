@@ -341,10 +341,10 @@
                                                                             ${sv.diaChi}</td>
                                                                         <td class="text-center">
                                                                             <c:choose>
-                                                                                <c:when test="${sv.dangNghiHoc}">
+                                                                                <c:when test="${sv.daNghiHoc}">
                                                                                     <span
                                                                                         class="badge border border-danger text-danger rounded-pill px-3 py-1 small fw-bold">
-                                                                                        <i class="bi bi-dot"></i> Đang
+                                                                                        <i class="bi bi-dot"></i> Đã
                                                                                         nghỉ
                                                                                     </span>
                                                                                 </c:when>
@@ -522,10 +522,10 @@
                                         <div class="col-md-12">
                                             <div class="form-check form-switch p-0 d-flex align-items-center gap-2">
                                                 <input class="form-check-input ms-0 mt-0" type="checkbox" role="switch"
-                                                    id="dangNghiHoc" name="dangNghiHoc" value="true"
-                                                    ${sinhVien.dangNghiHoc ? 'checked' : '' } disabled>
+                                                    id="daNghiHoc" name="daNghiHoc" value="true"
+                                                    ${sinhVien.daNghiHoc ? 'checked' : '' } disabled>
                                                 <label class="form-check-label fw-bold text-danger"
-                                                    for="dangNghiHoc">Đang nghỉ học</label>
+                                                    for="daNghiHoc">Đã nghỉ học</label>
                                             </div>
                                         </div>
                                     </div>
@@ -717,7 +717,7 @@
                 <script>
                     let currentMode = 'none'; // 'none', 'add', 'edit', 'delete'
                     let originalMaSV = '';
-                    const inputs = ['inp_maSV', 'inp_ho', 'inp_ten', 'inp_phai', 'inp_ngaySinh', 'inp_diaChi', 'dangNghiHoc'];
+                    const inputs = ['inp_maSV', 'inp_ho', 'inp_ten', 'inp_phai', 'inp_ngaySinh', 'inp_diaChi', 'daNghiHoc'];
                     const contextPath = '${pageContext.request.contextPath}';
                     const currentMaLop = '${maLop}';
                     const sessionRole = '${sessionScope.role}';
@@ -821,8 +821,8 @@
                                 rowHtml += '<td class="text-center small">' + ngaySinhStr + '</td>' +
                                     '<td class="small">' + (sv.diaChi || '') + '</td>' +
                                     '<td class="text-center">' +
-                                    '<span class="badge ' + (sv.dangNghiHoc ? 'bg-danger' : 'bg-success') + ' bg-opacity-10 ' + (sv.dangNghiHoc ? 'text-danger' : 'text-success') + ' rounded-pill px-3 py-1 small">' +
-                                    (sv.dangNghiHoc ? 'Nghỉ học' : 'Đang học') +
+                                    '<span class="badge ' + (sv.daNghiHoc ? 'bg-danger' : 'bg-success') + ' bg-opacity-10 ' + (sv.daNghiHoc ? 'text-danger' : 'text-success') + ' rounded-pill px-3 py-1 small">' +
+                                    (sv.daNghiHoc ? 'Đã nghỉ học' : 'Đang học') +
                                     '</span>' +
                                     '</td>';
                             }
@@ -859,7 +859,7 @@
                         document.getElementById('inp_ten').value = sv.ten || '';
                         document.getElementById('inp_phai').value = sv.phai || 'Nam';
                         document.getElementById('inp_diaChi').value = sv.diaChi || '';
-                        document.getElementById('dangNghiHoc').checked = sv.dangNghiHoc || false;
+                        document.getElementById('daNghiHoc').checked = sv.daNghiHoc || false;
 
                         if (sv.ngaySinh) {
                             const date = new Date(sv.ngaySinh);
@@ -906,7 +906,7 @@
                             phai: document.getElementById('inp_phai').value,
                             ngaySinh: document.getElementById('inp_ngaySinh').value,
                             diaChi: document.getElementById('inp_diaChi').value,
-                            dangNghiHoc: document.getElementById('dangNghiHoc').checked,
+                            daNghiHoc: document.getElementById('daNghiHoc').checked,
                             maLop: currentMaLop
                         };
 

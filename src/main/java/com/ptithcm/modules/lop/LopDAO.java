@@ -1,10 +1,12 @@
 package com.ptithcm.modules.lop;
 
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.Lop;
-import com.ptithcm.shared.base.BaseDAO;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.Lop;
+import com.ptithcm.shared.bases.BaseDAO;
 
 @Repository
 public class LopDAO extends BaseDAO<Lop, String> {

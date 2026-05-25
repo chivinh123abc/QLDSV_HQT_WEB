@@ -1,9 +1,11 @@
 package com.ptithcm.modules.monhoc;
 
-import com.ptithcm.entity.MonHoc;
-import com.ptithcm.shared.base.BaseDAO;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.MonHoc;
+import com.ptithcm.shared.bases.BaseDAO;
 
 @Repository
 public class MonHocDAO extends BaseDAO<MonHoc, String> {

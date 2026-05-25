@@ -1,11 +1,13 @@
 package com.ptithcm.modules.sinhvien;
 
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.Lop;
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.shared.base.BaseDAO;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.Lop;
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.shared.bases.BaseDAO;
 
 @Repository
 public class SinhVienDAO extends BaseDAO<SinhVien, String> {

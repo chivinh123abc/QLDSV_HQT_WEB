@@ -1,12 +1,15 @@
 package com.ptithcm.modules.diemso;
 
-import com.ptithcm.entity.DangKy;
-import com.ptithcm.entity.DangKyId;
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.shared.base.BaseDAO;
 import java.util.List;
+
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.DangKy;
+import com.ptithcm.entities.DangKyId;
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.shared.bases.BaseDAO;
+import com.ptithcm.shared.enums.TrangThaiDangKy;
 
 @Repository
 public class MarkDAO extends BaseDAO<DangKy, DangKyId> {
@@ -72,7 +75,7 @@ public class MarkDAO extends BaseDAO<DangKy, DangKyId> {
             String maKhoa) {
         StringBuilder hql = new StringBuilder(
                 "SELECT dk.sinhVien.maSV, dk.sinhVien.ho, dk.sinhVien.ten, dk.diemCC, dk.diemGK, dk.diemCK, dk.lopTinChi.maLTC, dk.lopTinChi.nhom, dk.lopTinChi.monHoc.tenMH "
-                        + "FROM DangKy dk " + "WHERE (dk.huyDangKy = false OR dk.huyDangKy IS NULL) ");
+                        + "FROM DangKy dk " + "WHERE dk.trangThaiDangKy = :hieuLuc ");
 
         if (searchMaSV != null && !searchMaSV.trim().isEmpty()) {
             hql.append("AND TRIM(dk.sinhVien.maSV) = :searchMaSV ");
@@ -106,6 +109,7 @@ public class MarkDAO extends BaseDAO<DangKy, DangKyId> {
             if (maKhoa != null && !maKhoa.isEmpty() && !maKhoa.equals("all"))
                 query.setParameter("maKhoa", maKhoa);
         }
+        query.setParameter("hieuLuc", TrangThaiDangKy.HIEU_LUC);
 
         return query.list();
     }
@@ -119,10 +123,10 @@ public class MarkDAO extends BaseDAO<DangKy, DangKyId> {
     public List<Object[]> getStudentGrades(String maSV) {
         String hql = "SELECT dk.lopTinChi.nienKhoa, dk.lopTinChi.hocKy, dk.lopTinChi.monHoc.maMH, dk.lopTinChi.monHoc.tenMH, dk.lopTinChi.nhom, "
                 + "dk.diemCC, dk.diemGK, dk.diemCK, dk.lopTinChi.monHoc.soTietLT, dk.lopTinChi.monHoc.soTietTH "
-                + "FROM DangKy dk "
-                + "WHERE TRIM(dk.sinhVien.maSV) = :maSV AND (dk.huyDangKy = false OR dk.huyDangKy IS NULL) "
+                + "FROM DangKy dk " + "WHERE TRIM(dk.sinhVien.maSV) = :maSV AND dk.trangThaiDangKy = :hieuLuc "
                 + "ORDER BY dk.lopTinChi.nienKhoa DESC, dk.lopTinChi.hocKy DESC, dk.lopTinChi.monHoc.maMH ASC";
 
-        return getSession().createQuery(hql, Object[].class).setParameter("maSV", maSV).list();
+        return getSession().createQuery(hql, Object[].class).setParameter("maSV", maSV)
+                .setParameter("hieuLuc", TrangThaiDangKy.HIEU_LUC).list();
     }
 }

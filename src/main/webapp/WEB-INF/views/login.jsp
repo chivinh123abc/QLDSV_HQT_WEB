@@ -113,6 +113,12 @@
             </div>
         </c:if>
 
+        <c:if test="${not empty success}">
+            <div class="alert alert-success alert-custom">
+                <i class="bi bi-check-circle me-2"></i> ${success}
+            </div>
+        </c:if>
+
         <form action="${pageContext.request.contextPath}/login" method="post">
 
             <div class="mb-3">
@@ -128,9 +134,13 @@
             <button type="submit" class="login-btn">ĐĂNG NHẬP</button>
         </form>
 
-        <div class="mt-4 text-center">
+        <div class="mt-4 text-center d-flex flex-column gap-2">
+            <div>
+                <a href="${pageContext.request.contextPath}/register" class="text-decoration-none small fw-semibold text-primary">Chưa có tài khoản? Đăng ký ngay</a>
+            </div>
             <span class="text-muted small">Quên mật khẩu? Liên hệ phòng đào tạo</span>
         </div>
     </div>
 </body>
 </html>
+

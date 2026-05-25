@@ -8,9 +8,9 @@
 //
 // MÔ HÌNH AUDIT (LuuVetThoiGian.java — @MappedSuperclass):
 // Tất cả các bảng đều thừa kế 3 cột lưu vết:
-//   - created_at    : Thời điểm tạo (set 1 lần qua @PrePersist)
-//   - updated_at    : Thời điểm cập nhật cuối (set qua @PreUpdate)
-//   - deleted_at    : Xóa mềm (@SQLRestriction "deleted_at IS NULL")
+//   - ngay_tao      : Thời điểm tạo (set 1 lần qua @PrePersist)
+//   - ngay_cap_nhat : Thời điểm cập nhật cuối (set qua @PreUpdate)
+//   - ngay_xoa      : Xóa mềm (@SQLRestriction "ngay_xoa IS NULL")
 // Kiểu dữ liệu: datetimeoffset (SQL Server) ↔ OffsetDateTime (Java)
 // ============================================================
 
@@ -23,9 +23,9 @@ Table khoa {
   ten_khoa nvarchar(100) [not null, unique, note: 'Tên khoa']
 
   // -- Lưu vết (LuuVetThoiGian) --
-  created_at datetimeoffset [not null, note: 'Thời điểm tạo']
-  updated_at datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
-  deleted_at datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
 }
 
 Table lop {
@@ -35,9 +35,9 @@ Table lop {
   khoa_id nvarchar(10) [not null, note: 'Khóa ngoại → khoa.id']
 
   // -- Lưu vết (LuuVetThoiGian) --
-  created_at datetimeoffset [not null, note: 'Thời điểm tạo']
-  updated_at datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
-  deleted_at datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
 
   indexes {
     khoa_id [name: 'idx_lop_khoa_id']
@@ -51,15 +51,47 @@ Table mon_hoc {
   so_tiet_thuc_hanh int [not null, note: 'Số tiết thực hành']
 
   // -- Lưu vết (LuuVetThoiGian) --
-  created_at datetimeoffset [not null, note: 'Thời điểm tạo']
-  updated_at datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
-  deleted_at datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
 }
 
 // ------------------------------------------------------------
-// BẢNG NHÂN SỰ (Người dùng)
-// Xác thực phân tán: mỗi bảng tự quản lý mật khẩu riêng biệt
+// BẢNG NHÂN SỰ & TÀI KHOẢN (Người dùng & Xác thực)
 // ------------------------------------------------------------
+
+Enum TrangThaiTaiKhoan {
+  CHUA_KICH_HOAT
+  DA_KICH_HOAT
+}
+
+Enum TrangThaiHoc {
+  DANG_HOC
+  NGHI_HOC
+}
+
+Enum TrangThaiLop {
+  HOAT_DONG
+  DA_HUY
+}
+
+Enum TrangThaiDangKy {
+  HIEU_LUC
+  DA_HUY
+}
+
+Table tai_khoan {
+  ten_dang_nhap nvarchar(50) [primary key, note: 'Mã SV hoặc Mã GV']
+  mat_khau nvarchar(255) [not null, note: 'Mật khẩu băm BCrypt']
+  email nvarchar(100) [not null]
+  phan_quyen nvarchar(20) [not null, note: 'SINHVIEN, KHOA, PGV']
+  trang_thai TrangThaiTaiKhoan [not null, default: 'CHUA_KICH_HOAT', note: 'Trạng thái kích hoạt']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null]
+  ngay_cap_nhat datetimeoffset [not null]
+  ngay_xoa datetimeoffset
+}
 
 Table sinh_vien {
   id nvarchar(10) [primary key, note: 'Mã số sinh viên (Khóa chính, dùng làm tên đăng nhập)']
@@ -69,13 +101,12 @@ Table sinh_vien {
   dia_chi nvarchar(200) [note: 'Địa chỉ thường trú']
   ngay_sinh date [not null, note: 'Ngày sinh']
   lop_id nvarchar(10) [not null, note: 'Khóa ngoại → lop.id']
-  is_dang_nghi_hoc bit [not null, default: 0, note: 'Trạng thái nghỉ học (0 = Đang học, 1 = Nghỉ)']
-  mat_khau nvarchar(255) [not null, note: 'Mật khẩu đã mã hóa BCrypt']
+  trang_thai_hoc TrangThaiHoc [not null, default: 'DANG_HOC', note: 'Trạng thái học tập']
 
   // -- Lưu vết (LuuVetThoiGian) --
-  created_at datetimeoffset [not null, note: 'Thời điểm tạo']
-  updated_at datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
-  deleted_at datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
 
   indexes {
     lop_id [name: 'idx_sinh_vien_lop_id']
@@ -90,13 +121,11 @@ Table giang_vien {
   hoc_vi nvarchar(50) [note: 'Học vị (ThS, TS,...)']
   hoc_ham nvarchar(50) [note: 'Học hàm (PGS, GS)']
   chuyen_mon nvarchar(100) [note: 'Chuyên môn đào tạo']
-  mat_khau nvarchar(255) [not null, note: 'Mật khẩu đã mã hóa BCrypt']
-  vai_tro nvarchar(20) [not null, default: 'KHOA', note: 'Vai trò: PGV (Phòng Giáo Vụ) hoặc KHOA']
 
   // -- Lưu vết (LuuVetThoiGian) --
-  created_at datetimeoffset [not null, note: 'Thời điểm tạo']
-  updated_at datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
-  deleted_at datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
 
   indexes {
     khoa_id [name: 'idx_giang_vien_khoa_id']
@@ -117,12 +146,12 @@ Table lop_tin_chi {
   khoa_id nvarchar(10) [not null, note: 'Khóa ngoại → khoa.id mở lớp']
   so_sv_toi_thieu int [not null, note: 'Số SV tối thiểu để mở lớp']
   so_sv_toi_da int [not null, note: 'Số SV tối đa cho lớp (bắt buộc nhập)']
-  is_huy_lop bit [not null, default: 0, note: 'Trạng thái hủy lớp (0 = Hoạt động, 1 = Đã hủy)']
+  trang_thai_lop TrangThaiLop [not null, default: 'HOAT_DONG', note: 'Trạng thái lớp học']
 
   // -- Lưu vết (LuuVetThoiGian) --
-  created_at datetimeoffset [not null, note: 'Thời điểm tạo']
-  updated_at datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
-  deleted_at datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
 
   indexes {
     (nien_khoa, hoc_ky, mon_hoc_id, nhom) [unique, name: 'idx_unique_lop_tin_chi']
@@ -138,12 +167,12 @@ Table dang_ky {
   diem_chuyen_can float [note: 'Điểm chuyên cần (0-10)']
   diem_giua_ky float [note: 'Điểm giữa kỳ (0-10)']
   diem_cuoi_ky float [note: 'Điểm cuối kỳ (0-10)']
-  is_huy_dang_ky bit [not null, default: 0, note: 'Trạng thái hủy đăng ký (0 = Còn hiệu lực, 1 = Đã hủy)']
+  trang_thai_dang_ky TrangThaiDangKy [not null, default: 'HIEU_LUC', note: 'Trạng thái đăng ký']
 
   // -- Lưu vết (LuuVetThoiGian) --
-  created_at datetimeoffset [not null, note: 'Thời điểm tạo']
-  updated_at datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
-  deleted_at datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
 
   indexes {
     (lop_tin_chi_id, sinh_vien_id) [pk]
@@ -155,7 +184,7 @@ Table dang_ky {
 
 // ============================================================
 // QUAN HỆ KHÓA NGOẠI — Tất cả dùng NO ACTION (Chặn xóa tầng cứng)
-// Việc xóa an toàn được xử lý qua Soft Delete (deleted_at) ở tầng Java
+// Việc xóa an toàn được xử lý qua Soft Delete (ngay_xoa) ở tầng Java
 // ============================================================
 
 // khoa ──1:N──> lop
@@ -181,3 +210,7 @@ Ref: lop_tin_chi.id < dang_ky.lop_tin_chi_id [delete: no action]
 
 // sinh_vien ──1:N──> dang_ky
 Ref: sinh_vien.id < dang_ky.sinh_vien_id [delete: no action]
+
+// tai_khoan ──1:1──> sinh_vien / giang_vien
+Ref: tai_khoan.ten_dang_nhap - sinh_vien.id [delete: no action]
+Ref: tai_khoan.ten_dang_nhap - giang_vien.id [delete: no action]

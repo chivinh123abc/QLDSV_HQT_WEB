@@ -1,18 +1,12 @@
 package com.ptithcm.modules.loptinchi;
 
-import com.ptithcm.entity.GiangVien;
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.LopTinChi;
-import com.ptithcm.entity.MonHoc;
-import com.ptithcm.shared.constant.SessionConstant;
-import com.ptithcm.shared.enumtype.RoleEnum;
-import com.ptithcm.shared.validator.LopTinChiValidator;
-
-import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,6 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.ptithcm.entities.GiangVien;
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.LopTinChi;
+import com.ptithcm.entities.MonHoc;
+import com.ptithcm.shared.constants.SessionConstant;
+import com.ptithcm.shared.enums.RoleEnum;
+import com.ptithcm.shared.validators.LopTinChiValidator;
 
 @Controller
 @RequestMapping("/credit-class")

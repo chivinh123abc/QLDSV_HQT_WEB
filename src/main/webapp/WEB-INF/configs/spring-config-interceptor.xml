@@ -20,7 +20,7 @@
             <mvc:exclude-mapping path="/auth/login.htm" />
             <mvc:exclude-mapping path="/captcha.htm" />
             <mvc:exclude-mapping path="/resources/**" />
-            <bean class="com.ptithcm.shared.interceptor.AuthInterceptor" />
+            <bean class="com.ptithcm.shared.interceptors.AuthInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>
 

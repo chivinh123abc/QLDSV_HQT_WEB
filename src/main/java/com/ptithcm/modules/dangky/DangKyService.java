@@ -1,15 +1,16 @@
 package com.ptithcm.modules.dangky;
 
-import com.ptithcm.entity.DangKy;
-import com.ptithcm.entity.DangKyId;
-import com.ptithcm.entity.LopTinChi;
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.shared.constant.MessageConstant;
-
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.DangKy;
+import com.ptithcm.entities.DangKyId;
+import com.ptithcm.entities.LopTinChi;
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.shared.constants.MessageConstant;
 
 @Service
 @Transactional
@@ -28,7 +29,7 @@ public class DangKyService {
         if (sv == null) {
             throw new Exception(MessageConstant.STUDENT_NOT_EXIST);
         }
-        if (sv.isDangNghiHoc()) {
+        if (sv.isDaNghiHoc()) {
             throw new Exception(MessageConstant.STUDENT_ON_LEAVE);
         }
 

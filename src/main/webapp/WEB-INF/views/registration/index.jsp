@@ -216,8 +216,8 @@
             document.getElementById('info-name').innerText = sv.ho + ' ' + sv.ten;
             document.getElementById('info-maSV').innerText = sv.maSV;
             document.getElementById('info-maLop').innerText = sv.maLop;
-            document.getElementById('info-status').innerText = sv.dangNghiHoc ? 'Nghỉ học' : 'Đang học';
-            document.getElementById('info-status').className = 'badge ' + (sv.dangNghiHoc ? 'bg-danger' : 'bg-success') + ' bg-opacity-10 ' + (sv.dangNghiHoc ? 'text-danger' : 'text-success') + ' rounded-pill';
+            document.getElementById('info-status').innerText = sv.daNghiHoc ? 'Đã nghỉ học' : 'Đang học';
+            document.getElementById('info-status').className = 'badge ' + (sv.daNghiHoc ? 'bg-danger' : 'bg-success') + ' bg-opacity-10 ' + (sv.daNghiHoc ? 'text-danger' : 'text-success') + ' rounded-pill';
         }
 
         async function loadAvailableLTC() {
@@ -355,3 +355,4 @@
     </script>
 </body>
 </html>
+

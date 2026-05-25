@@ -1,12 +1,14 @@
 package com.ptithcm.modules.sinhvien;
 
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.Lop;
-import com.ptithcm.entity.SinhVien;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.Lop;
+import com.ptithcm.entities.SinhVien;
 
 @Service
 @Transactional
