@@ -30,14 +30,26 @@ public class KhoaDAO extends BaseDAO<Khoa, String> {
     }
 
     public List<String> listTrimmedKhoaFromLop() {
-        return getSession().createQuery("SELECT distinct trim(maKhoa) FROM Lop", String.class).list();
+        List<String> list = getSession().createQuery("SELECT distinct maKhoa FROM Lop", String.class).list();
+        if (list != null) {
+            list.replaceAll(s -> s != null ? s.trim() : null);
+        }
+        return list;
     }
 
     public List<String> listTrimmedKhoaFromGiangVien() {
-        return getSession().createQuery("SELECT distinct trim(maKhoa) FROM GiangVien", String.class).list();
+        List<String> list = getSession().createQuery("SELECT distinct maKhoa FROM GiangVien", String.class).list();
+        if (list != null) {
+            list.replaceAll(s -> s != null ? s.trim() : null);
+        }
+        return list;
     }
 
     public List<String> listTrimmedKhoaFromLtc() {
-        return getSession().createQuery("SELECT distinct trim(maKhoa) FROM LopTinChi", String.class).list();
+        List<String> list = getSession().createQuery("SELECT distinct maKhoa FROM LopTinChi", String.class).list();
+        if (list != null) {
+            list.replaceAll(s -> s != null ? s.trim() : null);
+        }
+        return list;
     }
 }

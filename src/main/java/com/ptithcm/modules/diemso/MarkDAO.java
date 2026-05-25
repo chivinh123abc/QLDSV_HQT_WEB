@@ -78,7 +78,7 @@ public class MarkDAO extends BaseDAO<DangKy, DangKyId> {
                         + "FROM DangKy dk " + "WHERE dk.trangThaiDangKy = :hieuLuc ");
 
         if (searchMaSV != null && !searchMaSV.trim().isEmpty()) {
-            hql.append("AND TRIM(dk.sinhVien.maSV) = :searchMaSV ");
+            hql.append("AND dk.sinhVien.maSV = :searchMaSV ");
         } else {
             if (nienKhoa != null && !nienKhoa.isEmpty() && !nienKhoa.equals("all"))
                 hql.append("AND dk.lopTinChi.nienKhoa = :nienKhoa ");
@@ -115,18 +115,18 @@ public class MarkDAO extends BaseDAO<DangKy, DangKyId> {
     }
 
     public DangKy getRegistrationByLtcAndStudent(String maLTC, String maSV) {
-        String hql = "FROM DangKy dk WHERE dk.lopTinChi.maLTC = :maLTC AND TRIM(dk.sinhVien.maSV) = :maSV";
+        String hql = "FROM DangKy dk WHERE dk.lopTinChi.maLTC = :maLTC AND dk.sinhVien.maSV = :maSV";
         return getSession().createQuery(hql, DangKy.class).setParameter("maLTC", maLTC)
-                .setParameter("maSV", maSV.trim()).uniqueResult();
+                .setParameter("maSV", maSV != null ? maSV.trim() : "").uniqueResult();
     }
 
     public List<Object[]> getStudentGrades(String maSV) {
         String hql = "SELECT dk.lopTinChi.nienKhoa, dk.lopTinChi.hocKy, dk.lopTinChi.monHoc.maMH, dk.lopTinChi.monHoc.tenMH, dk.lopTinChi.nhom, "
                 + "dk.diemCC, dk.diemGK, dk.diemCK, dk.lopTinChi.monHoc.soTietLT, dk.lopTinChi.monHoc.soTietTH "
-                + "FROM DangKy dk " + "WHERE TRIM(dk.sinhVien.maSV) = :maSV AND dk.trangThaiDangKy = :hieuLuc "
+                + "FROM DangKy dk " + "WHERE dk.sinhVien.maSV = :maSV AND dk.trangThaiDangKy = :hieuLuc "
                 + "ORDER BY dk.lopTinChi.nienKhoa DESC, dk.lopTinChi.hocKy DESC, dk.lopTinChi.monHoc.maMH ASC";
 
-        return getSession().createQuery(hql, Object[].class).setParameter("maSV", maSV)
+        return getSession().createQuery(hql, Object[].class).setParameter("maSV", maSV != null ? maSV.trim() : "")
                 .setParameter("hieuLuc", TrangThaiDangKy.HIEU_LUC).list();
     }
 }

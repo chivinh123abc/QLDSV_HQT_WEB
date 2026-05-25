@@ -39,14 +39,13 @@ public class GiangVienDAO extends BaseDAO<GiangVien, String> {
     }
 
     public List<GiangVien> getLecturerByTrimmedId(String maGV) {
-        return getSession().createQuery("FROM GiangVien WHERE trim(maGV) = trim(:maGV)", GiangVien.class)
-                .setParameter("maGV", maGV.trim()).list();
+        return getSession().createQuery("FROM GiangVien WHERE maGV = :maGV", GiangVien.class)
+                .setParameter("maGV", maGV != null ? maGV.trim() : "").list();
     }
 
     public Long countLtcByLecturer(String maGV) {
-        return getSession()
-                .createQuery("SELECT COUNT(*) FROM LopTinChi WHERE trim(giangVien.maGV) = trim(:maGV)", Long.class)
-                .setParameter("maGV", maGV.trim()).uniqueResult();
+        return getSession().createQuery("SELECT COUNT(*) FROM LopTinChi WHERE giangVien.maGV = :maGV", Long.class)
+                .setParameter("maGV", maGV != null ? maGV.trim() : "").uniqueResult();
     }
 
     public Long countUserByLecturer(String maGV) {

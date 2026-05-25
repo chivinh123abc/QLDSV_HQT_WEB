@@ -34,14 +34,16 @@ public class DangKyDAO extends BaseDAO<DangKy, DangKyId> {
     public Long countSubjectRegisteredInSemester(String maSV, String maMH, String nienKhoa, int hocKy,
             String currentMaLTC) {
         String hqlSubject = "SELECT count(dk) FROM DangKy dk "
-                + "WHERE upper(trim(dk.sinhVien.maSV)) = upper(trim(:maSV)) " + "AND dk.trangThaiDangKy = :hieuLuc "
-                + "AND upper(trim(dk.lopTinChi.monHoc.maMH)) = upper(trim(:maMH)) "
-                + "AND upper(trim(dk.lopTinChi.nienKhoa)) = upper(trim(:nk)) " + "AND dk.lopTinChi.hocKy = :hk "
+                + "WHERE dk.sinhVien.maSV = :maSV AND dk.trangThaiDangKy = :hieuLuc "
+                + "AND dk.lopTinChi.monHoc.maMH = :maMH "
+                + "AND dk.lopTinChi.nienKhoa = :nk AND dk.lopTinChi.hocKy = :hk "
                 + "AND dk.lopTinChi.maLTC != :currentMaLTC";
-        return getSession().createQuery(hqlSubject, Long.class).setParameter("maSV", maSV)
-                .setParameter("hieuLuc", TrangThaiDangKy.HIEU_LUC).setParameter("maMH", maMH)
-                .setParameter("nk", nienKhoa).setParameter("hk", hocKy).setParameter("currentMaLTC", currentMaLTC)
-                .uniqueResult();
+        return getSession().createQuery(hqlSubject, Long.class)
+                .setParameter("maSV", maSV != null ? maSV.trim().toUpperCase() : "")
+                .setParameter("hieuLuc", TrangThaiDangKy.HIEU_LUC)
+                .setParameter("maMH", maMH != null ? maMH.trim().toUpperCase() : "")
+                .setParameter("nk", nienKhoa != null ? nienKhoa.trim().toUpperCase() : "").setParameter("hk", hocKy)
+                .setParameter("currentMaLTC", currentMaLTC).uniqueResult();
     }
 
     public List<LopTinChi> getAvailableClasses() {

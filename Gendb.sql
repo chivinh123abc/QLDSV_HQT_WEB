@@ -176,16 +176,16 @@ INSERT [dbo].[dang_ky] ([lop_tin_chi_id], [sinh_vien_id], [diem_chuyen_can], [di
 INSERT [dbo].[dang_ky] ([lop_tin_chi_id], [sinh_vien_id], [diem_chuyen_can], [diem_giua_ky], [diem_cuoi_ky], [trang_thai_dang_ky]) VALUES (N'5', N'SV02', NULL, NULL, NULL, N'DA_HUY')
 INSERT [dbo].[dang_ky] ([lop_tin_chi_id], [sinh_vien_id], [diem_chuyen_can], [diem_giua_ky], [diem_cuoi_ky], [trang_thai_dang_ky]) VALUES (N'6', N'SV01', NULL, NULL, NULL, N'DA_HUY')
 
--- Centralized Tai Khoan (BCrypt hash of '123' is $2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2)
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'admin', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'admin@ptithcm.edu.vn', N'PGV', N'DA_KICH_HOAT')
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'GV01', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'gv01@ptithcm.edu.vn', N'PGV', N'DA_KICH_HOAT')
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'GV02', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'gv02@ptithcm.edu.vn', N'KHOA', N'DA_KICH_HOAT')
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'SV01', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'sv01@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'SV02', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'sv02@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'SV03', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'sv03@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'N22DCCN001', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'n22dccn001@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'N22DCCN002', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'n22dccn002@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
-INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'N23DCAT001', N'$2a$10$E2upP9ZtY6Vb5Pq1vK8wO.xY196C4CeqpDqQY71661x0B4X3qd7Y2', N'n23dcat001@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
+-- Centralized Tai Khoan (BCrypt hash of '123' is $2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja)
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'admin', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'admin@ptithcm.edu.vn', N'PGV', N'DA_KICH_HOAT')
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'GV01', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'gv01@ptithcm.edu.vn', N'PGV', N'DA_KICH_HOAT')
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'GV02', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'gv02@ptithcm.edu.vn', N'KHOA', N'DA_KICH_HOAT')
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'SV01', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'sv01@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'SV02', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'sv02@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'SV03', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'sv03@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'N22DCCN001', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'n22dccn001@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'N22DCCN002', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'n22dccn002@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
+INSERT [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) VALUES (N'N23DCAT001', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'n23dcat001@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT')
 
 -- ------------------------------------------------------------
 -- CONSTRAINTS & FOREIGN KEYS

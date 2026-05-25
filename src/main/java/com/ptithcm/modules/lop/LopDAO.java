@@ -29,12 +29,20 @@ public class LopDAO extends BaseDAO<Lop, String> {
     }
 
     public List<String> listTrimmedLopFromStudents() {
-        return getSession().createQuery("SELECT distinct trim(lop.maLop) FROM SinhVien", String.class).list();
+        List<String> list = getSession().createQuery("SELECT distinct lop.maLop FROM SinhVien", String.class).list();
+        if (list != null) {
+            list.replaceAll(s -> s != null ? s.trim() : null);
+        }
+        return list;
     }
 
     public List<String> listTrimmedLopFromRegistrations() {
-        return getSession().createQuery("SELECT distinct trim(dk.sinhVien.lop.maLop) FROM DangKy dk", String.class)
-                .list();
+        List<String> list = getSession()
+                .createQuery("SELECT distinct dk.sinhVien.lop.maLop FROM DangKy dk", String.class).list();
+        if (list != null) {
+            list.replaceAll(s -> s != null ? s.trim() : null);
+        }
+        return list;
     }
 
     public Long countStudentsByLop(String maLop) {

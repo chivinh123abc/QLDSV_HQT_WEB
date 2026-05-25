@@ -97,13 +97,13 @@ public class RegisterController {
         String trimmedUser = username.trim();
 
         // Tìm sinh viên
-        String svHql = "FROM SinhVien WHERE TRIM(maSV) = :username";
+        String svHql = "FROM SinhVien WHERE maSV = :username";
         SinhVien sv = hSession.createQuery(svHql, SinhVien.class).setParameter("username", trimmedUser).uniqueResult();
         if (sv != null) {
             phanQuyen = "SINHVIEN";
         } else {
             // Tìm giảng viên
-            String gvHql = "FROM GiangVien WHERE TRIM(maGV) = :username";
+            String gvHql = "FROM GiangVien WHERE maGV = :username";
             GiangVien gv = hSession.createQuery(gvHql, GiangVien.class).setParameter("username", trimmedUser)
                     .uniqueResult();
             if (gv != null) {
@@ -119,7 +119,7 @@ public class RegisterController {
         // 5. Tạo tài khoản mới
         TaiKhoan newTk = new TaiKhoan();
         newTk.setTenDangNhap(trimmedUser);
-        newTk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt()));
+        newTk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt(12)));
         newTk.setEmail(email.trim());
         newTk.setPhanQuyen(phanQuyen);
         newTk.setTrangThai(TrangThaiTaiKhoan.CHUA_KICH_HOAT);

@@ -15,7 +15,11 @@ public class MonHocDAO extends BaseDAO<MonHoc, String> {
     }
 
     public List<String> listTrimmedSubjectIdsFromLtc() {
-        return getSession().createQuery("SELECT distinct trim(maMH) FROM LopTinChi", String.class).list();
+        List<String> list = getSession().createQuery("SELECT distinct maMH FROM LopTinChi", String.class).list();
+        if (list != null) {
+            list.replaceAll(s -> s != null ? s.trim() : null);
+        }
+        return list;
     }
 
     public Long countLtcBySubject(String maMH) {

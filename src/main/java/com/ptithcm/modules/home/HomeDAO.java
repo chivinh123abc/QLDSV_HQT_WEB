@@ -14,8 +14,8 @@ public class HomeDAO extends BaseDAO<SinhVien, String> {
     }
 
     public Long getRegisteredCount(String maSV) {
-        String hqlCount = "SELECT count(dk) FROM DangKy dk WHERE TRIM(dk.sinhVien.maSV) = :maSV AND dk.trangThaiDangKy = :hieuLuc";
-        return getSession().createQuery(hqlCount, Long.class).setParameter("maSV", maSV.trim())
+        String hqlCount = "SELECT count(dk) FROM DangKy dk WHERE dk.sinhVien.maSV = :maSV AND dk.trangThaiDangKy = :hieuLuc";
+        return getSession().createQuery(hqlCount, Long.class).setParameter("maSV", maSV != null ? maSV.trim() : "")
                 .setParameter("hieuLuc", TrangThaiDangKy.HIEU_LUC).uniqueResult();
     }
 

@@ -175,7 +175,7 @@ public class AccountController {
 
                 TaiKhoan tk = new TaiKhoan();
                 tk.setTenDangNhap(username);
-                tk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt()));
+                tk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt(12)));
                 tk.setEmail(email);
 
                 String phanQuyen = "SINHVIEN";
@@ -207,7 +207,7 @@ public class AccountController {
                 tk.setPhanQuyen(phanQuyen);
 
                 if (password != null && !password.trim().isEmpty()) {
-                    tk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt()));
+                    tk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt(12)));
                 }
 
                 hSession.merge(tk);

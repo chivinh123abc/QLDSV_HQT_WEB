@@ -31,7 +31,7 @@ public class AuthDAO {
         String u = username.trim();
 
         // 1. Truy vấn TaiKhoan theo tenDangNhap
-        String hql = "FROM TaiKhoan WHERE TRIM(tenDangNhap) = :username";
+        String hql = "FROM TaiKhoan WHERE tenDangNhap = :username";
         TaiKhoan taiKhoan = getSession().createQuery(hql, TaiKhoan.class).setParameter("username", u).uniqueResult();
 
         if (taiKhoan == null) {
@@ -65,12 +65,12 @@ public class AuthDAO {
     }
 
     public GiangVien findGiangVienByMaGV(String maGV) {
-        String hql = "FROM GiangVien WHERE TRIM(maGV) = :maGV";
+        String hql = "FROM GiangVien WHERE maGV = :maGV";
         return getSession().createQuery(hql, GiangVien.class).setParameter("maGV", maGV.trim()).uniqueResult();
     }
 
     public SinhVien findSinhVienByMaSV(String maSV) {
-        String hql = "FROM SinhVien WHERE TRIM(maSV) = :maSV";
+        String hql = "FROM SinhVien WHERE maSV = :maSV";
         return getSession().createQuery(hql, SinhVien.class).setParameter("maSV", maSV.trim()).uniqueResult();
     }
 
@@ -83,14 +83,23 @@ public class AuthDAO {
     }
 
     public List<String> getLecturerUsernamesWithCreditClasses() {
-        return getSession().createQuery(
-                "SELECT distinct trim(giangVien.maGV) FROM LopTinChi WHERE giangVien IS NOT NULL", String.class).list();
+        List<String> list = getSession()
+                .createQuery("SELECT distinct giangVien.maGV FROM LopTinChi WHERE giangVien IS NOT NULL", String.class)
+                .list();
+        if (list != null) {
+            list.replaceAll(s -> s != null ? s.trim() : null);
+        }
+        return list;
     }
 
     public List<String> getStudentUsernamesWithRegistrations() {
-        return getSession()
-                .createQuery("SELECT distinct trim(sinhVien.maSV) FROM DangKy WHERE sinhVien IS NOT NULL", String.class)
+        List<String> list = getSession()
+                .createQuery("SELECT distinct sinhVien.maSV FROM DangKy WHERE sinhVien IS NOT NULL", String.class)
                 .list();
+        if (list != null) {
+            list.replaceAll(s -> s != null ? s.trim() : null);
+        }
+        return list;
     }
 
     public Long countGiangVienByMaGV(String username) {
@@ -104,16 +113,12 @@ public class AuthDAO {
     }
 
     public Long countLtcByLecturerUsername(String username) {
-        return getSession()
-                .createQuery("SELECT COUNT(*) FROM LopTinChi WHERE upper(trim(giangVien.maGV)) = upper(trim(:uname))",
-                        Long.class)
-                .setParameter("uname", username).uniqueResult();
+        return getSession().createQuery("SELECT COUNT(*) FROM LopTinChi WHERE giangVien.maGV = :uname", Long.class)
+                .setParameter("uname", username != null ? username.trim() : "").uniqueResult();
     }
 
     public Long countDangKyByStudentUsername(String username) {
-        return getSession()
-                .createQuery("SELECT COUNT(*) FROM DangKy WHERE upper(trim(sinhVien.maSV)) = upper(trim(:uname))",
-                        Long.class)
-                .setParameter("uname", username).uniqueResult();
+        return getSession().createQuery("SELECT COUNT(*) FROM DangKy WHERE sinhVien.maSV = :uname", Long.class)
+                .setParameter("uname", username != null ? username.trim() : "").uniqueResult();
     }
 }

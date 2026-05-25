@@ -25,7 +25,7 @@
     <!-- Locale Resolver (Cookie based) -->
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
         <property name="defaultLocale" value="vi" />
-        <property name="cookieMaxAge" value="43200" />
+        <property name="cookieMaxAge" value="#{T(java.time.Duration).ofSeconds(2592000)}" />
     </bean>
 
     <!-- Locale Change Interceptor -->

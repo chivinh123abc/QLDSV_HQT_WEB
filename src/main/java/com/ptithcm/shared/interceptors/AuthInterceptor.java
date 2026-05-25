@@ -47,7 +47,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                                 Session hSession = factory.openSession();
                                 try {
                                     // 1. Truy vấn TaiKhoan theo tenDangNhap
-                                    String tkHql = "FROM TaiKhoan WHERE TRIM(tenDangNhap) = :username";
+                                    String tkHql = "FROM TaiKhoan WHERE tenDangNhap = :username";
                                     Query<TaiKhoan> tkQuery = hSession.createQuery(tkHql, TaiKhoan.class);
                                     tkQuery.setParameter("username", username);
                                     TaiKhoan tk = tkQuery.uniqueResult();
@@ -55,7 +55,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                                     if (tk != null && tk.getTrangThai() == TrangThaiTaiKhoan.DA_KICH_HOAT
                                             && BCrypt.checkpw(password, tk.getMatKhau())) {
                                         if ("SINHVIEN".equals(tk.getPhanQuyen())) {
-                                            String svHql = "FROM SinhVien WHERE TRIM(maSV) = :username";
+                                            String svHql = "FROM SinhVien WHERE maSV = :username";
                                             Query<SinhVien> svQuery = hSession.createQuery(svHql, SinhVien.class);
                                             svQuery.setParameter("username", username);
                                             SinhVien sv = svQuery.uniqueResult();
@@ -68,7 +68,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                                                 SessionUtil.setStudentProfile(session, sv);
                                             }
                                         } else {
-                                            String gvHql = "FROM GiangVien WHERE TRIM(maGV) = :username";
+                                            String gvHql = "FROM GiangVien WHERE maGV = :username";
                                             Query<GiangVien> gvQuery = hSession.createQuery(gvHql, GiangVien.class);
                                             gvQuery.setParameter("username", username);
                                             GiangVien gv = gvQuery.uniqueResult();
