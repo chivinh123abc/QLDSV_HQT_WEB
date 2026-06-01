@@ -1,15 +1,16 @@
 package com.ptithcm.modules.dangky;
 
-import com.ptithcm.entity.DangKy;
-import com.ptithcm.entity.DangKyId;
-import com.ptithcm.entity.LopTinChi;
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.shared.constant.MessageConstant;
-
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.DangKy;
+import com.ptithcm.entities.DangKyId;
+import com.ptithcm.entities.LopTinChi;
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.shared.constants.MessageConstant;
 
 @Service
 @Transactional
@@ -22,13 +23,13 @@ public class DangKyService {
         return dangKyDAO.findAll();
     }
 
-    public void registerClass(int maLTC, String maSV) throws Exception {
+    public void registerClass(String maLTC, String maSV) throws Exception {
         // 1. Kiểm tra Sinh viên
         SinhVien sv = dangKyDAO.getStudentById(maSV);
         if (sv == null) {
             throw new Exception(MessageConstant.STUDENT_NOT_EXIST);
         }
-        if (sv.isDangNghiHoc()) {
+        if (sv.isDaNghiHoc()) {
             throw new Exception(MessageConstant.STUDENT_ON_LEAVE);
         }
 
@@ -43,8 +44,8 @@ public class DangKyService {
 
         // 3. Kiểm tra ràng buộc môn học: Không thể đăng ký cùng một môn học trong cùng
         // học kỳ
-        Long countSameSubject = dangKyDAO.countSubjectRegisteredInSemester(maSV, ltc.getMaMH(), ltc.getNienKhoa(),
-                ltc.getHocKy(), maLTC);
+        Long countSameSubject = dangKyDAO.countSubjectRegisteredInSemester(maSV, ltc.getMonHoc().getMaMH(),
+                ltc.getNienKhoa(), ltc.getHocKy(), maLTC);
         if (countSameSubject > 0) {
             throw new Exception(MessageConstant.ALREADY_REGISTERED_SUBJECT);
         }
@@ -60,8 +61,8 @@ public class DangKyService {
             }
         } else {
             DangKy newDk = new DangKy();
-            newDk.setMaLTC(maLTC);
-            newDk.setMaSV(maSV);
+            newDk.setLopTinChi(ltc);
+            newDk.setSinhVien(sv);
             newDk.setHuyDangKy(false);
             dangKyDAO.save(newDk);
         }
@@ -71,7 +72,7 @@ public class DangKyService {
         dangKyDAO.update(dangKy);
     }
 
-    public void cancelRegistration(int maLTC, String maSV) throws Exception {
+    public void cancelRegistration(String maLTC, String maSV) throws Exception {
         DangKy dk = dangKyDAO.findById(new DangKyId(maLTC, maSV));
         if (dk == null || dk.isHuyDangKy()) {
             throw new Exception("Không tìm thấy thông tin đăng ký hoặc đã hủy trước đó!");

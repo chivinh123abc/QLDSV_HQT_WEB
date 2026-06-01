@@ -1,11 +1,13 @@
 package com.ptithcm.modules.lop;
 
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.Lop;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.Lop;
 
 @Service
 @Transactional
@@ -39,6 +41,9 @@ public class LopService {
     }
 
     public String saveClass(Lop lop, String mode) throws Exception {
+        if (lop.getMaKhoa() != null) {
+            lop.setKhoa(lopDAO.getSession().get(Khoa.class, lop.getMaKhoa()));
+        }
         Lop existing = lopDAO.findById(lop.getMaLop());
         if ("add".equals(mode)) {
             if (existing != null) {

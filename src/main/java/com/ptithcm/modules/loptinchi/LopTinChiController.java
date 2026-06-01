@@ -1,18 +1,12 @@
 package com.ptithcm.modules.loptinchi;
 
-import com.ptithcm.entity.GiangVien;
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.LopTinChi;
-import com.ptithcm.entity.MonHoc;
-import com.ptithcm.shared.constant.SessionConstant;
-import com.ptithcm.shared.enumtype.RoleEnum;
-import com.ptithcm.shared.validator.LopTinChiValidator;
-
-import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,6 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.ptithcm.entities.GiangVien;
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.LopTinChi;
+import com.ptithcm.entities.MonHoc;
+import com.ptithcm.shared.constants.SessionConstant;
+import com.ptithcm.shared.enums.RoleEnum;
+import com.ptithcm.shared.validators.LopTinChiValidator;
 
 @Controller
 @RequestMapping("/credit-class")
@@ -90,7 +92,7 @@ public class LopTinChiController {
     }
 
     @RequestMapping(params = "btnDelete")
-    public String delete(ModelMap model, @RequestParam("maLTC") int maLTC, HttpSession httpSession) {
+    public String delete(ModelMap model, @RequestParam("maLTC") String maLTC, HttpSession httpSession) {
         try {
             lopTinChiService.deleteLtc(maLTC);
             model.addAttribute("message", "Đã xóa lớp tín chỉ: " + maLTC);
@@ -105,7 +107,7 @@ public class LopTinChiController {
 
     @RequestMapping(value = "/api/get", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public LopTinChi getLTC(@RequestParam("maLTC") int maLTC) {
+    public LopTinChi getLTC(@RequestParam("maLTC") String maLTC) {
         return lopTinChiService.getLtcById(maLTC);
     }
 
@@ -136,8 +138,8 @@ public class LopTinChiController {
     private void populateCanDelete(List<LopTinChi> list) {
         if (list.isEmpty())
             return;
-        List<Integer> ltcWithReg = lopTinChiService.listLtcIdsWithRegistrations();
-        java.util.Set<Integer> dependentIds = new java.util.HashSet<>(ltcWithReg);
+        List<String> ltcWithReg = lopTinChiService.listLtcIdsWithRegistrations();
+        java.util.Set<String> dependentIds = new java.util.HashSet<>(ltcWithReg);
 
         for (LopTinChi ltc : list) {
             ltc.setCanDelete(!dependentIds.contains(ltc.getMaLTC()));
@@ -170,7 +172,7 @@ public class LopTinChiController {
 
     @RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> deleteLTC(@RequestParam("maLTC") int maLTC) {
+    public Map<String, Object> deleteLTC(@RequestParam("maLTC") String maLTC) {
         Map<String, Object> res = new HashMap<>();
         try {
             lopTinChiService.deleteLtcApi(maLTC);

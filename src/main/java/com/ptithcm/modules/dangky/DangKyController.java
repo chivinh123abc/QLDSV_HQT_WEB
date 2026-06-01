@@ -1,12 +1,9 @@
 package com.ptithcm.modules.dangky;
 
-import com.ptithcm.entity.DangKy;
-import com.ptithcm.entity.LopTinChi;
-import com.ptithcm.shared.constant.MessageConstant;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.ptithcm.entities.DangKy;
+import com.ptithcm.entities.LopTinChi;
+import com.ptithcm.shared.constants.MessageConstant;
 
 @Controller
 @RequestMapping("/registration")
@@ -30,7 +31,7 @@ public class DangKyController {
     }
 
     @RequestMapping(params = "btnInsert")
-    public String insert(ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public String insert(ModelMap model, @RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV) {
         try {
             dangKyService.registerClass(maLTC, maSV);
             model.addAttribute("message", MessageConstant.SUCCESS_REGISTER);
@@ -55,7 +56,7 @@ public class DangKyController {
     }
 
     @RequestMapping(params = "btnDelete")
-    public String delete(ModelMap model, @RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public String delete(ModelMap model, @RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV) {
         try {
             dangKyService.cancelRegistration(maLTC, maSV);
             model.addAttribute("message", "Đã hủy đăng ký thành công");
@@ -79,7 +80,7 @@ public class DangKyController {
 
     @RequestMapping(value = "/api/register", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> apiRegister(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public Map<String, Object> apiRegister(@RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV) {
         Map<String, Object> res = new HashMap<>();
         try {
             dangKyService.registerClass(maLTC, maSV);
@@ -97,7 +98,7 @@ public class DangKyController {
 
     @RequestMapping(value = "/api/cancel", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> apiCancel(@RequestParam("maLTC") int maLTC, @RequestParam("maSV") String maSV) {
+    public Map<String, Object> apiCancel(@RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV) {
         Map<String, Object> res = new HashMap<>();
         try {
             dangKyService.cancelRegistration(maLTC, maSV);

@@ -1,0 +1,216 @@
+// ============================================================
+// Sơ đồ CSDL hệ thống Quản lý Điểm Sinh Viên (QLDSV)
+// Chuẩn hóa: 1NF → 2NF → 3NF
+// DBMS: Microsoft SQL Server
+// Quy chuẩn đặt tên: naming-convention.md
+// Vẽ lược đồ: https://dbdiagram.io
+// ============================================================
+//
+// MÔ HÌNH AUDIT (LuuVetThoiGian.java — @MappedSuperclass):
+// Tất cả các bảng đều thừa kế 3 cột lưu vết:
+//   - ngay_tao      : Thời điểm tạo (set 1 lần qua @PrePersist)
+//   - ngay_cap_nhat : Thời điểm cập nhật cuối (set qua @PreUpdate)
+//   - ngay_xoa      : Xóa mềm (@SQLRestriction "ngay_xoa IS NULL")
+// Kiểu dữ liệu: datetimeoffset (SQL Server) ↔ OffsetDateTime (Java)
+// ============================================================
+
+// ------------------------------------------------------------
+// BẢNG DANH MỤC (Dữ liệu gốc)
+// ------------------------------------------------------------
+
+Table khoa {
+  id nvarchar(10) [primary key, note: 'Mã khoa (Khóa chính)']
+  ten_khoa nvarchar(100) [not null, unique, note: 'Tên khoa']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+}
+
+Table lop {
+  id nvarchar(10) [primary key, note: 'Mã lớp hành chính (Khóa chính)']
+  ten_lop nvarchar(100) [not null, note: 'Tên lớp']
+  khoa_hoc nvarchar(20) [not null, note: 'Khóa học (VD: 2022-2023)']
+  khoa_id nvarchar(10) [not null, note: 'Khóa ngoại → khoa.id']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+
+  indexes {
+    khoa_id [name: 'idx_lop_khoa_id']
+  }
+}
+
+Table mon_hoc {
+  id nvarchar(10) [primary key, note: 'Mã môn học (Khóa chính)']
+  ten_mon_hoc nvarchar(100) [not null, note: 'Tên môn học']
+  so_tiet_ly_thuyet int [not null, note: 'Số tiết lý thuyết']
+  so_tiet_thuc_hanh int [not null, note: 'Số tiết thực hành']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+}
+
+// ------------------------------------------------------------
+// BẢNG NHÂN SỰ & TÀI KHOẢN (Người dùng & Xác thực)
+// ------------------------------------------------------------
+
+Enum TrangThaiTaiKhoan {
+  CHUA_KICH_HOAT
+  DA_KICH_HOAT
+}
+
+Enum TrangThaiHoc {
+  DANG_HOC
+  NGHI_HOC
+}
+
+Enum TrangThaiLop {
+  HOAT_DONG
+  DA_HUY
+}
+
+Enum TrangThaiDangKy {
+  HIEU_LUC
+  DA_HUY
+}
+
+Table tai_khoan {
+  ten_dang_nhap nvarchar(50) [primary key, note: 'Mã SV hoặc Mã GV']
+  mat_khau nvarchar(255) [not null, note: 'Mật khẩu băm BCrypt']
+  email nvarchar(100) [not null]
+  phan_quyen nvarchar(20) [not null, note: 'SINHVIEN, KHOA, PGV']
+  trang_thai TrangThaiTaiKhoan [not null, default: 'CHUA_KICH_HOAT', note: 'Trạng thái kích hoạt']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null]
+  ngay_cap_nhat datetimeoffset [not null]
+  ngay_xoa datetimeoffset
+}
+
+Table sinh_vien {
+  id nvarchar(10) [primary key, note: 'Mã số sinh viên (Khóa chính, dùng làm tên đăng nhập)']
+  ho nvarchar(50) [not null, note: 'Họ và tên đệm']
+  ten nvarchar(50) [not null, note: 'Tên sinh viên']
+  phai nvarchar(10) [not null, note: 'Giới tính (Nam/Nữ)']
+  dia_chi nvarchar(200) [note: 'Địa chỉ thường trú']
+  ngay_sinh date [not null, note: 'Ngày sinh']
+  lop_id nvarchar(10) [not null, note: 'Khóa ngoại → lop.id']
+  trang_thai_hoc TrangThaiHoc [not null, default: 'DANG_HOC', note: 'Trạng thái học tập']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+
+  indexes {
+    lop_id [name: 'idx_sinh_vien_lop_id']
+  }
+}
+
+Table giang_vien {
+  id nvarchar(10) [primary key, note: 'Mã giảng viên (Khóa chính, dùng làm tên đăng nhập)']
+  khoa_id nvarchar(10) [not null, note: 'Khóa ngoại → khoa.id']
+  ho nvarchar(50) [not null, note: 'Họ và tên đệm']
+  ten nvarchar(50) [not null, note: 'Tên giảng viên']
+  hoc_vi nvarchar(50) [note: 'Học vị (ThS, TS,...)']
+  hoc_ham nvarchar(50) [note: 'Học hàm (PGS, GS)']
+  chuyen_mon nvarchar(100) [note: 'Chuyên môn đào tạo']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+
+  indexes {
+    khoa_id [name: 'idx_giang_vien_khoa_id']
+  }
+}
+
+// ------------------------------------------------------------
+// BẢNG NGHIỆP VỤ (Giao dịch)
+// ------------------------------------------------------------
+
+Table lop_tin_chi {
+  id nvarchar(50) [primary key, note: 'Mã lớp tín chỉ (Khóa chính, tự sinh dạng UUID)']
+  nien_khoa nvarchar(20) [not null, note: 'Niên khóa học (VD: 2025-2026)']
+  hoc_ky int [not null, note: 'Học kỳ (1, 2, hoặc 3)']
+  mon_hoc_id nvarchar(10) [not null, note: 'Khóa ngoại → mon_hoc.id']
+  nhom int [not null, note: 'Nhóm học']
+  giang_vien_id nvarchar(10) [not null, note: 'Khóa ngoại → giang_vien.id']
+  khoa_id nvarchar(10) [not null, note: 'Khóa ngoại → khoa.id mở lớp']
+  so_sv_toi_thieu int [not null, note: 'Số SV tối thiểu để mở lớp']
+  so_sv_toi_da int [not null, note: 'Số SV tối đa cho lớp (bắt buộc nhập)']
+  trang_thai_lop TrangThaiLop [not null, default: 'HOAT_DONG', note: 'Trạng thái lớp học']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+
+  indexes {
+    (nien_khoa, hoc_ky, mon_hoc_id, nhom) [unique, name: 'idx_unique_lop_tin_chi']
+    mon_hoc_id [name: 'idx_lop_tin_chi_mon_hoc_id']
+    giang_vien_id [name: 'idx_lop_tin_chi_giang_vien_id']
+    khoa_id [name: 'idx_lop_tin_chi_khoa_id']
+  }
+}
+
+Table dang_ky {
+  lop_tin_chi_id nvarchar(50) [not null, note: 'Khóa ngoại → lop_tin_chi.id']
+  sinh_vien_id nvarchar(10) [not null, note: 'Khóa ngoại → sinh_vien.id']
+  diem_chuyen_can float [note: 'Điểm chuyên cần (0-10)']
+  diem_giua_ky float [note: 'Điểm giữa kỳ (0-10)']
+  diem_cuoi_ky float [note: 'Điểm cuối kỳ (0-10)']
+  trang_thai_dang_ky TrangThaiDangKy [not null, default: 'HIEU_LUC', note: 'Trạng thái đăng ký']
+
+  // -- Lưu vết (LuuVetThoiGian) --
+  ngay_tao datetimeoffset [not null, note: 'Thời điểm tạo']
+  ngay_cap_nhat datetimeoffset [not null, note: 'Thời điểm cập nhật cuối']
+  ngay_xoa datetimeoffset [note: 'Xóa mềm (NULL = chưa xóa)']
+
+  indexes {
+    (lop_tin_chi_id, sinh_vien_id) [pk]
+    sinh_vien_id [name: 'idx_dang_ky_sinh_vien_id']
+  }
+
+  Note: 'Điểm hết môn = diem_chuyen_can * 0.1 + diem_giua_ky * 0.3 + diem_cuoi_ky * 0.6 (tính ở tầng Service, không lưu DB)'
+}
+
+// ============================================================
+// QUAN HỆ KHÓA NGOẠI — Tất cả dùng NO ACTION (Chặn xóa tầng cứng)
+// Việc xóa an toàn được xử lý qua Soft Delete (ngay_xoa) ở tầng Java
+// ============================================================
+
+// khoa ──1:N──> lop
+Ref: khoa.id < lop.khoa_id [delete: no action]
+
+// lop ──1:N──> sinh_vien
+Ref: lop.id < sinh_vien.lop_id [delete: no action]
+
+// khoa ──1:N──> giang_vien
+Ref: khoa.id < giang_vien.khoa_id [delete: no action]
+
+// khoa ──1:N──> lop_tin_chi
+Ref: khoa.id < lop_tin_chi.khoa_id [delete: no action]
+
+// giang_vien ──1:N──> lop_tin_chi
+Ref: giang_vien.id < lop_tin_chi.giang_vien_id [delete: no action]
+
+// mon_hoc ──1:N──> lop_tin_chi
+Ref: mon_hoc.id < lop_tin_chi.mon_hoc_id [delete: no action]
+
+// lop_tin_chi ──1:N──> dang_ky
+Ref: lop_tin_chi.id < dang_ky.lop_tin_chi_id [delete: no action]
+
+// sinh_vien ──1:N──> dang_ky
+Ref: sinh_vien.id < dang_ky.sinh_vien_id [delete: no action]
+
+// tai_khoan ──1:1──> sinh_vien / giang_vien
+Ref: tai_khoan.ten_dang_nhap - sinh_vien.id [delete: no action]
+Ref: tai_khoan.ten_dang_nhap - giang_vien.id [delete: no action]

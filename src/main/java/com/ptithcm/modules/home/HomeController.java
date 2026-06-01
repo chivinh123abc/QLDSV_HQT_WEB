@@ -1,14 +1,15 @@
 package com.ptithcm.modules.home;
 
-import com.ptithcm.entity.SinhVien;
-import com.ptithcm.shared.enumtype.RoleEnum;
-import com.ptithcm.shared.util.SessionUtil;
-
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.shared.enums.RoleEnum;
+import com.ptithcm.shared.utils.SessionUtil;
 
 @Controller
 public class HomeController {

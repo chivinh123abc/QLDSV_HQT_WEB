@@ -1,12 +1,14 @@
 package com.ptithcm.modules.sinhvien;
 
-import com.ptithcm.entity.Khoa;
-import com.ptithcm.entity.Lop;
-import com.ptithcm.entity.SinhVien;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.Khoa;
+import com.ptithcm.entities.Lop;
+import com.ptithcm.entities.SinhVien;
 
 @Service
 @Transactional
@@ -36,10 +38,16 @@ public class SinhVienService {
     }
 
     public void insertStudent(SinhVien sv) {
+        if (sv.getMaLop() != null) {
+            sv.setLop(sinhVienDAO.getSession().get(Lop.class, sv.getMaLop()));
+        }
         sinhVienDAO.save(sv);
     }
 
     public void updateStudent(SinhVien sv) {
+        if (sv.getMaLop() != null) {
+            sv.setLop(sinhVienDAO.getSession().get(Lop.class, sv.getMaLop()));
+        }
         sinhVienDAO.update(sv);
     }
 
@@ -57,6 +65,9 @@ public class SinhVienService {
     }
 
     public String saveStudentApi(SinhVien sv, String mode) throws Exception {
+        if (sv.getMaLop() != null) {
+            sv.setLop(sinhVienDAO.getSession().get(Lop.class, sv.getMaLop()));
+        }
         SinhVien existing = sinhVienDAO.findById(sv.getMaSV());
         if (mode.equals("add")) {
             if (existing != null) {

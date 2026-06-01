@@ -1,12 +1,14 @@
 package com.ptithcm.modules.report;
 
-import com.ptithcm.entity.Lop;
-import com.ptithcm.shared.base.BaseDAO;
 import java.util.List;
 import java.util.Map;
+
 import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.springframework.stereotype.Repository;
+
+import com.ptithcm.entities.Lop;
+import com.ptithcm.shared.bases.BaseDAO;
 
 @Repository
 public class ReportDAO extends BaseDAO<Lop, String> {

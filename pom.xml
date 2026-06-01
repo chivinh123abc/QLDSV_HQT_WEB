@@ -99,18 +99,6 @@
         <version>1.1.3</version>
     </dependency>
 
-    <!-- File Upload -->
-    <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>1.2.2</version>
-    </dependency>
-    <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>1.3.2</version>
-    </dependency>
-
     <!-- Jackson for JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -144,6 +132,32 @@
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
+        </dependency>
+
+        <!-- BCrypt Password Hashing -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <!-- Redis Client (Jedis) -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>5.1.2</version>
+        </dependency>
+
+        <!-- Jakarta Mail API and Angus Mail implementation (needed for JavaMailSenderImpl in Spring 6) -->
+        <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.2</version>
         </dependency>
 
   </dependencies>
@@ -208,7 +222,9 @@
                 <eclipse>
                     <file>${project.basedir}/eclipse-formatter.xml</file>
                 </eclipse>
-
+                <importOrder>
+                    <order>java,javax,jakarta,org,com,com.ptithcm</order>
+                </importOrder>
                 <removeUnusedImports />
                 <endWithNewline/>
             </java>

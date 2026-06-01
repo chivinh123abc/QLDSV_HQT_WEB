@@ -1,12 +1,14 @@
 package com.ptithcm.modules.diemso;
 
-import com.ptithcm.entity.DangKy;
-import com.ptithcm.entity.Khoa;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ptithcm.entities.DangKy;
+import com.ptithcm.entities.Khoa;
 
 @Service
 @Transactional
@@ -36,7 +38,7 @@ public class MarkService {
         return markDAO.loadStudents(nienKhoa, hocKy, maMH, nhom, searchMaSV, maKhoa);
     }
 
-    public void saveMark(int maLTC, String maSV, Float diemCC, Float diemGK, Float diemCK) throws Exception {
+    public void saveMark(String maLTC, String maSV, Float diemCC, Float diemGK, Float diemCK) throws Exception {
         DangKy dk = markDAO.getRegistrationByLtcAndStudent(maLTC, maSV);
         if (dk != null) {
             dk.setDiemCC(diemCC);
@@ -50,7 +52,7 @@ public class MarkService {
 
     public void saveAllMarks(List<Map<String, Object>> marks) throws Exception {
         for (Map<String, Object> mark : marks) {
-            int maLTC = (int) mark.get("maLTC");
+            String maLTC = mark.get("maLTC") != null ? mark.get("maLTC").toString() : "";
             String maSV = (String) mark.get("maSV");
 
             Float diemCC = mark.get("diemCC") != null && !mark.get("diemCC").toString().isEmpty()

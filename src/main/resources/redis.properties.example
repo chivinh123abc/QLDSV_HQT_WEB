@@ -1,0 +1,6 @@
+# Cấu hình Redis mẫu (Thay đổi thông tin thật trong redis.properties)
+
+redis.host=localhost
+redis.port=6379
+redis.password=
+redis.timeout=2000

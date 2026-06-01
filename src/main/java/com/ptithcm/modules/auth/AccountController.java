@@ -1,132 +1,218 @@
 package com.ptithcm.modules.auth;
 
-import com.ptithcm.entity.Users;
-import com.ptithcm.shared.enumtype.RoleEnum;
-import com.ptithcm.shared.util.SessionUtil;
-import com.ptithcm.shared.validator.UsersValidator;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import jakarta.servlet.http.HttpSession;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ptithcm.entities.GiangVien;
+import com.ptithcm.entities.SinhVien;
+import com.ptithcm.entities.TaiKhoan;
+import com.ptithcm.shared.dtos.UserSession;
+import com.ptithcm.shared.enums.TrangThaiTaiKhoan;
+import com.ptithcm.shared.utils.SessionUtil;
+
 @Controller
 @RequestMapping("/account")
 public class AccountController {
 
     @Autowired
-    private AuthService authService;
+    private SessionFactory sessionFactory;
 
-    @Autowired
-    private UsersValidator usersValidator;
+    @RequestMapping(method = RequestMethod.GET)
+    @Transactional
+    public String index(ModelMap model, HttpSession session) {
+        Session hSession = sessionFactory.getCurrentSession();
+        List<TaiKhoan> list = hSession.createQuery("FROM TaiKhoan", TaiKhoan.class).list();
 
-    @RequestMapping()
-    public String index(ModelMap model, jakarta.servlet.http.HttpSession httpSession) {
-        List<Users> userList = authService.listUsers();
+        List<Map<String, Object>> userList = new ArrayList<>();
+        UserSession currentLoggedIn = SessionUtil.getUser(session);
+        String currentLoggedInUser = currentLoggedIn != null ? currentLoggedIn.getUsername() : "";
 
-        Map<String, String> nameMap = new HashMap<>();
-        List<Object[]> gvList = authService.listGiangVienNames();
-        for (Object[] gv : gvList) {
-            nameMap.put((String) gv[0], (gv[1] != null ? gv[1] + " " : "") + (gv[2] != null ? gv[2] : ""));
-        }
-        List<Object[]> svList = authService.listSinhVienNames();
-        for (Object[] sv : svList) {
-            nameMap.put((String) sv[0], (sv[1] != null ? sv[1] + " " : "") + (sv[2] != null ? sv[2] : ""));
-        }
-
-        // Find lecturers with credit classes
-        List<String> ltcMaGV = authService.getLecturerUsernamesWithCreditClasses();
-        java.util.Set<String> dependentUsernames = new java.util.HashSet<>();
-        for (String s : ltcMaGV)
-            if (s != null)
-                dependentUsernames.add(s.trim().toUpperCase());
-
-        // Find students with registrations
-        List<String> dkMaSV = authService.getStudentUsernamesWithRegistrations();
-        for (String s : dkMaSV)
-            if (s != null)
-                dependentUsernames.add(s.trim().toUpperCase());
-
-        Users currentUser = SessionUtil.getUser(httpSession);
-        java.util.List<Map<String, Object>> userListWithNames = new java.util.ArrayList<>();
-        for (Users u : userList) {
+        for (TaiKhoan tk : list) {
             Map<String, Object> map = new HashMap<>();
-            map.put("userId", u.getUserId());
-            map.put("username", u.getUsername());
-            map.put("password", u.getPassword());
-            map.put("roleId", u.getRoleId());
-            String name = nameMap.get(u.getUsername());
-            map.put("fullName", name != null ? name.trim() : "Tài khoản tùy chỉnh");
+            map.put("userId", tk.getTenDangNhap());
+            map.put("username", tk.getTenDangNhap());
+            map.put("email", tk.getEmail());
 
-            // canDelete logic: not self AND (if lecturer/student, no dependencies)
-            boolean canDelete = true;
-            if (currentUser != null && currentUser.getUserId() == u.getUserId()) {
-                canDelete = false;
+            int roleId = 3; // Mặc định SINHVIEN
+            String roleName = "UNKNOWN";
+            if ("PGV".equals(tk.getPhanQuyen())) {
+                roleId = 1;
+                roleName = "PGV";
+            } else if ("KHOA".equals(tk.getPhanQuyen())) {
+                roleId = 2;
+                roleName = "KHOA";
+            } else if ("SINHVIEN".equals(tk.getPhanQuyen())) {
+                roleId = 3;
+                roleName = "SINHVIEN";
+            }
+            map.put("roleId", roleId);
+            map.put("roleName", roleName);
+
+            // Lấy tên hiển thị
+            String fullName = "Hệ thống";
+            if (roleId == 3) {
+                String svHql = "FROM SinhVien WHERE TRIM(maSV) = :username";
+                SinhVien sv = hSession.createQuery(svHql, SinhVien.class).setParameter("username", tk.getTenDangNhap())
+                        .uniqueResult();
+                if (sv != null) {
+                    fullName = sv.getHo() + " " + sv.getTen();
+                }
             } else {
-                String uname = u.getUsername() != null ? u.getUsername().trim().toUpperCase() : "";
-                if (dependentUsernames.contains(uname)) {
-                    canDelete = false;
+                String gvHql = "FROM GiangVien WHERE TRIM(maGV) = :username";
+                GiangVien gv = hSession.createQuery(gvHql, GiangVien.class)
+                        .setParameter("username", tk.getTenDangNhap()).uniqueResult();
+                if (gv != null) {
+                    fullName = gv.getHo() + " " + gv.getTen();
                 }
             }
+            map.put("fullName", fullName);
+
+            // Không cho phép tự xóa chính mình
+            boolean canDelete = !tk.getTenDangNhap().equalsIgnoreCase(currentLoggedInUser);
             map.put("canDelete", canDelete);
 
-            userListWithNames.add(map);
+            userList.add(map);
         }
 
-        model.addAttribute("userList", userListWithNames);
+        model.addAttribute("userList", userList);
         return "account/index";
-    }
-
-    @RequestMapping(value = "/api/get", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Users getUser(@RequestParam("userId") int userId) {
-        return authService.getUserById(userId);
     }
 
     @RequestMapping(value = "/api/unassigned", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public List<?> getUnassignedUsers(@RequestParam("roleId") int roleId) {
-        return authService.getUnassignedUsers(roleId, RoleEnum.SINHVIEN.getId());
+    @Transactional
+    public List<Map<String, Object>> getUnassigned(@RequestParam("roleId") int roleId) {
+        Session hSession = sessionFactory.getCurrentSession();
+        List<Map<String, Object>> res = new ArrayList<>();
+
+        if (roleId == 3) {
+            // Sinh viên chưa có tài khoản
+            List<SinhVien> sinhVienList = hSession.createQuery(
+                    "FROM SinhVien sv WHERE TRIM(sv.maSV) NOT IN (SELECT TRIM(tk.tenDangNhap) FROM TaiKhoan tk)",
+                    SinhVien.class).list();
+            for (SinhVien sv : sinhVienList) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("maSV", sv.getMaSV().trim());
+                map.put("ho", sv.getHo());
+                map.put("ten", sv.getTen());
+                res.add(map);
+            }
+        } else {
+            // Giảng viên chưa có tài khoản
+            List<GiangVien> giangVienList = hSession.createQuery(
+                    "FROM GiangVien gv WHERE TRIM(gv.maGV) NOT IN (SELECT TRIM(tk.tenDangNhap) FROM TaiKhoan tk)",
+                    GiangVien.class).list();
+            for (GiangVien gv : giangVienList) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("maGV", gv.getMaGV().trim());
+                map.put("ho", gv.getHo());
+                map.put("ten", gv.getTen());
+                res.add(map);
+            }
+        }
+        return res;
+    }
+
+    @RequestMapping(value = "/api/get", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    @Transactional
+    public Map<String, Object> getAccount(@RequestParam("userId") String userId) {
+        Session hSession = sessionFactory.getCurrentSession();
+        TaiKhoan tk = hSession.get(TaiKhoan.class, userId.trim());
+        Map<String, Object> map = new HashMap<>();
+        if (tk != null) {
+            map.put("userId", tk.getTenDangNhap());
+            map.put("username", tk.getTenDangNhap());
+            map.put("email", tk.getEmail());
+            int roleId = 3;
+            if ("PGV".equals(tk.getPhanQuyen())) {
+                roleId = 1;
+            } else if ("KHOA".equals(tk.getPhanQuyen())) {
+                roleId = 2;
+            }
+            map.put("roleId", roleId);
+            map.put("password", "");
+        }
+        return map;
     }
 
     @RequestMapping(value = "/api/save", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> saveUser(@RequestBody Users user, @RequestParam("mode") String mode,
-            jakarta.servlet.http.HttpSession httpSession) {
+    @Transactional
+    public Map<String, Object> saveAccount(@RequestBody Map<String, String> body, @RequestParam("mode") String mode) {
         Map<String, Object> res = new HashMap<>();
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(user, "user");
-        usersValidator.validate(user, bindingResult);
-        if (bindingResult.hasErrors()) {
-            String errorMsg = bindingResult.getFieldErrors().stream()
-                    .map(org.springframework.validation.FieldError::getDefaultMessage)
-                    .collect(Collectors.joining("<br>"));
-            res.put("status", "error");
-            res.put("message", errorMsg);
-            return res;
-        }
         try {
-            // Prevent self-demotion
-            Users currentUser = SessionUtil.getUser(httpSession);
-            if (currentUser != null && currentUser.getUserId() == user.getUserId()) {
-                if (currentUser.getRoleId() != user.getRoleId()) {
+            Session hSession = sessionFactory.getCurrentSession();
+            String username = body.get("username").trim();
+            String password = body.get("password");
+            String roleIdStr = body.get("roleId");
+            String email = body.get("email").trim();
+
+            if ("add".equalsIgnoreCase(mode)) {
+                TaiKhoan existing = hSession.get(TaiKhoan.class, username);
+                if (existing != null) {
                     res.put("status", "error");
-                    res.put("message", "Không thể tự thay đổi Nhóm quyền của tài khoản đang đăng nhập!");
+                    res.put("message", "Tên đăng nhập đã tồn tại!");
                     return res;
                 }
-                currentUser.setUsername(user.getUsername());
-                currentUser.setPassword(user.getPassword());
+
+                TaiKhoan tk = new TaiKhoan();
+                tk.setTenDangNhap(username);
+                tk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt(12)));
+                tk.setEmail(email);
+
+                String phanQuyen = "SINHVIEN";
+                if ("1".equals(roleIdStr)) {
+                    phanQuyen = "PGV";
+                } else if ("2".equals(roleIdStr)) {
+                    phanQuyen = "KHOA";
+                }
+                tk.setPhanQuyen(phanQuyen);
+                tk.setTrangThai(TrangThaiTaiKhoan.DA_KICH_HOAT); // Admin tạo thì kích hoạt trực tiếp
+
+                hSession.persist(tk);
+            } else if ("edit".equalsIgnoreCase(mode)) {
+                String userId = body.get("userId").trim();
+                TaiKhoan tk = hSession.get(TaiKhoan.class, userId);
+                if (tk == null) {
+                    res.put("status", "error");
+                    res.put("message", "Không tìm thấy tài khoản!");
+                    return res;
+                }
+
+                tk.setEmail(email);
+                String phanQuyen = "SINHVIEN";
+                if ("1".equals(roleIdStr)) {
+                    phanQuyen = "PGV";
+                } else if ("2".equals(roleIdStr)) {
+                    phanQuyen = "KHOA";
+                }
+                tk.setPhanQuyen(phanQuyen);
+
+                if (password != null && !password.trim().isEmpty()) {
+                    tk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt(12)));
+                }
+
+                hSession.merge(tk);
             }
 
-            authService.saveUser(user, mode);
             res.put("status", "success");
         } catch (Exception e) {
             res.put("status", "error");
@@ -137,18 +223,15 @@ public class AccountController {
 
     @RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public Map<String, Object> deleteUser(@RequestParam("userId") int userId,
-            jakarta.servlet.http.HttpSession httpSession) {
+    @Transactional
+    public Map<String, Object> deleteAccount(@RequestParam("userId") String userId) {
         Map<String, Object> res = new HashMap<>();
         try {
-            Users currentUser = SessionUtil.getUser(httpSession);
-            if (currentUser != null && currentUser.getUserId() == userId) {
-                res.put("status", "error");
-                res.put("message", "Không thể xóa tài khoản mà bạn đang sử dụng để đăng nhập!");
-                return res;
+            Session hSession = sessionFactory.getCurrentSession();
+            TaiKhoan tk = hSession.get(TaiKhoan.class, userId.trim());
+            if (tk != null) {
+                hSession.remove(tk);
             }
-
-            authService.deleteUser(userId);
             res.put("status", "success");
         } catch (Exception e) {
             res.put("status", "error");

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Load Redis properties file -->
+    <context:property-placeholder location="classpath:redis.properties" ignore-unresolvable="true" />
+
+    <!-- Connection Pool Config for Jedis -->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig" />
+
+    <!-- Connection Pool for Jedis -->
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool" destroy-method="close">
+        <constructor-arg name="poolConfig" ref="jedisPoolConfig" />
+        <constructor-arg name="host" value="${redis.host}" />
+        <constructor-arg name="port" value="${redis.port}" type="int" />
+        <constructor-arg name="timeout" value="${redis.timeout}" type="int" />
+        <constructor-arg name="password" value="#{ '${redis.password}' == '' ? null : '${redis.password}' }" />
+    </bean>
+</beans>

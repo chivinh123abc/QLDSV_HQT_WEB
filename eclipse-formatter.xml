@@ -6,5 +6,11 @@
         <setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="space"/>
         <setting id="org.eclipse.jdt.core.formatter.tabulation.size" value="4"/>
         <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="120"/>
+
+        <!-- XML Formatting Settings -->
+        <setting id="org.eclipse.wst.xml.core.indentationChar" value="space"/>
+        <setting id="org.eclipse.wst.xml.core.indentationWidth" value="4"/>
+        <setting id="org.eclipse.wst.xml.core.lineWidth" value="120"/>
+        <setting id="org.eclipse.wst.xml.core.formatter.alignEndBracket" value="false"/>
     </profile>
 </profiles>
