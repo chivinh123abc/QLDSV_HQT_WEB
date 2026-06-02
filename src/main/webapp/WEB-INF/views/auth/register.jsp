@@ -135,6 +135,7 @@
         </c:if>
 
         <form action="${pageContext.request.contextPath}/register" method="post">
+            <input type="hidden" name="csrf_token" value="${csrfToken}" />
             <div class="mb-3">
                 <label class="form-label">Mã số người dùng (Mã SV / Mã GV)</label>
                 <div class="input-group">

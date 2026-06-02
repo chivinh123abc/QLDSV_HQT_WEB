@@ -155,6 +155,7 @@
                                                         </div>
                                                         <!-- Pure HTML Form to Cancel Registration (No maSV passed in parameters) -->
                                                         <form action="${pageContext.request.contextPath}/registration" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đăng ký lớp này không?');">
+                                                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                             <input type="hidden" name="maLTC" value="${reg.lopTinChi.maLTC}">
                                                             <button type="submit" name="btnDelete" class="btn btn-xs btn-outline-danger border-0">
                                                                 <i class="bi bi-x-circle-fill"></i> Hủy
@@ -224,6 +225,7 @@
                                                                 <c:when test="${isRegistered}">
                                                                     <!-- Pure HTML Form to Cancel Registration (No maSV passed in parameters) -->
                                                                     <form action="${pageContext.request.contextPath}/registration" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đăng ký lớp này không?');">
+                                                                        <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                         <input type="hidden" name="maLTC" value="${item.maLTC}">
                                                                         <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger rounded-3 px-3">
                                                                             <i class="bi bi-x-circle me-1"></i> Hủy đăng ký
@@ -238,6 +240,7 @@
                                                                 <c:otherwise>
                                                                     <!-- Pure HTML Form to Register (No maSV passed in parameters) -->
                                                                     <form action="${pageContext.request.contextPath}/registration" method="POST">
+                                                                        <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                         <input type="hidden" name="maLTC" value="${item.maLTC}">
                                                                         <button type="submit" name="btnInsert" class="btn btn-sm btn-primary rounded-3 px-3" <c:if test="${empty selectedStudent}">disabled title="Vui lòng tra cứu sinh viên trước"</c:if>>
                                                                             <i class="bi bi-plus-circle me-1"></i> Đăng ký

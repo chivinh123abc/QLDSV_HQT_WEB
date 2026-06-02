@@ -2,6 +2,7 @@
 <configuration>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
+            <charset>UTF-8</charset>
             <pattern>%cyan([Spring]) %gray(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %magenta([%X{context}]) %msg%n</pattern>
         </encoder>
     </appender>

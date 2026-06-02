@@ -51,16 +51,16 @@ public class AuditLogAspect {
 
                 // Phân loại màu sắc (Log Level) dựa trên hành động giống NestJS
                 if (methodName.startsWith("delete")) {
-                    logger.warn("Xoa du lieu: {}", message); // WARN sẽ có màu vàng
+                    logger.warn("DELETE action: {}", message);
                 } else if (methodName.startsWith("update")) {
-                    logger.info("Cap nhat: {}", message); // INFO sẽ có màu xanh
+                    logger.info("UPDATE action: {}", message);
                 } else {
-                    logger.info("Them moi: {}", message); // INFO sẽ có màu xanh
+                    logger.info("INSERT action: {}", message);
                 }
             }
         } catch (Exception e) {
             MDC.put("context", "AuditLogAspect");
-            logger.error("Loi khi ghi Audit Log: ", e); // ERROR sẽ có màu đỏ
+            logger.error("Error writing Audit Log: ", e);
         } finally {
             // Luôn nhớ xóa MDC sau khi log xong để tránh rò rỉ dữ liệu sang thread khác
             MDC.remove("context");

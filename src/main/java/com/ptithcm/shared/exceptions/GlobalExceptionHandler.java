@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public String handleAllExceptions(Exception ex, ModelMap model) {
         // Ghi log lỗi chi tiết ra console/file để developer debug
-        logger.error("Hệ thống xảy ra lỗi nghiêm trọng: ", ex);
+        logger.error("System error occurred: ", ex);
 
         // Trả thông báo thân thiện ra View
         model.addAttribute("errorMsg", "Hệ thống đang bảo trì hoặc xảy ra sự cố gián đoạn. Vui lòng thử lại sau!");

@@ -120,6 +120,7 @@
         </c:if>
 
         <form action="${pageContext.request.contextPath}/login" method="post">
+            <input type="hidden" name="csrf_token" value="${csrfToken}" />
 
             <div class="mb-3">
                 <label class="form-label">Tên đăng nhập</label>
