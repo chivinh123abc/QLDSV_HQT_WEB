@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Báo cáo - QLDSV_HTC_WEB</title>
+    <title><s:message code="report.page.title"/></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css" />
@@ -49,15 +50,15 @@
 
             <main id="main-content" class="app-content">
                 <div class="container-fluid p-4">
-                    <h2 class="mb-4"><i class="bi bi-file-earmark-bar-graph text-primary"></i> Hệ thống báo cáo</h2>
+                    <h2 class="mb-4"><i class="bi bi-file-earmark-bar-graph text-primary"></i> <s:message code="report.system"/></h2>
 
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <div class="card h-100 report-card" id="cardSummary">
                                 <div class="card-body text-center py-4">
                                     <i class="bi bi-grid-3x3-gap fs-1 text-primary mb-3"></i>
-                                    <h4>Bảng điểm tổng kết</h4>
-                                    <p class="text-muted">Xem điểm tổng kết của tất cả sinh viên trong một lớp.</p>
+                                    <h4><s:message code="report.summary.grades"/></h4>
+                                    <p class="text-muted"><s:message code="report.view.grades.desc"/></p>
                                 </div>
                             </div>
                         </div>
@@ -65,8 +66,8 @@
                             <div class="card h-100 report-card" id="cardStudents">
                                 <div class="card-body text-center py-4">
                                     <i class="bi bi-people fs-1 text-success mb-3"></i>
-                                    <h4>Danh sách sinh viên lớp tín chỉ</h4>
-                                    <p class="text-muted">Xem danh sách sinh viên đăng ký một lớp tín chỉ cụ thể.</p>
+                                    <h4><s:message code="report.student.list"/></h4>
+                                    <p class="text-muted"><s:message code="report.view.students.desc"/></p>
                                 </div>
                             </div>
                         </div>
@@ -76,7 +77,7 @@
                     <div class="filter-pane" id="filterSummary">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-4">
-                                <label class="form-label">Chọn lớp</label>
+                                <label class="form-label"><s:message code="global.lbl.selectClass"/></label>
                                 <select class="form-select" id="selLop">
                                     <c:forEach var="lop" items="${lopList}">
                                         <option value="${lop.maLop}">${lop.maLop} - ${lop.tenLop}</option>
@@ -85,7 +86,7 @@
                             </div>
                             <div class="col-md-2">
                                 <button class="btn btn-primary w-100" id="btnGenSummary">
-                                    <i class="bi bi-play-fill"></i> Tạo báo cáo
+                                    <i class="bi bi-play-fill"></i> <s:message code="report.btn.create"/>
                                 </button>
                             </div>
                         </div>
@@ -95,7 +96,7 @@
                     <div class="filter-pane" id="filterStudents">
                         <div class="row g-3">
                             <div class="col-md-3">
-                                <label class="form-label">Niên khóa</label>
+                                <label class="form-label"><s:message code="global.lbl.academicYear"/></label>
                                 <select class="form-select" id="nk">
                                     <c:forEach var="nk" items="${nienKhoaList}">
                                         <option value="${nk}">${nk}</option>
@@ -103,7 +104,7 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Học kỳ</label>
+                                <label class="form-label"><s:message code="global.lbl.semester"/></label>
                                 <select class="form-select" id="hk">
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -111,15 +112,15 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Môn học</label>
+                                <label class="form-label"><s:message code="global.lbl.subject"/></label>
                                 <select class="form-select" id="mh">
-                                    <option value="">-- Tải môn học... --</option>
+                                    <option value=""><s:message code="report.loading.subjects"/></option>
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Nhóm</label>
+                                <label class="form-label"><s:message code="global.lbl.group"/></label>
                                 <select class="form-select" id="nhom">
-                                    <option value="">-- Nhóm --</option>
+                                    <option value=""><s:message code="report.group"/></option>
                                 </select>
                             </div>
                             <div class="col-md-1 d-flex align-items-end">
@@ -132,9 +133,9 @@
 
                     <div class="report-result d-none" id="resultArea">
                         <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0" id="resultTitle">Kết quả báo cáo</h5>
+                            <h5 class="mb-0" id="resultTitle"><s:message code="report.result"/></h5>
                             <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
-                                <i class="bi bi-printer"></i> In báo cáo
+                                <i class="bi bi-printer"></i> <s:message code="report.btn.print"/>
                             </button>
                         </div>
                         <div class="table-responsive p-0">
@@ -176,7 +177,7 @@
                 $.get('${pageContext.request.contextPath}/report/summary-marks', { maLop: maLop }, function(res) {
                     if (res.success) {
                         $('#resultArea').removeClass('d-none');
-                        $('#resultTitle').text('Bảng điểm tổng kết - Lớp ' + maLop);
+                        $('#resultTitle').text('<s:message code="report.js.summaryTitle"/> ' + maLop);
                         
                         // Build header
                         let headHtml = '<tr>';
@@ -208,10 +209,10 @@
                 let nkValue = $('#nk').val();
                 let hkValue = $('#hk').val();
                 $.get('${pageContext.request.contextPath}/mark/get-subjects', { nienKhoa: nkValue, hocKy: hkValue }, function(data) {
-                    let html = '<option value="">-- Chọn môn học --</option>';
+                    let html = '<option value="">-- Chọn <s:message code="subject.count.suffix"/> --</option>';
                     data.forEach(item => html += `<option value="${item[0]}">${item[1]}</option>`);
                     $('#mh').html(html);
-                    $('#nhom').html('<option value="">-- Nhóm --</option>');
+                    $('#nhom').html('<option value="">-- <s:message code="global.lbl.group"/> --</option>');
                 });
             }
 
@@ -223,7 +224,7 @@
                     hocKy: $('#hk').val(), 
                     maMH: $(this).val() 
                 }, function(data) {
-                    let html = '<option value="">-- Nhóm --</option>';
+                    let html = '<option value="">-- <s:message code="global.lbl.group"/> --</option>';
                     data.forEach(item => html += `<option value="${item}">${item}</option>`);
                     $('#nhom').html(html);
                 });
@@ -238,22 +239,22 @@
                 };
                 
                 if (!params.maMH || !params.nhom) {
-                    alert('Vui lòng chọn đầy đủ thông tin!');
+                    alert('<s:message code="report.js.selectAll"/>');
                     return;
                 }
 
                 $.get('${pageContext.request.contextPath}/report/credit-class-students', params, function(res) {
                     if (res.success) {
                         $('#resultArea').removeClass('d-none');
-                        $('#resultTitle').text('Danh sách sinh viên lớp tín chỉ');
+                        $('#resultTitle').text('<s:message code="report.js.studentListTitle"/>');
                         
                         $('#reportTable thead').html(`
                             <tr>
                                 <th>MASV</th>
-                                <th>Họ</th>
-                                <th>Tên</th>
-                                <th>Phái</th>
-                                <th>Mã Lớp</th>
+                                <th><s:message code="report.lbl.lastName"/></th>
+                                <th><s:message code="report.lbl.firstName"/></th>
+                                <th><s:message code="report.lbl.gender"/></th>
+                                <th><s:message code="report.lbl.classCode"/></th>
                             </tr>
                         `);
 

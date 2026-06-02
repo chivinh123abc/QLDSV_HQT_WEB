@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đăng ký tài khoản - Hệ thống Tín chỉ</title>
+    <title><s:message code="auth.register.page.title"/></title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -124,8 +125,8 @@
             <div class="mb-3">
                 <i class="bi bi-person-plus-fill fs-1 text-primary"></i>
             </div>
-            <h2>Đăng ký tài khoản</h2>
-            <p>Tạo tài khoản tự phục vụ dành cho Sinh viên & Giảng viên</p>
+            <h2><s:message code="auth.register.title"/></h2>
+            <p><s:message code="auth.register.self.service.desc"/></p>
         </div>
 
         <c:if test="${not empty error}">
@@ -137,7 +138,7 @@
         <form action="${pageContext.request.contextPath}/register" method="post">
             <input type="hidden" name="csrf_token" value="${csrfToken}" />
             <div class="mb-3">
-                <label class="form-label">Mã số người dùng (Mã SV / Mã GV)</label>
+                <label class="form-label"><s:message code="auth.register.user.id"/></label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-card-text text-muted"></i></span>
                     <input type="text" name="username" class="form-control border-start-0" placeholder="VD: SV01, GV01, N22DCCN001..." value="${username}" required>
@@ -145,48 +146,48 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Địa chỉ Email (Nhận mã kích hoạt OTP)</label>
+                <label class="form-label"><s:message code="auth.register.email.otp"/></label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
-                    <input type="email" name="email" class="form-control border-start-0" placeholder="Nhập email của bạn..." value="${email}" required>
+                    <input type="email" name="email" class="form-control border-start-0" placeholder="<s:message code="auth.register.enter.email"/>" value="${email}" required>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Mật khẩu</label>
+                <label class="form-label"><s:message code="auth.register.password"/></label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
-                    <input type="password" name="password" class="form-control border-start-0" placeholder="Nhập mật khẩu mới..." required>
+                    <input type="password" name="password" class="form-control border-start-0" placeholder="<s:message code="auth.register.enter.new.password"/>" required>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Xác nhận mật khẩu</label>
+                <label class="form-label"><s:message code="auth.register.confirm.password"/></label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-key-fill text-muted"></i></span>
-                    <input type="password" name="confirmPassword" class="form-control border-start-0" placeholder="Nhập lại mật khẩu..." required>
+                    <input type="password" name="confirmPassword" class="form-control border-start-0" placeholder="<s:message code="auth.register.confirm.password.placeholder"/>" required>
                 </div>
             </div>
 
             <div class="mb-4">
-                <label class="form-label">Mã xác nhận CAPTCHA</label>
+                <label class="form-label"><s:message code="auth.register.captcha"/></label>
                 <div class="captcha-container">
                     <div class="captcha-img-wrapper" onclick="refreshCaptcha()">
-                        <img id="captchaImg" src="${pageContext.request.contextPath}/captcha" alt="CAPTCHA" title="Click để đổi hình khác" />
+                        <img id="captchaImg" src="${pageContext.request.contextPath}/captcha" alt="CAPTCHA" title="<s:message code="auth.register.click.change.image"/>" />
                     </div>
-                    <button type="button" class="btn btn-outline-secondary refresh-btn" onclick="refreshCaptcha()" title="Đổi mã CAPTCHA">
+                    <button type="button" class="btn btn-outline-secondary refresh-btn" onclick="refreshCaptcha()" title="<s:message code="auth.register.change.captcha"/>">
                         <i class="bi bi-arrow-clockwise"></i>
                     </button>
-                    <input type="text" name="captcha" class="form-control" placeholder="Nhập mã..." maxlength="5" required autocomplete="off">
+                    <input type="text" name="captcha" class="form-control" placeholder="<s:message code="auth.register.enter.code"/>" maxlength="5" required autocomplete="off">
                 </div>
             </div>
 
-            <button type="submit" class="register-btn">ĐĂNG KÝ NGAY</button>
+            <button type="submit" class="register-btn"><s:message code="global.btn.register"/></button>
         </form>
 
         <div class="mt-4 text-center">
-            <span class="text-muted small">Đã có tài khoản? </span>
-            <a href="${pageContext.request.contextPath}/login" class="text-decoration-none small fw-semibold text-primary">Đăng nhập tại đây</a>
+            <span class="text-muted small"><s:message code="auth.register.has.account"/> </span>
+            <a href="${pageContext.request.contextPath}/login" class="text-decoration-none small fw-semibold text-primary"><s:message code="auth.register.login.here"/></a>
         </div>
     </div>
 

@@ -1,10 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
         <aside class="app-sidebar" id="appSidebar">
             <div class="sidebar-brand">
                 <h2>QLDSV_HTC</h2>
-                <p>Hệ thống tín chỉ</p>
+                <p><s:message code="shared.sidebar.credit.system"/></p>
             </div>
 
             <nav class="sidebar-nav" aria-label="Main Navigation">
@@ -12,7 +13,7 @@
                     <%-- Trang chủ: All users --%>
                     <li>
                         <a class="nav-link" href="${pageContext.request.contextPath}/index">
-                            <i class="bi bi-house-door"></i> Trang chủ
+                            <i class="bi bi-house-door"></i> <s:message code="global.menu.home"/>
                         </a>
                     </li>
 
@@ -20,7 +21,7 @@
                     <c:if test="${sessionScope.role == 'SINHVIEN'}">
                         <li>
                             <a class="nav-link" href="${pageContext.request.contextPath}/mark/student">
-                                <i class="bi bi-bookmark-star"></i> Xem điểm
+                                <i class="bi bi-bookmark-star"></i> <s:message code="sidebar.menu.viewGrades"/>
                             </a>
                         </li>
                     </c:if>
@@ -29,27 +30,27 @@
                             <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                 <li>
                                     <a class="nav-link" href="${pageContext.request.contextPath}/student">
-                                        <i class="bi bi-people"></i> Sinh viên
+                                        <i class="bi bi-people"></i> <s:message code="sidebar.menu.students"/>
                                     </a>
                                 </li>
                                 <li>
                                     <a class="nav-link" href="${pageContext.request.contextPath}/class">
-                                        <i class="bi bi-building"></i> Lớp học
+                                        <i class="bi bi-building"></i> <s:message code="dashboard.classroom"/>
                                     </a>
                                 </li>
                                 <li>
                                     <a class="nav-link" href="${pageContext.request.contextPath}/subject">
-                                        <i class="bi bi-book"></i> Môn học
+                                        <i class="bi bi-book"></i> <s:message code="global.lbl.subject"/>
                                     </a>
                                 </li>
                                 <li>
                                     <a class="nav-link" href="${pageContext.request.contextPath}/credit-class">
-                                        <i class="bi bi-journal-text"></i> Lớp tín chỉ
+                                        <i class="bi bi-journal-text"></i> <s:message code="sidebar.menu.creditClasses"/>
                                     </a>
                                 </li>
                                 <li>
                                     <a class="nav-link" href="${pageContext.request.contextPath}/lecturer">
-                                        <i class="bi bi-person-badge"></i> Giảng viên
+                                        <i class="bi bi-person-badge"></i> <s:message code="sidebar.menu.lecturers"/>
                                     </a>
                                 </li>
                             </c:if>
@@ -59,7 +60,7 @@
                                     <c:if test="${sessionScope.role == 'SINHVIEN' || sessionScope.role == 'PGV'}">
                                         <li>
                                             <a class="nav-link" href="${pageContext.request.contextPath}/registration">
-                                                 <i class="bi bi-pencil-square"></i> Đăng ký môn
+                                                 <i class="bi bi-pencil-square"></i> <s:message code="sidebar.menu.registration"/>
                                              </a>
                                          </li>
                                     </c:if>
@@ -68,7 +69,7 @@
                                         <c:if test="${sessionScope.role == 'KHOA' || sessionScope.role == 'PGV'}">
                                             <li>
                                                 <a class="nav-link" href="${pageContext.request.contextPath}/mark">
-                                                    <i class="bi bi-check2-square"></i> Nhập điểm
+                                                    <i class="bi bi-check2-square"></i> <s:message code="sidebar.menu.enterGrades"/>
                                                 </a>
                                             </li>
                                         </c:if>
@@ -78,7 +79,7 @@
                                                 <li>
                                                     <a class="nav-link"
                                                         href="${pageContext.request.contextPath}/faculty">
-                                                        <i class="bi bi-diagram-3"></i> Khoa
+                                                        <i class="bi bi-diagram-3"></i> <s:message code="sidebar.menu.faculty"/>
                                                     </a>
                                                 </li>
                                             </c:if>
@@ -89,7 +90,7 @@
                                                     <li>
                                                         <a class="nav-link"
                                                             href="${pageContext.request.contextPath}/report">
-                                                            <i class="bi bi-file-earmark-text"></i> Báo cáo
+                                                            <i class="bi bi-file-earmark-text"></i> <s:message code="sidebar.menu.reports"/>
                                                         </a>
                                                     </li>
                                                 </c:if>
@@ -99,7 +100,7 @@
                                                         <li>
                                                             <a class="nav-link"
                                                                 href="${pageContext.request.contextPath}/account">
-                                                                <i class="bi bi-person-lines-fill"></i> TK Phân quyền
+                                                                <i class="bi bi-person-lines-fill"></i> <s:message code="sidebar.menu.accountRoles"/>
                                                             </a>
                                                         </li>
                                                     </c:if>
@@ -113,8 +114,8 @@
                     <span class="role-badge role-sv ${sessionScope.role == 'SINHVIEN' ? 'active' : ''}">SV</span>
                 </div>
                 <a href="${pageContext.request.contextPath}/logout" class="sidebar-logout text-decoration-none"
-                    aria-label="Đăng xuất khỏi hệ thống">
-                    <i class="bi bi-box-arrow-left" aria-hidden="true"></i> Đăng xuất
+                    aria-label="<s:message code="sidebar.tooltip.logout"/>">
+                    <i class="bi bi-box-arrow-left" aria-hidden="true"></i> <s:message code="sidebar.btn.logout"/>
                 </a>
             </div>
         </aside>

@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <!DOCTYPE html>
         <html lang="vi">
@@ -6,7 +7,7 @@
         <head>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Quản lý Môn học - QLDSV_HTC_WEB</title>
+            <title><s:message code="subject.management.title"/></title>
             <!-- Bootstrap CSS -->
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
             <!-- Bootstrap Icons -->
@@ -156,20 +157,20 @@
 
                             <div class="d-flex align-items-center gap-2 mb-4">
                                 <i class="bi bi-journal-bookmark-fill text-primary fs-3"></i>
-                                <h3 class="mb-0 fw-bold text-dark">Quản lý Môn học</h3>
+                                <h3 class="mb-0 fw-bold text-dark"><s:message code="subject.management"/></h3>
                             </div>
 
                             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                                 <div
                                     class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="fw-bold text-primary text-uppercase small mb-1">Danh mục Môn học</h6>
-                                        <p class="text-muted small mb-0">Quản lý chương trình và định mức môn học</p>
+                                        <h6 class="fw-bold text-primary text-uppercase small mb-1"><s:message code="subject.directory"/></h6>
+                                        <p class="text-muted small mb-0"><s:message code="subject.management.desc"/></p>
                                     </div>
                                     <c:if test="${sessionScope.role == 'PGV'}">
                                         <button class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm"
                                             onclick="resetForm()">
-                                            <i class="bi bi-plus-circle-fill me-1"></i> Cập nhật Môn học
+                                            <i class="bi bi-plus-circle-fill me-1"></i> Cập nhật <s:message code="global.lbl.subject"/>
                                         </button>
                                     </c:if>
                                 </div>
@@ -183,11 +184,11 @@
                                                     class="bi bi-search text-muted"></i></span>
                                             <input type="text" id="search-input"
                                                 class="form-control bg-light border-0 small"
-                                                placeholder="Tìm mã hoặc tên môn..." onkeyup="filterLocal()">
+                                                placeholder="<s:message code="subject.search"/>" onkeyup="filterLocal()">
                                         </div>
                                         <div class="text-muted small">
-                                            <i class="bi bi-info-circle me-1"></i> Tổng cộng <strong
-                                                id="subject-count">${monHocList.size()}</strong> môn học
+                                            <i class="bi bi-info-circle me-1"></i> <s:message code="subject.total"/> <strong
+                                                id="subject-count">${monHocList.size()}</strong> <s:message code="subject.count.suffix"/>
                                         </div>
                                     </div>
 
@@ -196,12 +197,12 @@
                                         <table class="table table-custom align-middle mb-0">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th class="px-3">MÃ MH</th>
-                                                    <th>TÊN MÔN HỌC</th>
-                                                    <th class="text-center">TIẾT LT</th>
-                                                    <th class="text-center">TIẾT TH</th>
+                                                    <th class="px-3"><s:message code="subject.lbl.code"/></th>
+                                                    <th><s:message code="subject.lbl.name"/></th>
+                                                    <th class="text-center"><s:message code="subject.lbl.theoryHours"/></th>
+                                                    <th class="text-center"><s:message code="subject.lbl.practiceHours"/></th>
                                                     <c:if test="${sessionScope.role == 'PGV'}">
-                                                        <th class="text-center">THAO TÁC</th>
+                                                        <th class="text-center"><s:message code="global.lbl.actions"/></th>
                                                     </c:if>
                                                 </tr>
                                             </thead>
@@ -214,16 +215,16 @@
                                                         <td>
                                                             <div class="subject-title">${item.tenMH}</div>
                                                             <div class="subject-subtitle">
-                                                                <i class="bi bi-info-circle"></i> Đã chuẩn hóa
+                                                                <i class="bi bi-info-circle"></i> <s:message code="global.lbl.standardized"/>
                                                             </div>
                                                         </td>
                                                         <td class="text-center">
                                                             <span class="badge-soft-secondary">${item.soTietLT}
-                                                                tiết</span>
+                                                                <s:message code="global.lbl.hours"/></span>
                                                         </td>
                                                         <td class="text-center">
                                                             <span class="badge-soft-secondary">${item.soTietTH}
-                                                                tiết</span>
+                                                                <s:message code="global.lbl.hours"/></span>
                                                         </td>
                                                         <c:if test="${sessionScope.role == 'PGV'}">
                                                             <td class="text-center">
@@ -236,8 +237,7 @@
                                                                     <button
                                                                         onclick="event.stopPropagation(); selectSubject('${item.maMH}', 'delete', true)"
                                                                         class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}"
-                                                                        ${!item.canDelete ? 'disabled title="Không thể xóa"'
-                                                                        : '' }>
+                                                                        <c:if test="${!item.canDelete}">disabled title="<s:message code='subject.cannot.delete'/>"</c:if>>
                                                                         <i class="bi bi-trash3"></i>
                                                                     </button>
                                                                 </div>
@@ -249,7 +249,7 @@
                                                     <tr>
                                                         <td colspan="5" class="text-center py-5 text-muted">
                                                             <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
-                                                            Chưa có dữ liệu môn học
+                                                            <s:message code="subject.no.data"/>
                                                         </td>
                                                     </tr>
                                                 </c:if>
@@ -269,7 +269,7 @@
                     <div class="modal-content border-0 shadow-lg rounded-4">
                         <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
                             <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                                <i class="bi bi-journal-plus"></i> Quản lý Thông tin Môn học
+                                <i class="bi bi-journal-plus"></i> Quản lý Thông tin <s:message code="global.lbl.subject"/>
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
@@ -279,46 +279,46 @@
                             <div class="d-flex gap-2 mb-4 p-2 bg-light rounded-3 border shadow-sm">
                                 <button type="button" id="btn_mode_add"
                                     class="btn btn-toolbar-add fw-bold flex-fill py-2" onclick="handleModeClick('add')">
-                                    <i class="bi bi-plus-circle"></i> <span class="btn-text">THÊM</span>
+                                    <i class="bi bi-plus-circle"></i> <span class="btn-text"><s:message code="global.btn.add"/></span>
                                 </button>
                                 <button type="button" id="btn_mode_edit"
                                     class="btn btn-toolbar-edit fw-bold flex-fill py-2"
                                     onclick="handleModeClick('edit')">
-                                    <i class="bi bi-pencil-square"></i> <span class="btn-text">SỬA</span>
+                                    <i class="bi bi-pencil-square"></i> <span class="btn-text"><s:message code="global.btn.edit"/></span>
                                 </button>
                                 <button type="button" id="btn_mode_delete"
                                     class="btn btn-toolbar-delete fw-bold flex-fill py-2"
                                     onclick="handleModeClick('delete')">
-                                    <i class="bi bi-trash3"></i> <span class="btn-text">XÓA</span>
+                                    <i class="bi bi-trash3"></i> <span class="btn-text"><s:message code="global.btn.delete"/></span>
                                 </button>
                                 <button type="button" id="btn_mode_cancel"
                                     class="btn btn-toolbar-cancel fw-bold flex-fill py-2"
                                     onclick="handleModeClick('none')" disabled>
-                                    <i class="bi bi-x-circle"></i> HỦY
+                                    <i class="bi bi-x-circle"></i> <s:message code="global.btn.cancel"/>
                                 </button>
                             </div>
 
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">MÃ MÔN HỌC <span
+                                    <label class="form-label small fw-bold text-muted"><s:message code="subject.lbl.code"/> <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control rounded-3" id="inp_maMH"
                                         placeholder="VD: CTDL" required disabled>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">TÊN MÔN HỌC <span
+                                    <label class="form-label small fw-bold text-muted"><s:message code="subject.lbl.name"/> <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control rounded-3" id="inp_tenMH"
-                                        placeholder="VD: Cấu trúc dữ liệu" required disabled>
+                                        placeholder="<s:message code="subject.example.name"/>" required disabled>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">SỐ TIẾT LÝ THUYẾT <span
+                                    <label class="form-label small fw-bold text-muted"><s:message code="subject.lbl.theoryHours"/> <span
                                             class="text-danger">*</span></label>
                                     <input type="number" class="form-control rounded-3" id="inp_soTietLT"
                                         placeholder="VD: 30" required disabled>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">SỐ TIẾT THỰC HÀNH <span
+                                    <label class="form-label small fw-bold text-muted"><s:message code="subject.lbl.practiceHours"/> <span
                                             class="text-danger">*</span></label>
                                     <input type="number" class="form-control rounded-3" id="inp_soTietTH"
                                         placeholder="VD: 15" required disabled>
@@ -328,17 +328,17 @@
                             <!-- MINI TABLE FOR REFERENCE -->
                             <div class="mt-4 pt-3 border-top">
                                 <h6 class="fw-bold text-primary mb-3 d-flex align-items-center gap-2">
-                                    <i class="bi bi-list-ul"></i> Danh mục môn học hiện có
+                                    <i class="bi bi-list-ul"></i> <s:message code="subject.directory.existing"/>
                                 </h6>
                                 <div class="table-responsive rounded-3 border bg-white shadow-sm"
                                     style="max-height: 200px; overflow-y: auto;">
                                     <table class="table table-hover table-sm align-middle mb-0">
                                         <thead class="table-light sticky-top">
                                             <tr>
-                                                <th class="border-0 px-3 small fw-bold text-muted">MÃ MH</th>
-                                                <th class="border-0 small fw-bold text-muted">TÊN MÔN HỌC</th>
+                                                <th class="border-0 px-3 small fw-bold text-muted"><s:message code="subject.lbl.code"/></th>
+                                                <th class="border-0 small fw-bold text-muted"><s:message code="subject.lbl.name"/></th>
                                                 <th class="border-0 text-center small fw-bold text-muted">LT/TH</th>
-                                                <th class="border-0 text-center small fw-bold text-muted">THAO TÁC</th>
+                                                <th class="border-0 text-center small fw-bold text-muted"><s:message code="global.lbl.actions"/></th>
                                             </tr>
                                         </thead>
                                         <tbody id="mini-table-body">
@@ -360,8 +360,7 @@
                                                             <button type="button"
                                                                 onclick="event.stopPropagation(); selectSubject('${m.maMH}', 'delete', true)"
                                                                 class="btn btn-xs btn-outline-danger border-0 p-1 ${!m.canDelete ? 'disabled opacity-25' : ''}"
-                                                                ${!m.canDelete ? 'disabled title="Không thể xóa"' : ''
-                                                                }>
+                                                                <c:if test="${!m.canDelete}">disabled title="<s:message code='subject.cannot.delete'/>"</c:if>>
                                                                 <i class="bi bi-trash3"></i>
                                                             </button>
                                                         </div>
@@ -386,7 +385,7 @@
                             <h5 id="notifyTitle" class="fw-bold mb-2"></h5>
                             <p id="notifyMessage" class="text-muted small mb-4"></p>
                             <button type="button" class="btn btn-primary w-100 rounded-3 fw-bold"
-                                data-bs-dismiss="modal">ĐÓNG</button>
+                                data-bs-dismiss="modal"><s:message code="global.btn.close"/></button>
                         </div>
                     </div>
                 </div>
@@ -398,13 +397,13 @@
                         <div class="modal-body text-center p-4">
                             <div class="mb-3"><i class="bi bi-exclamation-triangle-fill text-warning"
                                     style="font-size: 3.5rem;"></i></div>
-                            <h5 id="confirmTitle" class="fw-bold mb-2">Xác nhận</h5>
+                            <h5 id="confirmTitle" class="fw-bold mb-2"><s:message code="global.btn.confirm"/></h5>
                             <p id="confirmMessage" class="text-muted small mb-4"></p>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-light w-100 rounded-3 fw-bold"
-                                    data-bs-dismiss="modal">HỦY</button>
+                                    data-bs-dismiss="modal"><s:message code="global.btn.cancel"/></button>
                                 <button type="button" id="confirmOkBtn"
-                                    class="btn btn-danger w-100 rounded-3 fw-bold shadow-sm">XÓA</button>
+                                    class="btn btn-danger w-100 rounded-3 fw-bold shadow-sm"><s:message code="global.btn.delete"/></button>
                             </div>
                         </div>
                     </div>
@@ -463,7 +462,7 @@
                     const container = document.getElementById('subject-table-body');
                     document.getElementById('subject-count').innerText = data.length;
                     if (data.length === 0) {
-                        container.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">Không tìm thấy môn học nào</td></tr>';
+                        container.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted"><s:message code="subject.js.notFound"/></td></tr>';
                         return;
                     }
                     container.innerHTML = data.map(item => `
@@ -471,10 +470,10 @@
                     <td class="px-3"><span class="badge-soft-primary">\${item.maMH}</span></td>
                     <td>
                         <div class="subject-title">\${item.tenMH}</div>
-                        <div class="subject-subtitle"><i class="bi bi-info-circle"></i> Đã chuẩn hóa</div>
+                        <div class="subject-subtitle"><i class="bi bi-info-circle"></i> <s:message code="global.lbl.standardized"/></div>
                     </td>
-                    <td class="text-center"><span class="badge-soft-secondary">\${item.soTietLT} tiết</span></td>
-                    <td class="text-center"><span class="badge-soft-secondary">\${item.soTietTH} tiết</span></td>
+                    <td class="text-center"><span class="badge-soft-secondary">\${item.soTietLT} <s:message code="global.lbl.hours"/></span></td>
+                    <td class="text-center"><span class="badge-soft-secondary">\${item.soTietTH} <s:message code="global.lbl.hours"/></span></td>
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center">
                             <button onclick="event.stopPropagation(); selectSubject('\${item.maMH}', 'edit', true)" class="btn btn-sm btn-outline-primary border-0 rounded-3"><i class="bi bi-pencil-square"></i></button>
@@ -584,7 +583,7 @@
                         soTietLT: parseInt(document.getElementById('inp_soTietLT').value),
                         soTietTH: parseInt(document.getElementById('inp_soTietTH').value)
                     };
-                    if (!data.maMH || !data.tenMH) { showNotify('Cảnh báo', 'Vui lòng nhập đầy đủ thông tin!', 'info'); return; }
+                    if (!data.maMH || !data.tenMH) { showNotify('<s:message code="global.btn.warning"/>', '<s:message code="subject.js.pleaseEnterInfo"/>', 'info'); return; }
                     try {
                         const res = await fetch(contextPath + '/subject/api/save?mode=' + currentMode, {
                             method: 'POST',
@@ -596,14 +595,14 @@
                             await refreshTable();
                             setMode('none');
                             bootstrap.Modal.getInstance(document.getElementById('subjectModal')).hide();
-                            showNotify('Thành công', 'Thông tin môn học đã được lưu.');
-                        } else showNotify('Lỗi', result.message, 'error');
-                    } catch (e) { showNotify('Lỗi', e.message, 'error'); }
+                            showNotify('Thành công', '<s:message code="subject.js.saved"/>');
+                        } else showNotify('<s:message code="global.btn.error"/>', result.message, 'error');
+                    } catch (e) { showNotify('<s:message code="global.btn.error"/>', e.message, 'error'); }
                 }
 
                 async function performDelete() {
                     const maMH = document.getElementById('inp_maMH').value;
-                    showConfirm('Bạn có chắc chắn muốn xóa môn học này?', async () => {
+                    showConfirm('<s:message code="subject.js.confirmDelete"/>', async () => {
                         try {
                             const res = await fetch(contextPath + '/subject/api/delete?maMH=' + maMH, { method: 'POST' });
                             const result = await res.json();
@@ -611,9 +610,9 @@
                                 await refreshTable();
                                 setMode('none');
                                 bootstrap.Modal.getInstance(document.getElementById('subjectModal')).hide();
-                                showNotify('Thành công', 'Môn học đã được xóa.');
-                            } else showNotify('Lỗi', result.message, 'error');
-                        } catch (e) { showNotify('Lỗi', e.message, 'error'); }
+                                showNotify('Thành công', '<s:message code="subject.js.deleted"/>');
+                            } else showNotify('<s:message code="global.btn.error"/>', result.message, 'error');
+                        } catch (e) { showNotify('<s:message code="global.btn.error"/>', e.message, 'error'); }
                     });
                 }
 

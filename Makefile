@@ -2,7 +2,7 @@
 
 help:
 	@echo "Available commands:"
-	@echo "  make dev    - Setup Git hook and start Tomcat server (mvn clean package cargo:run)"
+	@echo "  make dev    - Setup Git hooks, start Watcher (Auto-reload) & Tomcat (cargo:run)"
 	@echo "  make build  - Compile and build the WAR package (mvn clean package)"
 	@echo "  make clean  - Clean build target directory (mvn clean)"
 	@echo "  make format - Auto-format code using Spotless (mvn spotless:apply)"
@@ -10,7 +10,9 @@ help:
 
 dev:
 	git config core.hooksPath .githooks
-	mvn clean package cargo:run
+	@echo "Starting Auto-Reload system (Server + Watcher)..."
+	cmd /c start "Maven File Watcher" cmd /c "mvn fizzed-watcher:run"
+	mvn clean spotless:apply package cargo:run
 
 build:
 	mvn clean package

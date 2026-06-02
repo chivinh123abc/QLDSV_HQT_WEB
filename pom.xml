@@ -13,6 +13,14 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>ckfinder-repository</id>
+      <name>CKFinder Repository</name>
+      <url>https://maven.cksource.com/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <!-- Spring MVC & Core -->
     <dependency>
@@ -175,6 +183,26 @@
             <artifactId>logback-classic</artifactId>
             <version>1.4.7</version>
         </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cksource</groupId>
+            <artifactId>ckfinder3</artifactId>
+            <version>3.5.2</version>
+        </dependency>
 
   </dependencies>
 
@@ -182,6 +210,29 @@
     <finalName>QLDSV_HTC_WEB</finalName>
     <sourceDirectory>src/main/java</sourceDirectory>
     <plugins>
+        <plugin>
+            <groupId>com.fizzed</groupId>
+            <artifactId>fizzed-watcher-maven-plugin</artifactId>
+            <version>1.0.6</version>
+            <configuration>
+              <watches>
+                  <!-- Theo dõi code Java -->
+                  <watch>
+                      <directory>src/main/java</directory>
+                  </watch>
+                  <!-- Theo dõi giao diện JSP, HTML, CSS -->
+                  <watch>
+                      <directory>src/main/webapp</directory>
+                  </watch>
+              </watches>
+              <goals>
+                  <!-- Khi có thay đổi, tự động chạy 2 lệnh này -->
+                  <goal>spotless:apply</goal>
+                  <goal>compile</goal>
+                  <goal>war:exploded</goal>
+              </goals>
+            </configuration>
+        </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.2</version>

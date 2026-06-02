@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <!DOCTYPE html>
         <html lang="vi">
@@ -6,7 +7,7 @@
         <head>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Quản lý Lớp Tín Chỉ - QLDSV_HTC_WEB</title>
+            <title><s:message code="credit-class.management.title"/></title>
             <!-- Bootstrap CSS -->
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
             <!-- Bootstrap Icons -->
@@ -174,8 +175,8 @@
                                     <i class="bi bi-layers-fill fs-3"></i>
                                 </div>
                                 <div>
-                                    <h3 class="mb-0 fw-bold text-dark">Quản lý Lớp Tín Chỉ</h3>
-                                    <p class="text-muted small mb-0">Thiết lập kế hoạch mở lớp và giảng dạy</p>
+                                    <h3 class="mb-0 fw-bold text-dark"><s:message code="credit-class.management.title"/></h3>
+                                    <p class="text-muted small mb-0"><s:message code="credit-class.plan.desc"/></p>
                                 </div>
                             </div>
 
@@ -197,12 +198,12 @@
                                 <div
                                     class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="fw-bold text-primary text-uppercase small mb-1">Danh sách lớp tín chỉ
+                                        <h6 class="fw-bold text-primary text-uppercase small mb-1"><s:message code="credit-class.list.title"/>
                                         </h6>
                                     </div>
                                     <c:if test="${sessionScope.role == 'PGV'}">
                                         <a href="${pageContext.request.contextPath}/credit-class?maKhoa=${maKhoa}&lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
-                                            <i class="bi bi-plus-circle-fill me-1"></i> Mở Lớp Mới
+                                            <i class="bi bi-plus-circle-fill me-1"></i> Mở <s:message code="global.lbl.selectClass"/> Mới
                                         </a>
                                     </c:if>
                                 </div>
@@ -220,7 +221,7 @@
                                                             <select name="maKhoa"
                                                                 class="form-select bg-light border-0 fw-semibold"
                                                                 onchange="this.form.submit()">
-                                                                <option value="all">Tất cả Khoa</option>
+                                                                <option value="all"><s:message code="credit-class.all.faculties"/></option>
                                                                 <c:forEach var="k" items="${khoaList}">
                                                                     <option value="${k.maKhoa}" ${param.maKhoa == k.maKhoa || maKhoa == k.maKhoa ? 'selected' : ''}>${k.tenKhoa}</option>
                                                                 </c:forEach>
@@ -239,8 +240,8 @@
                                         </div>
                                         <div class="col-md-8 text-end">
                                             <div class="text-muted small fw-medium">
-                                                <i class="bi bi-info-circle me-1"></i> Tìm thấy <strong
-                                                    class="text-primary">${ltcList.size()}</strong> lớp tín chỉ
+                                                <i class="bi bi-info-circle me-1"></i> <s:message code="credit-class.found"/> <strong
+                                                    class="text-primary">${ltcList.size()}</strong> <s:message code="credit-class.count.suffix"/>
                                             </div>
                                         </div>
                                     </div>
@@ -250,14 +251,14 @@
                                         <table class="table table-custom align-middle mb-0">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th class="px-3">MÃ LTC</th>
-                                                    <th>MÔN HỌC</th>
-                                                    <th>NIÊN KHÓA / KỲ</th>
-                                                    <th class="text-center">NHÓM</th>
-                                                    <th>GIẢNG VIÊN</th>
-                                                    <th class="text-center">TRẠNG THÁI</th>
+                                                    <th class="px-3"><s:message code="credit-class.lbl.classId"/></th>
+                                                    <th><s:message code="credit-class.lbl.subject"/></th>
+                                                    <th><s:message code="credit-class.lbl.yearSemester"/></th>
+                                                    <th class="text-center"><s:message code="credit-class.lbl.group"/></th>
+                                                    <th><s:message code="credit-class.lbl.lecturer"/></th>
+                                                    <th class="text-center"><s:message code="credit-class.lbl.status"/></th>
                                                     <c:if test="${sessionScope.role == 'PGV'}">
-                                                        <th class="text-center">THAO TÁC</th>
+                                                        <th class="text-center"><s:message code="global.lbl.actions"/></th>
                                                     </c:if>
                                                 </tr>
                                             </thead>
@@ -273,25 +274,24 @@
                                                         </td>
                                                         <td>
                                                             <div class="fw-bold text-dark">${item.nienKhoa}</div>
-                                                            <div class="small text-muted">Học kỳ: ${item.hocKy}</div>
+                                                            <div class="small text-muted"><s:message code="credit-class.semester"/></div>
                                                         </td>
-                                                        <td class="text-center"><span class="badge-soft-secondary">Nhóm
+                                                        <td class="text-center"><span class="badge-soft-secondary"><s:message code="global.lbl.group"/>
                                                                 ${item.nhom}</span></td>
                                                         <td>
                                                             <div class="fw-semibold text-primary">${item.giangVien.ho} ${item.giangVien.ten}</div>
-                                                            <div class="small text-muted">Tối thiểu:
+                                                            <div class="small text-muted"><s:message code="credit-class.lbl.minStudents"/>
                                                                 ${item.soSVToiThieu} SV</div>
                                                         </td>
                                                         <td class="text-center">
                                                             <c:choose>
                                                                 <c:when test="${item.huyLop}">
                                                                     <span class="badge-soft-danger small"><i
-                                                                            class="bi bi-x-circle"></i> Đã hủy</span>
+                                                                            class="bi bi-x-circle"></i> <s:message code="credit-class.canceled"/></span>
                                                                 </c:when>
                                                                 <c:otherwise>
                                                                     <span class="badge-soft-success small"><i
-                                                                            class="bi bi-check-circle"></i> Đang
-                                                                        mở</span>
+                                                                            class="bi bi-check-circle"></i> <s:message code="credit-class.status.open"/></span>
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </td>
@@ -306,8 +306,7 @@
                                                                         <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                         <input type="hidden" name="maLTC" value="${item.maLTC}">
                                                                         <input type="hidden" name="maKhoa" value="${maKhoa}">
-                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}"
-                                                                            ${!item.canDelete ? 'disabled title="Không thể xóa do đã có sinh viên đăng ký"' : ''}>
+                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!item.canDelete}">disabled title="<s:message code='credit-class.cannot.delete'/>"</c:if>>
                                                                             <i class="bi bi-trash3"></i>
                                                                         </button>
                                                                     </form>
@@ -320,7 +319,7 @@
                                                     <tr>
                                                         <td colspan="${sessionScope.role == 'PGV' ? 7 : 6}" class="text-center py-5 text-muted">
                                                             <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
-                                                            Không tìm thấy lớp tín chỉ nào
+                                                            <s:message code="credit-class.no.data"/>
                                                         </td>
                                                     </tr>
                                                 </c:if>
@@ -343,8 +342,8 @@
                                 <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
                                     <i class="bi bi-layers-fill"></i>
                                     <c:choose>
-                                        <c:when test="${mode == 'edit'}">Cập nhật Lớp Tín Chỉ</c:when>
-                                        <c:otherwise>Mở Lớp Tín Chỉ Mới</c:otherwise>
+                                        <c:when test="${mode == 'edit'}"><s:message code="credit-class.update"/></c:when>
+                                        <c:otherwise><s:message code="credit-class.open.new"/></c:otherwise>
                                     </c:choose>
                                 </h5>
                                 <a href="${pageContext.request.contextPath}/credit-class?maKhoa=${maKhoa}" class="btn-close btn-close-white text-decoration-none"></a>
@@ -355,39 +354,39 @@
                                     <div class="row g-3 p-3 bg-white border rounded-3 shadow-sm mb-4">
                                         <input type="hidden" name="maLTC" value="${ltc.maLTC}">
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">NIÊN KHÓA <span class="text-danger">*</span></label>
+                                            <label class="form-label small fw-bold text-muted"><s:message code="global.lbl.academicYear.upper"/> <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="nienKhoa" value="${ltc.nienKhoa}"
                                                 placeholder="VD: 2023-2024" required>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label small fw-bold text-muted">HỌC KỲ <span class="text-danger">*</span></label>
+                                            <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.lastName"/>C KỲ <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" name="hocKy" min="1" max="3" value="${not empty ltc.hocKy ? ltc.hocKy : 1}"
                                                 required>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label small fw-bold text-muted">NHÓM <span class="text-danger">*</span></label>
+                                            <label class="form-label small fw-bold text-muted"><s:message code="credit-class.lbl.group"/> <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" name="nhom" min="1" value="${not empty ltc.nhom ? ltc.nhom : 1}" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">MÔN HỌC <span class="text-danger">*</span></label>
+                                            <label class="form-label small fw-bold text-muted"><s:message code="credit-class.lbl.subject"/> <span class="text-danger">*</span></label>
                                             <select class="form-select" name="maMH" required>
-                                                <option value="">-- Chọn môn học --</option>
+                                                <option value=""><s:message code="credit-class.select.subject"/></option>
                                                 <c:forEach var="mh" items="${monHocList}">
                                                     <option value="${mh.maMH}" ${ltc.monHoc.maMH == mh.maMH ? 'selected' : ''}>[${mh.maMH}] ${mh.tenMH}</option>
                                                 </c:forEach>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">GIẢNG VIÊN <span class="text-danger">*</span></label>
+                                            <label class="form-label small fw-bold text-muted"><s:message code="credit-class.lbl.lecturer"/> <span class="text-danger">*</span></label>
                                             <select class="form-select" name="maGV" required>
-                                                <option value="">-- Chọn giảng viên --</option>
+                                                <option value=""><s:message code="credit-class.select.lecturer"/></option>
                                                 <c:forEach var="gv" items="${giangVienList}">
                                                     <option value="${gv.maGV}" ${ltc.giangVien.maGV == gv.maGV ? 'selected' : ''}>[${gv.maGV}] ${gv.ho} ${gv.ten}</option>
                                                 </c:forEach>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">KHOA QUẢN LÝ <span class="text-danger">*</span></label>
+                                            <label class="form-label small fw-bold text-muted"><s:message code="credit-class.lbl.faculty.required"/> <span class="text-danger">*</span></label>
                                             <select name="maKhoa" class="form-select">
                                                 <c:forEach var="k" items="${khoaList}">
                                                     <option value="${k.maKhoa}" ${(not empty ltc.khoa.maKhoa ? ltc.khoa.maKhoa == k.maKhoa : maKhoa == k.maKhoa) ? 'selected' : ''}>${k.tenKhoa}</option>
@@ -395,27 +394,26 @@
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label small fw-bold text-muted">SV TỐI THIỂU <span class="text-danger">*</span></label>
+                                            <label class="form-label small fw-bold text-muted"><s:message code="credit-class.lbl.minStudents.required"/> <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" name="soSVToiThieu" min="1" value="${not empty ltc.soSVToiThieu ? ltc.soSVToiThieu : 1}"
                                                 required>
                                         </div>
                                         <div class="col-md-3 d-flex align-items-end pb-1">
                                             <div class="form-check form-switch mb-2">
                                                 <input class="form-check-input" type="checkbox" name="huyLop" id="inp_huyLop" value="true" ${ltc.huyLop ? 'checked' : ''}>
-                                                <label class="form-check-label fw-bold text-danger small" for="inp_huyLop">Hủy
-                                                    lớp</label>
+                                                <label class="form-check-label fw-bold text-danger small" for="inp_huyLop"><s:message code="credit-class.btn.cancel.class"/></label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0 px-4 pb-4">
-                                    <a href="${pageContext.request.contextPath}/credit-class?maKhoa=${maKhoa}" class="btn btn-light rounded-3 fw-bold">HỦY</a>
+                                    <a href="${pageContext.request.contextPath}/credit-class?maKhoa=${maKhoa}" class="btn btn-light rounded-3 fw-bold"><s:message code="global.btn.cancel"/></a>
                                     <c:choose>
                                         <c:when test="${mode == 'edit'}">
-                                            <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (SỬA)</button>
+                                            <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.edit"/>)</button>
                                         </c:when>
                                         <c:otherwise>
-                                            <button type="submit" name="btnInsert" class="btn btn-success rounded-3 fw-bold px-4">GHI (THÊM)</button>
+                                            <button type="submit" name="btnInsert" class="btn btn-success rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.add"/>)</button>
                                         </c:otherwise>
                                     </c:choose>
                                 </div>

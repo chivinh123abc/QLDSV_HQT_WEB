@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đăng nhập - QLDSV_HTC_WEB</title>
+    <title><s:message code="auth.login.page.title"/></title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -103,8 +104,8 @@
             <div class="mb-3">
                 <i class="bi bi-shield-lock-fill fs-1 text-primary"></i>
             </div>
-            <h2>Hệ thống Tín chỉ</h2>
-            <p>Vui lòng đăng nhập để tiếp tục</p>
+            <h2><s:message code="auth.login.credit.system"/></h2>
+            <p><s:message code="auth.login.please.login"/></p>
         </div>
 
         <c:if test="${not empty error}">
@@ -123,23 +124,23 @@
             <input type="hidden" name="csrf_token" value="${csrfToken}" />
 
             <div class="mb-3">
-                <label class="form-label">Tên đăng nhập</label>
-                <input type="text" name="username" class="form-control" placeholder="Nhập mã số hoặc tên..." value="${username}" required>
+                <label class="form-label"><s:message code="auth.login.username"/></label>
+                <input type="text" name="username" class="form-control" placeholder="<s:message code="auth.login.enter.id"/>" value="${username}" required>
             </div>
 
             <div class="mb-4">
-                <label class="form-label">Mật khẩu</label>
-                <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu..." required>
+                <label class="form-label"><s:message code="auth.login.password"/></label>
+                <input type="password" name="password" class="form-control" placeholder="<s:message code="auth.login.enter.password"/>" required>
             </div>
 
-            <button type="submit" class="login-btn">ĐĂNG NHẬP</button>
+            <button type="submit" class="login-btn"><s:message code="global.btn.login"/></button>
         </form>
 
         <div class="mt-4 text-center d-flex flex-column gap-2">
             <div>
-                <a href="${pageContext.request.contextPath}/register" class="text-decoration-none small fw-semibold text-primary">Chưa có tài khoản? Đăng ký ngay</a>
+                <a href="${pageContext.request.contextPath}/register" class="text-decoration-none small fw-semibold text-primary"><s:message code="auth.login.no.account"/></a>
             </div>
-            <span class="text-muted small">Quên mật khẩu? Liên hệ phòng đào tạo</span>
+            <span class="text-muted small"><s:message code="auth.login.forgot.password"/></span>
         </div>
     </div>
 </body>
