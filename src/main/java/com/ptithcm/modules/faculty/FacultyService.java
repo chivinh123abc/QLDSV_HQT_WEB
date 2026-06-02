@@ -3,10 +3,14 @@ package com.ptithcm.modules.faculty;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ptithcm.entities.Khoa;
+import com.ptithcm.shared.constants.CacheConstant;
+import com.ptithcm.shared.events.CacheEvictEvent;
+import com.ptithcm.shared.services.RedisService;
 
 @Service
 @Transactional
@@ -15,8 +19,20 @@ public class FacultyService {
     @Autowired
     private FacultyDAO facultyDAO;
 
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
     public List<Khoa> listKhoa() {
-        return facultyDAO.findAll();
+        List<Khoa> cached = redisService.getList(CacheConstant.FACULTY_ALL, Khoa.class);
+        if (cached != null) {
+            return cached;
+        }
+        List<Khoa> result = facultyDAO.findAll();
+        redisService.set(CacheConstant.FACULTY_ALL, result, CacheConstant.DEFAULT_TTL_SECONDS);
+        return result;
     }
 
     public Khoa getKhoaById(String maKhoa) {
@@ -48,6 +64,7 @@ public class FacultyService {
             }
             facultyDAO.update(khoa);
         }
+        eventPublisher.publishEvent(new CacheEvictEvent(this, CacheConstant.FACULTY_ALL));
         return "success";
     }
 
@@ -70,6 +87,7 @@ public class FacultyService {
         Khoa khoa = facultyDAO.findById(maKhoa);
         if (khoa != null) {
             facultyDAO.delete(khoa);
+            eventPublisher.publishEvent(new CacheEvictEvent(this, CacheConstant.FACULTY_ALL));
         } else {
             throw new Exception("Không tìm thấy khoa để xóa!");
         }

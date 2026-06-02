@@ -12,10 +12,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.ptithcm.entities.base.LuuVetThoiGian;
 
 @Entity
 @Table(name = "giang_vien")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class GiangVien extends LuuVetThoiGian {
     @Id
     @Column(name = "id")
@@ -25,6 +29,7 @@ public class GiangVien extends LuuVetThoiGian {
     @JoinColumn(name = "khoa_id", nullable = false)
     private Khoa khoa;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "giangVien", fetch = FetchType.LAZY)
     private List<LopTinChi> dsLopTinChi;
 

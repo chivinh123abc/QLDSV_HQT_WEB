@@ -3,11 +3,15 @@ package com.ptithcm.modules.classroom;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ptithcm.entities.Khoa;
 import com.ptithcm.entities.Lop;
+import com.ptithcm.shared.constants.CacheConstant;
+import com.ptithcm.shared.events.CacheEvictEvent;
+import com.ptithcm.shared.services.RedisService;
 
 @Service
 @Transactional
@@ -15,6 +19,12 @@ public class ClassroomService {
 
     @Autowired
     private ClassroomDAO classroomDAO;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public List<Khoa> listKhoa() {
         return classroomDAO.listKhoa();
@@ -25,7 +35,13 @@ public class ClassroomService {
     }
 
     public List<Lop> listAllLop() {
-        return classroomDAO.listAllLop();
+        List<Lop> cached = redisService.getList(CacheConstant.CLASSROOM_ALL, Lop.class);
+        if (cached != null) {
+            return cached;
+        }
+        List<Lop> result = classroomDAO.listAllLop();
+        redisService.set(CacheConstant.CLASSROOM_ALL, result, CacheConstant.DEFAULT_TTL_SECONDS);
+        return result;
     }
 
     public List<String> listTrimmedLopFromStudents() {
@@ -56,6 +72,7 @@ public class ClassroomService {
             }
             classroomDAO.update(lop);
         }
+        eventPublisher.publishEvent(new CacheEvictEvent(this, CacheConstant.CLASSROOM_ALL));
         return "success";
     }
 
@@ -72,6 +89,7 @@ public class ClassroomService {
         Lop lop = classroomDAO.findById(maLop);
         if (lop != null) {
             classroomDAO.delete(lop);
+            eventPublisher.publishEvent(new CacheEvictEvent(this, CacheConstant.CLASSROOM_ALL));
         } else {
             throw new Exception("Không tìm thấy lớp để xóa!");
         }
