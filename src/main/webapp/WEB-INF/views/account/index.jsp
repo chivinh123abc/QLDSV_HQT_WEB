@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -6,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý Tài khoản - QLDSV_HTC_WEB</title>
+    <title><s:message code="account.management.title"/></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons -->
@@ -36,7 +37,7 @@
                 <div class="container-fluid max-w-7xl mx-auto">
                     <div class="d-flex align-items-center gap-2 mb-4">
                         <i class="bi bi-person-lines-fill text-primary fs-3"></i>
-                        <h3 class="mb-0 fw-bold text-dark">Quản lý Tài khoản</h3>
+                        <h3 class="mb-0 fw-bold text-dark"><s:message code="account.management"/></h3>
                     </div>
 
                     <!-- FLASH MESSAGES -->
@@ -56,11 +57,11 @@
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                         <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="fw-bold text-primary text-uppercase small mb-1">Danh sách Tài khoản</h6>
-                                <p class="text-muted small mb-0">Quản lý tài khoản đăng nhập cho Giảng viên và Sinh viên</p>
+                                <h6 class="fw-bold text-primary text-uppercase small mb-1"><s:message code="account.list"/></h6>
+                                <p class="text-muted small mb-0"><s:message code="account.management.desc"/></p>
                             </div>
                             <a href="${pageContext.request.contextPath}/account?lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
-                                <i class="bi bi-plus-circle-fill me-1"></i> Cấp Tài khoản mới
+                                <i class="bi bi-plus-circle-fill me-1"></i> <s:message code="account.grant.new.btn"/>
                             </a>
                         </div>
 
@@ -68,12 +69,12 @@
                             <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                                 <div class="input-group" style="max-width: 300px;">
                                     <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                    <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="Tìm tên đăng nhập..." onkeyup="filterLocal()">
+                                    <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="<s:message code="account.search.username"/>" onkeyup="filterLocal()">
                                 </div>
                                 <div class="d-flex gap-3 align-items-center">
-                                    <label class="fw-bold small text-muted text-uppercase mb-0">Lọc theo quyền:</label>
+                                    <label class="fw-bold small text-muted text-uppercase mb-0"><s:message code="account.filter.by.role"/></label>
                                     <select id="role-filter" class="form-select form-select-sm border-0 bg-light text-primary fw-bold" style="min-width: 150px;" onchange="filterLocalByRole()">
-                                        <option value="all">-- Tất cả quyền --</option>
+                                        <option value="all"><s:message code="account.all.roles"/></option>
                                         <option value="1">PGV</option>
                                         <option value="2">KHOA</option>
                                         <option value="3">SINHVIEN</option>
@@ -86,11 +87,11 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th class="px-3" style="width: 10%;">ID</th>
-                                            <th style="width: 15%;">TÊN ĐĂNG NHẬP</th>
-                                            <th style="width: 20%;">HỌ TÊN</th>
+                                            <th style="width: 15%;"><s:message code="account.username.label"/></th>
+                                            <th style="width: 20%;"><s:message code="account.lbl.fullName"/></th>
                                             <th style="width: 25%;">EMAIL</th>
-                                            <th class="text-center" style="width: 15%;">NHÓM QUYỀN</th>
-                                            <th class="text-center" style="width: 15%;">THAO TÁC</th>
+                                            <th class="text-center" style="width: 15%;"><s:message code="account.lbl.roleGroup"/></th>
+                                            <th class="text-center" style="width: 15%;"><s:message code="global.lbl.actions"/></th>
                                         </tr>
                                     </thead>
                                     <tbody id="user-table-body">
@@ -116,7 +117,7 @@
                                                         <form action="${pageContext.request.contextPath}/account/delete" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này không?');" class="d-inline">
                                                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                             <input type="hidden" name="userId" value="${item.userId}">
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="Tài khoản này không thể xóa"' : ''}>
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="<s:message code="account.cannot.delete"/>"' : ''}>
                                                                 <i class="bi bi-trash3"></i>
                                                             </button>
                                                         </form>
@@ -128,7 +129,7 @@
                                             <tr>
                                                 <td colspan="6" class="text-center py-5 text-muted">
                                                     <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
-                                                    Chưa có dữ liệu tài khoản
+                                                    <s:message code="account.no.data"/>
                                                 </td>
                                             </tr>
                                         </c:if>
@@ -151,8 +152,8 @@
                         <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
                             <i class="bi bi-shield-lock-fill"></i>
                             <c:choose>
-                                <c:when test="${mode == 'edit'}">Cập nhật Tài khoản</c:when>
-                                <c:otherwise>Cấp Tài khoản Mới</c:otherwise>
+                                <c:when test="${mode == 'edit'}"><s:message code="account.update"/></c:when>
+                                <c:otherwise><s:message code="account.grant.new"/></c:otherwise>
                             </c:choose>
                         </h5>
                         <a href="${pageContext.request.contextPath}/account" class="btn-close btn-close-white text-decoration-none"></a>
@@ -164,12 +165,12 @@
                                 <input type="hidden" name="mode" value="${not empty mode ? mode : 'add'}">
                                 <input type="hidden" name="userId" value="${account.tenDangNhap}">
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted">NHÓM QUYỀN <span class="text-danger">*</span></label>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="account.lbl.roleGroup"/> <span class="text-danger">*</span></label>
                                     <select class="form-select rounded-3" name="roleId" id="inp_roleId" onchange="toggleRoleOptions()" ${mode == 'edit' ? 'disabled' : ''} required>
-                                        <option value="" disabled ${empty account.phanQuyen ? 'selected' : ''}>-- Chọn quyền --</option>
-                                        <option value="1" ${account.phanQuyen == 'PGV' ? 'selected' : ''}>PGV (Phòng Giáo Vụ)</option>
+                                        <option value="" disabled ${empty account.phanQuyen ? 'selected' : ''}><s:message code="account.select.role"/></option>
+                                        <option value="1" ${account.phanQuyen == 'PGV' ? 'selected' : ''}><s:message code="account.role.pgv"/></option>
                                         <option value="2" ${account.phanQuyen == 'KHOA' ? 'selected' : ''}>KHOA</option>
-                                        <option value="3" ${account.phanQuyen == 'SINHVIEN' ? 'selected' : ''}>SINHVIEN (Sinh viên)</option>
+                                        <option value="3" ${account.phanQuyen == 'SINHVIEN' ? 'selected' : ''}><s:message code="account.role.student"/></option>
                                     </select>
                                     <c:if test="${mode == 'edit'}">
                                         <input type="hidden" name="roleId" value="${account.phanQuyen == 'PGV' ? '1' : (account.phanQuyen == 'KHOA' ? '2' : '3')}">
@@ -178,18 +179,18 @@
                                 
                                 <c:if test="${empty mode || mode == 'add'}">
                                     <div class="col-12" id="div_unassigned_sv" style="display: none;">
-                                        <label class="form-label small fw-bold text-muted">CHỌN SINH VIÊN CHƯA CÓ TÀI KHẢN <span class="text-danger">*</span></label>
+                                        <label class="form-label small fw-bold text-muted"><s:message code="account.select.student.noAccount"/> <span class="text-danger">*</span></label>
                                         <select class="form-select rounded-3" id="sel_unassigned_sv" onchange="selectUnassignedSV()">
-                                            <option value="" disabled selected>-- Chọn sinh viên --</option>
+                                            <option value="" disabled selected><s:message code="account.select.student"/></option>
                                             <c:forEach var="sv" items="${unassignedStudents}">
                                                 <option value="${sv.maSV}">${sv.ho} ${sv.ten} (${sv.maSV})</option>
                                             </c:forEach>
                                         </select>
                                     </div>
                                     <div class="col-12" id="div_unassigned_gv" style="display: none;">
-                                        <label class="form-label small fw-bold text-muted">CHỌN GIẢNG VIÊN CHƯA CÓ TÀI KHẢN <span class="text-danger">*</span></label>
+                                        <label class="form-label small fw-bold text-muted"><s:message code="account.select.lecturer.noAccount"/> <span class="text-danger">*</span></label>
                                         <select class="form-select rounded-3" id="sel_unassigned_gv" onchange="selectUnassignedGV()">
-                                            <option value="" disabled selected>-- Chọn giảng viên --</option>
+                                            <option value="" disabled selected><s:message code="account.select.lecturer"/></option>
                                             <c:forEach var="gv" items="${unassignedLecturers}">
                                                 <option value="${gv.maGV}">${gv.ho} ${gv.ten} (${gv.maGV})</option>
                                             </c:forEach>
@@ -198,35 +199,35 @@
                                 </c:if>
 
                                 <div class="col-12" id="div_username">
-                                    <label class="form-label small fw-bold text-muted">TÊN ĐĂNG NHẬP <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control rounded-3 bg-light" name="username" id="inp_username" value="${account.tenDangNhap}" placeholder="Tên đăng nhập..." required readonly>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="account.username.label"/> <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control rounded-3 bg-light" name="username" id="inp_username" value="${account.tenDangNhap}" placeholder="<s:message code="account.username.label"/>" required readonly>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted">MẬT KHẨU <c:if test="${empty mode || mode == 'add'}"><span class="text-danger">*</span></c:if></label>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="account.lbl.password"/> <c:if test="${empty mode || mode == 'add'}"><span class="text-danger">*</span></c:if></label>
                                     <div class="input-group">
-                                        <input type="password" class="form-control rounded-start-3" name="password" id="inp_password" placeholder="Nhập mật khẩu..." ${mode == 'edit' ? '' : 'required'}>
+                                        <input type="password" class="form-control rounded-start-3" name="password" id="inp_password" placeholder="<s:message code="account.enter.password"/>" ${mode == 'edit' ? '' : 'required'}>
                                         <button class="btn btn-outline-secondary rounded-end-3" type="button" id="btnTogglePass" onclick="togglePassword()">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                     <c:if test="${mode == 'edit'}">
-                                        <small class="text-muted fst-italic">Bỏ trống nếu không muốn đổi mật khẩu.</small>
+                                        <small class="text-muted fst-italic"><s:message code="account.leave.blank.no.change"/></small>
                                     </c:if>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label small fw-bold text-muted">EMAIL <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control rounded-3" name="email" id="inp_email" value="${account.email}" placeholder="Nhập địa chỉ email..." required>
+                                    <input type="email" class="form-control rounded-3" name="email" id="inp_email" value="${account.email}" placeholder="<s:message code="account.enter.email"/>" required>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer border-0 px-4 pb-4">
-                            <a href="${pageContext.request.contextPath}/account" class="btn btn-light rounded-3 fw-bold">HỦY</a>
+                            <a href="${pageContext.request.contextPath}/account" class="btn btn-light rounded-3 fw-bold"><s:message code="global.btn.cancel"/></a>
                             <c:choose>
                                 <c:when test="${mode == 'edit'}">
-                                    <button type="submit" class="btn btn-primary rounded-3 fw-bold px-4">GHI (SỬA)</button>
+                                    <button type="submit" class="btn btn-primary rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.edit"/>)</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <button type="submit" class="btn btn-success rounded-3 fw-bold px-4">GHI (THÊM)</button>
+                                    <button type="submit" class="btn btn-success rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.add"/>)</button>
                                 </c:otherwise>
                             </c:choose>
                         </div>

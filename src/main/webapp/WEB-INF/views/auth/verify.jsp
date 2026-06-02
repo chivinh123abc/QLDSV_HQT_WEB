@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Xác thực tài khoản - Hệ thống Tín chỉ</title>
+    <title><s:message code="auth.verify.page.title"/></title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -114,8 +115,8 @@
             <div class="mb-3">
                 <i class="bi bi-shield-fill-check fs-1 text-primary"></i>
             </div>
-            <h2>Xác thực tài khoản</h2>
-            <p>Mã OTP kích hoạt gồm 6 chữ số đã được gửi tới địa chỉ Email đã đăng ký cho tài khoản <strong>${username}</strong>.</p>
+            <h2><s:message code="auth.verify.title"/></h2>
+            <p><s:message code="auth.verify.otp.sent"/> <strong>${username}</strong>.</p>
         </div>
 
         <c:if test="${not empty error}">
@@ -129,19 +130,19 @@
             <input type="hidden" name="username" value="${username}" />
 
             <div class="mb-3">
-                <label class="form-label">Nhập mã xác thực OTP</label>
-                <input type="text" name="otp" class="form-control otp-input" maxlength="6" placeholder="******" required autocomplete="off" pattern="\d{6}" title="Mã OTP phải chứa 6 chữ số">
+                <label class="form-label"><s:message code="auth.verify.enter.otp"/></label>
+                <input type="text" name="otp" class="form-control otp-input" maxlength="6" placeholder="******" required autocomplete="off" pattern="\d{6}" title="<s:message code="auth.verify.otp.6digits"/>">
             </div>
 
-            <button type="submit" class="verify-btn">KÍCH HOẠT TÀI KHOẢN</button>
+            <button type="submit" class="verify-btn"><s:message code="auth.verify.btn.activate"/></button>
         </form>
 
         <div class="mt-4 text-center d-flex flex-column gap-2">
             <div>
-                <span class="text-muted small">Không nhận được mã? </span>
-                <a href="${pageContext.request.contextPath}/register" class="text-decoration-none small fw-semibold text-primary">Đăng ký gửi lại</a>
+                <span class="text-muted small"><s:message code="auth.verify.not.received"/> </span>
+                <a href="${pageContext.request.contextPath}/register" class="text-decoration-none small fw-semibold text-primary"><s:message code="auth.verify.request.resend"/></a>
             </div>
-            <span class="text-muted small">Thời hạn hiệu lực mã là 5 phút.</span>
+            <span class="text-muted small"><s:message code="auth.verify.otp.expiry"/></span>
         </div>
     </div>
 </body>

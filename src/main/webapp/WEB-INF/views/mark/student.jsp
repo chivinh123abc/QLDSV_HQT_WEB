@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
@@ -7,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bảng điểm cá nhân - QLDSV_HTC</title>
+    <title><s:message code="mark.student.page.title"/></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons -->
@@ -116,12 +117,12 @@
                                 <i class="bi bi-mortarboard fs-3"></i>
                             </div>
                             <div>
-                                <h3 class="mb-0 fw-bold text-dark">Kết quả học tập cá nhân</h3>
-                                <p class="text-muted small mb-0">Hồ sơ điểm: <strong class="text-primary">${student.ho} ${student.ten}</strong> (${student.maSV}) - Lớp: ${student.maLop}</p>
+                                <h3 class="mb-0 fw-bold text-dark"><s:message code="mark.student.personal.results"/></h3>
+                                <p class="text-muted small mb-0"><s:message code="mark.student.grade.profile"/> <strong class="text-primary">${student.ho} ${student.ten}</strong> <s:message code="mark.student.class.info"/></p>
                             </div>
                         </div>
                         <button class="btn btn-outline-primary fw-bold rounded-pill px-4" onclick="window.print()">
-                            <i class="bi bi-printer me-2"></i> In bảng điểm
+                            <i class="bi bi-printer me-2"></i> <s:message code="mark.student.btn.print"/>
                         </button>
                     </div>
 
@@ -130,7 +131,7 @@
                         <div class="col-md-3">
                             <div class="card grade-card shadow-sm h-100">
                                 <div class="card-body p-4 text-center">
-                                    <h6 class="text-muted fw-bold small text-uppercase mb-2">Môn đã đăng ký</h6>
+                                    <h6 class="text-muted fw-bold small text-uppercase mb-2"><s:message code="mark.student.registered.subjects"/></h6>
                                     <h2 id="total-subjects" class="fw-bold mb-0 text-primary">0</h2>
                                 </div>
                             </div>
@@ -138,7 +139,7 @@
                         <div class="col-md-3">
                             <div class="card grade-card shadow-sm h-100">
                                 <div class="card-body p-4 text-center">
-                                    <h6 class="text-muted fw-bold small text-uppercase mb-2">Tín chỉ tích lũy</h6>
+                                    <h6 class="text-muted fw-bold small text-uppercase mb-2"><s:message code="mark.student.accumulated.credits"/></h6>
                                     <h2 id="passed-credits-stat" class="fw-bold mb-0 text-success">0</h2>
                                 </div>
                             </div>
@@ -146,7 +147,7 @@
                         <div class="col-md-3">
                             <div class="card grade-card shadow-sm h-100">
                                 <div class="card-body p-4 text-center">
-                                    <h6 class="text-muted fw-bold small text-uppercase mb-2">Môn chưa đạt (F)</h6>
+                                    <h6 class="text-muted fw-bold small text-uppercase mb-2"><s:message code="mark.student.failed.subjects"/></h6>
                                     <h2 id="failed-subjects" class="fw-bold mb-0 text-danger">0</h2>
                                 </div>
                             </div>
@@ -154,7 +155,7 @@
                         <div class="col-md-3">
                             <div class="card grade-card shadow-sm h-100">
                                 <div class="card-body p-4 text-center">
-                                    <h6 class="text-muted fw-bold small text-uppercase mb-2">Điểm tích lũy (Hệ 10)</h6>
+                                    <h6 class="text-muted fw-bold small text-uppercase mb-2"><s:message code="mark.student.gpa.scale10"/></h6>
                                     <h2 id="average-gpa-stat" class="fw-bold mb-0 text-warning">0.00</h2>
                                 </div>
                             </div>
@@ -166,12 +167,12 @@
                         <div class="card-body p-3 d-flex flex-wrap gap-3 align-items-center justify-content-between">
                             <div class="input-group" style="max-width: 300px;">
                                 <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-                                <input type="text" id="subject-search" class="form-control bg-light border-0" placeholder="Tìm tên môn học..." onkeyup="filterGrades()">
+                                <input type="text" id="subject-search" class="form-control bg-light border-0" placeholder="<s:message code="mark.student.search.subject"/>" onkeyup="filterGrades()">
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <label for="semester-filter" class="text-muted small fw-bold mb-0 text-nowrap">Học kỳ hiển thị:</label>
+                                <label for="semester-filter" class="text-muted small fw-bold mb-0 text-nowrap"><s:message code="mark.student.display.semester"/></label>
                                 <select id="semester-filter" class="form-select bg-light border-0" onchange="filterGrades()">
-                                    <option value="all">-- Tất cả học kỳ --</option>
+                                    <option value="all"><s:message code="mark.student.all.semesters"/></option>
                                     <!-- Dynamic options filled by script -->
                                 </select>
                             </div>
@@ -183,7 +184,7 @@
                         <c:when test="${empty groupedMarks}">
                             <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted">
                                 <i class="bi bi-emoji-neutral fs-1 d-block mb-3 opacity-25"></i>
-                                Chưa có dữ liệu điểm học tập nào được tìm thấy.
+                                <s:message code="mark.student.no.data"/>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -193,7 +194,7 @@
                                         <!-- Header Học kỳ -->
                                         <div class="semester-header mb-3 d-flex align-items-center justify-content-between">
                                             <span class="fs-5"><i class="bi bi-calendar3 me-2"></i>${entry.key}</span>
-                                            <span class="badge bg-white text-primary rounded-pill px-3 py-1 small fw-bold semester-subjects-count">0 môn</span>
+                                            <span class="badge bg-white text-primary rounded-pill px-3 py-1 small fw-bold semester-subjects-count"><s:message code="mark.student.zero.subjects"/></span>
                                         </div>
 
                                         <!-- Bảng điểm chi tiết học kỳ -->
@@ -204,16 +205,16 @@
                                                         <thead class="table-light">
                                                             <tr>
                                                                 <th class="text-center" style="width: 60px;">STT</th>
-                                                                <th style="width: 140px;">Mã môn học</th>
-                                                                <th>Tên môn học</th>
-                                                                <th class="text-center" style="width: 80px;">Nhóm</th>
-                                                                <th class="text-center" style="width: 90px;">Tín chỉ</th>
+                                                                <th style="width: 140px;"><s:message code="global.lbl.subjectCode"/></th>
+                                                                <th><s:message code="global.lbl.subjectName"/></th>
+                                                                <th class="text-center" style="width: 80px;"><s:message code="global.lbl.group"/></th>
+                                                                <th class="text-center" style="width: 90px;"><s:message code="global.lbl.credits"/></th>
                                                                 <th class="text-center" style="width: 110px;">CC (10%)</th>
                                                                 <th class="text-center" style="width: 110px;">GK (30%)</th>
                                                                 <th class="text-center" style="width: 110px;">CK (60%)</th>
-                                                                <th class="text-center" style="width: 110px;">Tổng kết</th>
-                                                                <th class="text-center" style="width: 100px;">Điểm chữ</th>
-                                                                <th class="text-center" style="width: 110px;">Đạt</th>
+                                                                <th class="text-center" style="width: 110px;"><s:message code="global.lbl.finalScore"/></th>
+                                                                <th class="text-center" style="width: 100px;"><s:message code="global.lbl.grade"/></th>
+                                                                <th class="text-center" style="width: 110px;"><s:message code="global.lbl.passed"/></th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -327,13 +328,13 @@
                                                                     <td class="text-center">
                                                                         <c:choose>
                                                                             <c:when test="${isPassed == 'true'}">
-                                                                                <span class="text-success fs-5" title="Đã tích lũy thành công"><i class="bi bi-check-circle-fill"></i></span>
+                                                                                <span class="text-success fs-5" title="<s:message code="mark.student.accumulated.success"/>"><i class="bi bi-check-circle-fill"></i></span>
                                                                             </c:when>
                                                                             <c:when test="${row[5] != null && row[6] != null && row[7] != null}">
-                                                                                <span class="text-danger fs-5" title="Chưa đạt - Phải học lại"><i class="bi bi-x-circle-fill"></i></span>
+                                                                                <span class="text-danger fs-5" title="<s:message code="mark.student.failed.retake"/>"><i class="bi bi-x-circle-fill"></i></span>
                                                                             </c:when>
                                                                             <c:otherwise>
-                                                                                <span class="text-muted small" title="Điểm chưa hoàn tất"><i class="bi bi-dash-circle"></i></span>
+                                                                                <span class="text-muted small" title="<s:message code="mark.student.incomplete.grade"/>"><i class="bi bi-dash-circle"></i></span>
                                                                             </c:otherwise>
                                                                         </c:choose>
                                                                     </td>
@@ -351,15 +352,15 @@
                                                 <div class="col-lg-4 col-md-6 border-end-md">
                                                     <div class="d-flex flex-column gap-2">
                                                         <div class="small text-muted d-flex justify-content-between pe-3">
-                                                            <span>- Điểm trung bình học kỳ hệ 4:</span>
+                                                            <span><s:message code="mark.student.gpa.semester.scale4"/></span>
                                                             <strong class="text-dark sem-gpa4">0.00</strong>
                                                         </div>
                                                         <div class="small text-muted d-flex justify-content-between pe-3">
-                                                            <span>- Điểm trung bình học kỳ hệ 10:</span>
+                                                            <span><s:message code="mark.student.gpa.semester.scale4"/></span>
                                                             <strong class="text-dark sem-gpa10">0.00</strong>
                                                         </div>
                                                         <div class="small text-muted d-flex justify-content-between pe-3">
-                                                            <span>- Số tín chỉ đạt học kỳ:</span>
+                                                            <span><s:message code="mark.student.semester.credits"/></span>
                                                             <strong class="text-dark sem-passed-credits">0</strong>
                                                         </div>
                                                     </div>
@@ -367,23 +368,23 @@
                                                 <div class="col-lg-4 col-md-6 border-end-lg">
                                                     <div class="d-flex flex-column gap-2 ps-md-3">
                                                         <div class="small text-muted d-flex justify-content-between pe-3">
-                                                            <span>- Điểm trung bình tích lũy hệ 4:</span>
+                                                            <span><s:message code="mark.student.gpa.cumulative.scale4"/></span>
                                                             <strong class="text-dark cum-gpa4">0.00</strong>
                                                         </div>
                                                         <div class="small text-muted d-flex justify-content-between pe-3">
-                                                            <span>- Điểm trung bình tích lũy hệ 10:</span>
+                                                            <span><s:message code="mark.student.gpa.cumulative.scale4"/></span>
                                                             <strong class="text-dark cum-gpa10">0.00</strong>
                                                         </div>
                                                         <div class="small text-muted d-flex justify-content-between pe-3">
-                                                            <span>- Số tín chỉ tích lũy:</span>
+                                                            <span><s:message code="mark.student.cumulative.credits"/></span>
                                                             <strong class="text-dark cum-passed-credits">0</strong>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4 col-md-12">
                                                     <div class="d-flex flex-column justify-content-center h-100 ps-lg-4 text-lg-start text-center mt-lg-0 mt-3">
-                                                        <div class="small text-muted mb-1">- Phân loại điểm trung bình HK:</div>
-                                                        <h4 class="fw-bold mb-0 sem-ranking text-success">Khá</h4>
+                                                        <div class="small text-muted mb-1"><s:message code="mark.student.gpa.classification"/></div>
+                                                        <h4 class="fw-bold mb-0 sem-ranking text-success"><s:message code="mark.student.grade.good"/></h4>
                                                     </div>
                                                 </div>
                                             </div>
@@ -475,7 +476,7 @@
                 const cumGpa4 = cumCreditsWithScore > 0 ? (cumWeightedScore4 / cumCreditsWithScore) : 0;
 
                 // Set HTML metrics for this semester's summary card
-                section.querySelector('.semester-subjects-count').innerText = semSubjectsCount + ' môn';
+                section.querySelector('.semester-subjects-count').innerText = semSubjectsCount + ' <s:message code="mark.student.js.subjectSuffix"/>';
                 section.querySelector('.sem-gpa4').innerText = semGpa4.toFixed(2);
                 section.querySelector('.sem-gpa10').innerText = semGpa10.toFixed(2);
                 section.querySelector('.sem-passed-credits').innerText = semPassedCredits;
@@ -487,22 +488,22 @@
                 // Semester classification rank
                 const rankEl = section.querySelector('.sem-ranking');
                 if (semGpa10 >= 9.0) {
-                    rankEl.innerText = 'Xuất sắc';
+                    rankEl.innerText = '<s:message code="mark.student.rank.excellent"/>';
                     rankEl.className = 'fw-bold mb-0 sem-ranking text-success';
                 } else if (semGpa10 >= 8.0) {
-                    rankEl.innerText = 'Giỏi';
+                    rankEl.innerText = '<s:message code="mark.student.rank.veryGood"/>';
                     rankEl.className = 'fw-bold mb-0 sem-ranking text-success';
                 } else if (semGpa10 >= 6.5) {
-                    rankEl.innerText = 'Khá';
+                    rankEl.innerText = '<s:message code="mark.student.rank.good"/>';
                     rankEl.className = 'fw-bold mb-0 sem-ranking text-primary';
                 } else if (semGpa10 >= 5.0) {
-                    rankEl.innerText = 'Trung bình';
+                    rankEl.innerText = '<s:message code="mark.student.rank.average"/>';
                     rankEl.className = 'fw-bold mb-0 sem-ranking text-warning';
                 } else if (semGpa10 > 0) {
-                    rankEl.innerText = 'Yếu';
+                    rankEl.innerText = '<s:message code="mark.student.rank.weak"/>';
                     rankEl.className = 'fw-bold mb-0 sem-ranking text-danger';
                 } else {
-                    rankEl.innerText = 'Chưa xếp loại';
+                    rankEl.innerText = '<s:message code="mark.student.rank.unranked"/>';
                     rankEl.className = 'fw-bold mb-0 sem-ranking text-muted';
                 }
             });

@@ -48,6 +48,8 @@ Thumbs.db
 *~
 
 # Bỏ qua file môi trường chứa thông tin nhạy cảm
-*.properties
+database.properties
+gmail.properties
+redis.properties
 
 *.dbdiagram

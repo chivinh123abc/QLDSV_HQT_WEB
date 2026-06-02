@@ -1,0 +1,30 @@
+{
+    "enabled": true,
+    "licenseName": "",
+    "licenseKey": "",
+    "root": "",
+    "baseUrl": "/userfiles/",
+    "baseDir": "",
+    "backends": [
+        {
+            "name": "default",
+            "adapter": "local",
+            "baseUrl": "/userfiles/",
+            "directory": "src/main/webapp/userfiles"
+        }
+    ],
+    "resourceTypes": [
+        {
+            "name": "Files",
+            "backend": "default",
+            "allowedExtensions": "pdf,doc,docx,xls,xlsx,zip,rar,txt",
+            "deniedExtensions": "jsp,php,exe,sh,bat"
+        },
+        {
+            "name": "Images",
+            "backend": "default",
+            "allowedExtensions": "bmp,gif,jpeg,jpg,png,webp",
+            "deniedExtensions": ""
+        }
+    ]
+}

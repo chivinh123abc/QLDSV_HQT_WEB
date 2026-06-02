@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <!DOCTYPE html>
         <html lang="vi">
@@ -6,7 +7,7 @@
         <head>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Nhập điểm - QLDSV_HTC_WEB</title>
+            <title><s:message code="mark.page.title"/></title>
             <!-- Google Fonts -->
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
                 rel="stylesheet">
@@ -151,9 +152,9 @@
                             <div
                                 class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                                 <div class="animate__animated animate__fadeInLeft">
-                                    <h2 class="page-title"><i class="bi bi-grid-3x3-gap-fill me-2"></i>Quản lý Nhập điểm
+                                    <h2 class="page-title"><i class="bi bi-grid-3x3-gap-fill me-2"></i><s:message code="mark.lbl.title"/>
                                     </h2>
-                                    <p class="text-muted small mb-0">Hệ thống nhập điểm học phần theo lớp tín chỉ</p>
+                                    <p class="text-muted small mb-0"><s:message code="mark.system.desc"/></p>
                                 </div>
                                 <div class="d-flex gap-2 animate__animated animate__fadeInRight" id="summaryHeader"
                                     style="display: none !important;">
@@ -162,7 +163,7 @@
                                     <div class="summary-badge"><i class="bi bi-people text-success"></i> <span
                                             id="sum-count">0</span> SV</div>
                                     <button class="btn btn-primary save-all-btn ms-2" id="btnSaveAll">
-                                        <i class="bi bi-cloud-arrow-up-fill me-2"></i> LƯU TẤT CẢ
+                                        <i class="bi bi-cloud-arrow-up-fill me-2"></i> <s:message code="global.btn.save"/> TẤT CẢ
                                     </button>
                                 </div>
                             </div>
@@ -173,7 +174,7 @@
                                         <div class="col-lg-3 col-md-6">
                                             <label class="form-label text-secondary fw-semibold small">KHOA</label>
                                             <select class="form-select border-0 bg-light rounded-3" id="maKhoaFilter" onchange="updateSubjects()">
-                                                <option value="all">-- Tất cả khoa --</option>
+                                                <option value="all"><s:message code="mark.all.faculties"/></option>
                                                 <c:forEach var="k" items="${khoaList}">
                                                     <option value="${k.maKhoa}">${k.tenKhoa}</option>
                                                 </c:forEach>
@@ -181,18 +182,18 @@
                                         </div>
                                     </c:if>
                                     <div class="col-lg-2 col-md-6">
-                                        <label class="form-label text-secondary fw-semibold small">NIÊN KHÓA</label>
+                                        <label class="form-label text-secondary fw-semibold small"><s:message code="global.lbl.academicYear.upper"/></label>
                                         <select class="form-select border-0 bg-light rounded-3" id="nienKhoa">
-                                            <option value="all">-- Tất cả niên khóa --</option>
+                                            <option value="all"><s:message code="mark.all.academic.years"/></option>
                                             <c:forEach var="nk" items="${nienKhoaList}">
                                                 <option value="${nk}">${nk}</option>
                                             </c:forEach>
                                         </select>
                                     </div>
                                     <div class="col-lg-2 col-md-6">
-                                        <label class="form-label text-secondary fw-semibold small">HỌC KỲ</label>
+                                        <label class="form-label text-secondary fw-semibold small"><s:message code="student.lbl.lastName"/>C KỲ</label>
                                         <select class="form-select border-0 bg-light rounded-3" id="hocKy">
-                                            <option value="all">-- Tất cả học kỳ --</option>
+                                            <option value="all"><s:message code="mark.all.semesters"/></option>
                                             <option value="1">1</option>
                                             <option value="2">2</option>
                                             <option value="3">3</option>
@@ -200,21 +201,21 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-4 col-md-12">
-                                        <label class="form-label text-secondary fw-semibold small">MÔN HỌC</label>
+                                        <label class="form-label text-secondary fw-semibold small"><s:message code="credit-class.lbl.subject"/></label>
                                         <select class="form-select border-0 bg-light rounded-3" id="monHoc" disabled>
-                                            <option value="">-- Chọn môn học --</option>
+                                            <option value=""><s:message code="mark.select.subject"/></option>
                                         </select>
                                     </div>
                                     <div class="col-lg-2 col-md-8">
-                                        <label class="form-label text-secondary fw-semibold small">NHÓM</label>
+                                        <label class="form-label text-secondary fw-semibold small"><s:message code="credit-class.lbl.group"/></label>
                                         <select class="form-select border-0 bg-light rounded-3" id="nhom" disabled>
-                                            <option value="">-- Nhóm --</option>
+                                            <option value=""><s:message code="mark.group"/></option>
                                         </select>
                                     </div>
                                     <div class="col-lg-2 col-md-12">
-                                        <label class="form-label text-secondary fw-semibold small">TÌM MÃ SV</label>
+                                        <label class="form-label text-secondary fw-semibold small"><s:message code="mark.lbl.searchStudentId"/></label>
                                         <input type="text" class="form-control border-0 bg-light rounded-3 shadow-none"
-                                            id="searchMaSV" placeholder="Nhập mã SV...">
+                                            id="searchMaSV" placeholder="<s:message code="mark.enter.student.id"/>">
                                     </div>
                                     <div class="col-lg-1 col-md-4 d-flex align-items-end">
                                         <button type="button" class="btn btn-primary w-100 rounded-3 p-2 shadow-sm"
@@ -233,14 +234,14 @@
                                             <thead>
                                                 <tr>
                                                     <th class="ps-4">STT</th>
-                                                    <th>Mã Sinh Viên</th>
-                                                    <th>Họ và Tên</th>
-                                                    <th>Môn học & Nhóm</th>
+                                                    <th><s:message code="global.lbl.studentId"/></th>
+                                                    <th><s:message code="global.lbl.fullName"/></th>
+                                                    <th><s:message code="mark.subject.group"/></th>
                                                     <th class="text-center">CC (10%)</th>
                                                     <th class="text-center">GK (30%)</th>
                                                     <th class="text-center">CK (60%)</th>
-                                                    <th class="text-center">Tổng</th>
-                                                    <th class="text-center">Thao tác</th>
+                                                    <th class="text-center"><s:message code="global.lbl.total"/></th>
+                                                    <th class="text-center"><s:message code="global.lbl.actions"/></th>
                                                 </tr>
                                             </thead>
                                             <tbody id="studentListBody">
@@ -248,7 +249,7 @@
                                                     <td colspan="8" class="text-center py-5 text-muted">
                                                         <div class="opacity-50 mb-3"><i class="bi bi-inbox fs-1"></i>
                                                         </div>
-                                                        Vui lòng chọn thông tin lớp tín chỉ để bắt đầu nhập điểm.
+                                                        <s:message code="mark.please.select.info"/>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -306,12 +307,12 @@
                         let maKhoa = $('#maKhoaFilter').val() || '';
                         if (nk && hk) {
                             $.get('${pageContext.request.contextPath}/mark/get-subjects', { nienKhoa: nk, hocKy: hk, maKhoa: maKhoa }, function (data) {
-                                let html = '<option value="">-- Chọn môn học --</option>';
+                                let html = '<option value="">-- Chọn <s:message code="subject.count.suffix"/> --</option>';
                                 data.forEach(item => {
                                     html += `<option value="\${item[0]}">[\${item[0]}] \${item[1]}</option>`;
                                 });
                                 $('#monHoc').html(html).prop('disabled', false);
-                                $('#nhom').html('<option value="">-- Nhóm --</option>').prop('disabled', true);
+                                $('#nhom').html('<option value="">-- <s:message code="global.lbl.group"/> --</option>').prop('disabled', true);
                             });
                         }
                     }
@@ -325,7 +326,7 @@
                         let maKhoa = $('#maKhoaFilter').val() || '';
                         if (nk && hk && mh) {
                             $.get('${pageContext.request.contextPath}/mark/get-groups', { nienKhoa: nk, hocKy: hk, maMH: mh, maKhoa: maKhoa }, function (data) {
-                                let html = '<option value="">-- Nhóm --</option>';
+                                let html = '<option value="">-- <s:message code="global.lbl.group"/> --</option>';
                                 data.forEach(item => {
                                     html += `<option value="\${item}">\${item}</option>`;
                                 });
@@ -370,12 +371,12 @@
                             maKhoa: maKhoa || null
                         }, function (data) {
                             if (!data || data.length === 0) {
-                                $('#studentListBody').html('<tr><td colspan="9" class="text-center py-5 text-danger fw-medium">Không có dữ liệu sinh viên phù hợp.</td></tr>');
+                                $('#studentListBody').html('<tr><td colspan="9" class="text-center py-5 text-danger fw-medium"><s:message code="mark.js.noStudentData"/></td></tr>');
                                 $('#summaryHeader').attr('style', 'display: none !important;');
                                 return;
                             }
 
-                            $('#sum-subject').text(searchVal ? 'Tìm kiếm: ' + searchVal : (mh ? $('#monHoc option:selected').text() : 'Tất cả môn học'));
+                            $('#sum-subject').text(searchVal ? 'Tìm kiếm: ' + searchVal : (mh ? $('#monHoc option:selected').text() : 'Tất cả <s:message code="subject.count.suffix"/>'));
                             $('#sum-count').text(data.length);
                             $('#summaryHeader').attr('style', 'display: flex !important;');
 
@@ -387,7 +388,7 @@
                                 <td class="ps-4 text-muted small">\${index + 1}</td>
                                 <td class="fw-bold text-dark">\${row[0]}</td>
                                 <td class="fw-medium">\${row[1]} \${row[2]}</td>
-                                <td class="small text-secondary">\${row[8]} <br/><span class="badge bg-light text-dark border">Nhóm \${row[7]}</span></td>
+                                <td class="small text-secondary">\${row[8]} <br/><span class="badge bg-light text-dark border"><s:message code="global.lbl.group"/> \${row[7]}</span></td>
                                 <td class="text-center">
                                     <input type="number" class="form-control form-control-sm mx-auto input-mark" 
                                            step="0.1" min="0" max="10" value="\${row[3] != null ? row[3] : ''}" 
@@ -484,7 +485,7 @@
                             diemCK: diemCK || null
                         }, function (res) {
                             if (res.success) {
-                                showToast('Đã lưu điểm cho ' + masv);
+                                showToast('<s:message code="mark.js.savedGrade"/> ' + masv);
                                 btn.html('<i class="bi bi-cloud-check-fill text-success"></i>').prop('disabled', false);
                             } else {
                                 showToast(res.message, 'error');
@@ -517,13 +518,13 @@
                         });
 
                         if (hasError) {
-                            showToast('Vui lòng sửa các điểm không hợp lệ (0-10)!', 'error');
+                            showToast('<s:message code="mark.js.invalidGrade"/>', 'error');
                             return;
                         }
 
                         let btn = $(this);
                         let originalHtml = btn.html();
-                        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> ĐANG LƯU...');
+                        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> <s:message code="mark.js.saving"/>');
 
                         $.ajax({
                             url: '${pageContext.request.contextPath}/mark/save-all',
@@ -533,7 +534,7 @@
                             success: function (res) {
                                 if (res.success) {
                                     showToast(res.message);
-                                    btn.removeClass('btn-primary').addClass('btn-success').html('<i class="bi bi-check-lg me-2"></i> HOÀN TẤT');
+                                    btn.removeClass('btn-primary').addClass('btn-success').html('<i class="bi bi-check-lg me-2"></i> <s:message code="mark.js.completed"/>');
                                     setTimeout(() => {
                                         btn.removeClass('btn-success').addClass('btn-primary').html(originalHtml).prop('disabled', false);
                                     }, 3000);
@@ -543,7 +544,7 @@
                                 }
                             },
                             error: function () {
-                                showToast('Lỗi hệ thống khi lưu điểm!', 'error');
+                                showToast('<s:message code="mark.js.systemError"/>', 'error');
                                 btn.html(originalHtml).prop('disabled', false);
                             }
                         });

@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
@@ -7,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý Sinh viên - QLDSV_HTC_WEB</title>
+    <title><s:message code="student.management.title"/></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons -->
@@ -45,7 +46,7 @@
 
                     <div class="d-flex align-items-center gap-2 mb-4">
                         <i class="bi bi-mortarboard-fill text-primary fs-3"></i>
-                        <h3 class="mb-0 fw-bold text-dark">Quản lý Sinh viên</h3>
+                        <h3 class="mb-0 fw-bold text-dark"><s:message code="student.management"/></h3>
                     </div>
 
                     <!-- FLASH MESSAGES -->
@@ -65,14 +66,14 @@
                     <!-- MASTER SECTION: CLASS LIST -->
                     <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
                         <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2">
-                            <h6 class="fw-bold text-primary text-uppercase small mb-0">Quản lý sinh viên - Theo Lớp</h6>
+                            <h6 class="fw-bold text-primary text-uppercase small mb-0"><s:message code="student.management.by.class"/></h6>
                         </div>
                         <div class="card-body px-4 pb-4">
                             <!-- SEARCH & FILTER TOOLBAR -->
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div class="input-group" style="max-width: 300px;">
                                     <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                    <input type="text" id="class-search" class="form-control bg-light border-0 small" placeholder="Tìm mã lớp hoặc tên lớp..." onkeyup="filterLocalClasses()">
+                                    <input type="text" id="class-search" class="form-control bg-light border-0 small" placeholder="<s:message code="student.search.class"/>" onkeyup="filterLocalClasses()">
                                 </div>
                                 <div class="d-flex gap-2">
                                     <c:choose>
@@ -80,7 +81,7 @@
                                             <!-- Standard SSR form filter for PGV role -->
                                             <form action="${pageContext.request.contextPath}/student" method="GET" class="d-inline">
                                                 <select name="maKhoa" class="form-select form-select-sm border-0 bg-light text-muted fw-bold" onchange="this.form.submit()">
-                                                    <option value="all">-- Tất cả khoa --</option>
+                                                    <option value="all"><s:message code="student.all.faculties"/></option>
                                                     <c:forEach var="khoa" items="${khoaList}">
                                                         <option value="${khoa.maKhoa}" ${param.maKhoa == khoa.maKhoa || maKhoa == khoa.maKhoa ? 'selected' : ''}>${khoa.tenKhoa}</option>
                                                     </c:forEach>
@@ -104,9 +105,9 @@
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="border-0 px-3 small fw-bold text-muted">MÃ LỚP</th>
-                                            <th class="border-0 small fw-bold text-muted">TÊN LỚP</th>
-                                            <th class="border-0 text-center small fw-bold text-muted">KHÓA HỌC</th>
+                                            <th class="border-0 px-3 small fw-bold text-muted"><s:message code="classroom.lbl.classCode"/></th>
+                                            <th class="border-0 small fw-bold text-muted"><s:message code="classroom.lbl.className"/></th>
+                                            <th class="border-0 text-center small fw-bold text-muted"><s:message code="classroom.lbl.academicTerm"/></th>
                                             <th class="border-0 text-center small fw-bold text-muted">KHOA</th>
                                         </tr>
                                     </thead>
@@ -131,14 +132,14 @@
                                         </c:forEach>
                                         <c:if test="${empty lopList}">
                                             <tr>
-                                                <td colspan="4" class="text-center py-4 text-muted">Không tìm thấy lớp học nào</td>
+                                                <td colspan="4" class="text-center py-4 text-muted"><s:message code="student.no.classes.found"/></td>
                                             </tr>
                                         </c:if>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="mt-2 text-muted small px-1">
-                                <i class="bi bi-info-circle me-1"></i> Chọn một dòng để nạp danh sách sinh viên tương ứng phía dưới
+                                <i class="bi bi-info-circle me-1"></i> <s:message code="student.select.class.hint"/>
                             </div>
                         </div>
                     </div>
@@ -151,12 +152,12 @@
                                     <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-3 d-flex justify-content-between align-items-center">
                                         <h6 class="fw-bold text-success text-uppercase small mb-0 d-flex align-items-center gap-2">
                                             <i class="bi bi-people-fill text-success"></i>
-                                            Danh sách sinh viên - Lớp: <span class="text-dark">${maLop}</span>
+                                            Danh sách sinh viên - <s:message code="registration.class.label"/> <span class="text-dark">${maLop}</span>
                                         </h6>
                                         <c:if test="${sessionScope.role == 'PGV'}">
                                             <!-- Button to trigger ADD modal via query parameter (clean reload) -->
                                             <a href="${pageContext.request.contextPath}/student?maLop=${maLop}&lnkAdd" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
-                                                <i class="bi bi-person-plus-fill me-1"></i> Thêm Sinh viên
+                                                <i class="bi bi-person-plus-fill me-1"></i> <s:message code="student.btn.add"/>
                                             </a>
                                         </c:if>
                                     </div>
@@ -164,7 +165,7 @@
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="input-group" style="max-width: 300px;">
                                                 <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                                <input type="text" id="student-search" class="form-control bg-light border-0 small" placeholder="Tìm MSV hoặc tên sinh viên..." onkeyup="filterLocalStudents()">
+                                                <input type="text" id="student-search" class="form-control bg-light border-0 small" placeholder="<s:message code="student.search.student"/>" onkeyup="filterLocalStudents()">
                                             </div>
                                         </div>
 
@@ -172,14 +173,14 @@
                                             <table class="table table-hover align-middle mb-0">
                                                 <thead class="table-light">
                                                     <tr>
-                                                        <th class="border-0 px-3 small fw-bold text-muted">MÃ SV</th>
-                                                        <th class="border-0 small fw-bold text-muted">HỌ VÀ TÊN</th>
-                                                        <th class="border-0 text-center small fw-bold text-muted">PHÁI</th>
-                                                        <th class="border-0 text-center small fw-bold text-muted">NGÀY SINH</th>
-                                                        <th class="border-0 small fw-bold text-muted">ĐỊA CHỈ</th>
-                                                        <th class="border-0 text-center small fw-bold text-muted">TRẠNG THÁI</th>
+                                                        <th class="border-0 px-3 small fw-bold text-muted"><s:message code="student.lbl.studentId"/></th>
+                                                        <th class="border-0 small fw-bold text-muted"><s:message code="student.lbl.lastName"/> VÀ <s:message code="lecturer.lbl.firstName.required"/></th>
+                                                        <th class="border-0 text-center small fw-bold text-muted"><s:message code="student.lbl.gender.upper"/></th>
+                                                        <th class="border-0 text-center small fw-bold text-muted"><s:message code="student.lbl.dob.upper"/></th>
+                                                        <th class="border-0 small fw-bold text-muted"><s:message code="student.address"/></th>
+                                                        <th class="border-0 text-center small fw-bold text-muted"><s:message code="credit-class.lbl.status"/></th>
                                                         <c:if test="${sessionScope.role == 'PGV'}">
-                                                            <th class="border-0 text-center small fw-bold text-muted">THAO TÁC</th>
+                                                            <th class="border-0 text-center small fw-bold text-muted"><s:message code="global.lbl.actions"/></th>
                                                         </c:if>
                                                     </tr>
                                                 </thead>
@@ -222,7 +223,7 @@
                                                                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                             <input type="hidden" name="maSV" value="${sv.maSV}">
                                                                             <input type="hidden" name="maLop" value="${maLop}">
-                                                                            <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!sv.canDelete ? 'disabled opacity-25' : ''}" ${!sv.canDelete ? 'disabled title="Sinh viên này không thể xóa do có dữ liệu liên quan"' : ''}>
+                                                                            <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!sv.canDelete ? 'disabled opacity-25' : ''}" ${!sv.canDelete ? 'disabled title="<s:message code="student.cannot.delete"/>"' : ''}>
                                                                                 <i class="bi bi-trash3"></i>
                                                                             </button>
                                                                         </form>
@@ -235,7 +236,7 @@
                                                         <tr>
                                                             <td colspan="7" class="text-center py-5 text-muted">
                                                                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                                                                Chưa có dữ liệu sinh viên cho lớp này
+                                                                <s:message code="student.no.data"/>
                                                             </td>
                                                         </tr>
                                                     </c:if>
@@ -248,8 +249,8 @@
                             <c:otherwise>
                                 <div class="text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
                                     <i class="bi bi-arrow-up-circle fs-1 text-primary opacity-25 d-block mb-3"></i>
-                                    <h5 class="text-muted fw-bold">Vui lòng chọn một lớp để xem danh sách sinh viên</h5>
-                                    <p class="text-muted small">Thông tin sinh viên sẽ hiển thị tại đây sau khi bạn chọn lớp từ danh sách phía trên.</p>
+                                    <h5 class="text-muted fw-bold"><s:message code="student.please.select.class"/></h5>
+                                    <p class="text-muted small"><s:message code="student.info.placeholder"/></p>
                                 </div>
                             </c:otherwise>
                         </c:choose>
@@ -269,8 +270,8 @@
                         <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
                             <i class="bi bi-person-vcard"></i> 
                             <c:choose>
-                                <c:when test="${mode == 'edit'}">Cập nhật Hồ sơ Sinh viên</c:when>
-                                <c:otherwise>Thêm mới Sinh viên</c:otherwise>
+                                <c:when test="${mode == 'edit'}"><s:message code="student.update.profile"/></c:when>
+                                <c:otherwise><s:message code="student.add.new"/></c:otherwise>
                             </c:choose>
                         </h5>
                         <a href="${pageContext.request.contextPath}/student?maLop=${maLop}" class="btn-close btn-close-white text-decoration-none"></a>
@@ -281,55 +282,55 @@
                         <div class="modal-body p-4">
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">MÃ SINH VIÊN</label>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.studentId.form"/></label>
                                     <input type="text" class="form-control rounded-3" id="inp_maSV" name="maSV" value="${sinhVien.maSV}" placeholder="VD: N23DCCN001" required ${mode == 'edit' ? 'readonly' : ''}>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">HỌ</label>
-                                    <input type="text" class="form-control rounded-3" id="inp_ho" name="ho" value="${sinhVien.ho}" placeholder="VD: Nguyễn Văn" required>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.lastName"/></label>
+                                    <input type="text" class="form-control rounded-3" id="inp_ho" name="ho" value="${sinhVien.ho}" placeholder="<s:message code="student.example.name"/>" required>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">TÊN</label>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.firstName.required"/></label>
                                     <input type="text" class="form-control rounded-3" id="inp_ten" name="ten" value="${sinhVien.ten}" placeholder="VD: An" required>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">PHÁI</label>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.gender.upper"/></label>
                                     <select class="form-select rounded-3" id="inp_phai" name="phai">
                                         <option value="Nam" ${sinhVien.phai == 'Nam' ? 'selected' : ''}>Nam</option>
-                                        <option value="Nữ" ${sinhVien.phai == 'Nữ' ? 'selected' : ''}>Nữ</option>
+                                        <option value="<s:message code="global.gender.female"/>" ${sinhVien.phai == 'Nữ' ? 'selected' : ''}><s:message code="global.gender.female"/></option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">NGÀY SINH</label>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.dob.upper"/></label>
                                     <fmt:formatDate var="fmtDate" value="${sinhVien.ngaySinh}" pattern="yyyy-MM-dd" />
                                     <!-- Fallback to param values if bindingResult failed and format wasn't parsed -->
                                     <input type="date" class="form-control rounded-3" id="inp_ngaySinh" name="ngaySinh" value="${not empty fmtDate ? fmtDate : param.ngaySinh}" required>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">LỚP HIỆN TẠI</label>
+                                    <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.currentClass"/></label>
                                     <input type="text" class="form-control rounded-3 bg-light" name="maLop" value="${maLop}" readonly>
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label small fw-bold text-muted">ĐỊA CHỈ</label>
-                                    <input type="text" class="form-control rounded-3" id="inp_diaChi" name="diaChi" value="${sinhVien.diaChi}" placeholder="VD: 97 Man Thiện, Q.9, TP.HCM">
+                                    <label class="form-label small fw-bold text-muted"><s:message code="student.address"/></label>
+                                    <input type="text" class="form-control rounded-3" id="inp_diaChi" name="diaChi" value="${sinhVien.diaChi}" placeholder="<s:message code="student.example.address"/>">
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-check form-switch p-0 d-flex align-items-center gap-2">
                                         <input class="form-check-input ms-0 mt-0" type="checkbox" role="switch" id="daNghiHoc" name="daNghiHoc" value="true" ${sinhVien.daNghiHoc ? 'checked' : ''}>
-                                        <label class="form-check-label fw-bold text-danger" for="daNghiHoc">Đã nghỉ học</label>
+                                        <label class="form-check-label fw-bold text-danger" for="daNghiHoc"><s:message code="student.status.dropped"/></label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="modal-footer border-0 px-4 pb-4">
-                            <a href="${pageContext.request.contextPath}/student?maLop=${maLop}" class="btn btn-light rounded-3 fw-bold">HỦY</a>
+                            <a href="${pageContext.request.contextPath}/student?maLop=${maLop}" class="btn btn-light rounded-3 fw-bold"><s:message code="global.btn.cancel"/></a>
                             <c:choose>
                                 <c:when test="${mode == 'edit'}">
-                                    <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (SỬA)</button>
+                                    <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.edit"/>)</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <button type="submit" name="btnInsert" class="btn btn-success rounded-3 fw-bold px-4">GHI (THÊM)</button>
+                                    <button type="submit" name="btnInsert" class="btn btn-success rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.add"/>)</button>
                                 </c:otherwise>
                             </c:choose>
                         </div>
