@@ -10,10 +10,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.ptithcm.entities.base.LuuVetThoiGian;
 
 @Entity
 @Table(name = "mon_hoc")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class MonHoc extends LuuVetThoiGian {
     @Id
     @Column(name = "id")
@@ -28,6 +32,7 @@ public class MonHoc extends LuuVetThoiGian {
     @Column(name = "so_tiet_thuc_hanh")
     private int soTietTH;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "monHoc", fetch = FetchType.LAZY)
     private List<LopTinChi> dsLopTinChi;
 

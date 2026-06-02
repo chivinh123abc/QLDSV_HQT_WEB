@@ -125,6 +125,7 @@
         </c:if>
 
         <form action="${pageContext.request.contextPath}/verify" method="post">
+            <input type="hidden" name="csrf_token" value="${csrfToken}" />
             <input type="hidden" name="username" value="${username}" />
 
             <div class="mb-3">

@@ -278,6 +278,7 @@
                                                                     </a>
                                                                     <!-- Delete Form POST -->
                                                                     <form action="${pageContext.request.contextPath}/class" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lớp này không?');" class="d-inline">
+                                                                        <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                         <input type="hidden" name="maLop" value="${item.maLop}">
                                                                         <input type="hidden" name="maKhoa" value="${maKhoa}">
                                                                         <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="Không thể xóa do lớp có dữ liệu liên quan"' : ''}>
@@ -327,6 +328,7 @@
                                 <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}" class="btn-close btn-close-white text-decoration-none"></a>
                             </div>
                             <form action="${pageContext.request.contextPath}/class" method="POST">
+                                <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                 <div class="modal-body p-4">
                                     <div class="row g-3">
                                         <div class="col-md-6">

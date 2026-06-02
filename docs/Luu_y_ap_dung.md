@@ -140,33 +140,33 @@ Dựa trên tài liệu [Tong_hop_kien_thuc.md](./lessons/Tong_hop_kien_thuc.md)
 
 - **Lý do:** Đây là tính năng tiêu chuẩn của các ứng dụng doanh nghiệp thực tế, giúp ghi lại dấu vết dữ liệu được tạo ra lúc nào, ai cập nhật, và hỗ trợ xóa mềm (Soft Delete).
 - **Cách áp dụng:**
-  - [ ] Tạo một `@MappedSuperclass` (ví dụ [LuuVetThoiGian.java](../../src/main/java/com/ptithcm/entity/base/LuuVetThoiGian.java)) chứa 3 trường: `createdAt`, `updatedAt`, `deletedAt`.
-  - [ ] Cho các Entity khác (SinhVien, GiangVien, Lop...) kế thừa từ class này.
-  - [ ] Sử dụng các callback `@PrePersist` và `@PreUpdate` để tự động gán thời gian hiện tại của hệ thống khi ghi xuống CSDL.
+  - [x] Tạo một `@MappedSuperclass` (ví dụ [LuuVetThoiGian.java](../../src/main/java/com/ptithcm/entity/base/LuuVetThoiGian.java)) chứa 3 trường: `createdAt`, `updatedAt`, `deletedAt`.
+  - [x] Cho các Entity khác (SinhVien, GiangVien, Lop...) kế thừa từ class này.
+  - [x] Sử dụng các callback `@PrePersist` và `@PreUpdate` để tự động gán thời gian hiện tại của hệ thống khi ghi xuống CSDL.
 
 ### 🔄 3.3. Tận Dụng Form Submit Truyền Thống và Mô Hình SSR (Không Tạo API/AJAX)
 
 - **Lý do:** Tuân thủ quy định không sử dụng và tạo các endpoint API/AJAX. Hệ thống hoạt động thuần túy theo mô hình kết xuất phía máy chủ (Server-Side Rendering).
 - **Cách áp dụng:**
-  - [ ] Loại bỏ hoàn toàn việc viết các REST Controllers hoặc các action trả về `@ResponseBody` JSON/XML.
-  - [ ] Mọi hành động thao tác (Đăng ký môn học, Hủy đăng ký, Cập nhật điểm, Lưu thông tin) đều phải gửi thông qua thẻ `<form>` hoặc `<form:form>` với phương thức `POST` truyền thống.
-  - [ ] Sau khi xử lý POST thành công ở Controller, sử dụng `redirect` về trang GET tương ứng để hiển thị trạng thái dữ liệu mới.
-  - [ ] Dữ liệu kết quả được đưa vào `ModelMap` và kết xuất thẳng ra HTML thông qua JSP JSTL trên server trước khi trả về cho client.
-  - [ ] **Lưu file Upload cục bộ:** Khi tải lên file (ảnh sinh viên, tài liệu), sử dụng `CommonsMultipartResolver` của Spring để nhận file và lưu thẳng vào thư mục cục bộ của máy chủ (ví dụ: `resources/uploads/` thông qua `ServletContext.getRealPath`) bằng hàm `file.transferTo(savedFile)`. Tuyệt đối không dùng các API upload lưu trữ đám mây bên ngoài.
+  - [x] Loại bỏ hoàn toàn việc viết các REST Controllers hoặc các action trả về `@ResponseBody` JSON/XML.
+  - [x] Mọi hành động thao tác (Đăng ký môn học, Hủy đăng ký, Cập nhật điểm, Lưu thông tin) đều phải gửi thông qua thẻ `<form>` hoặc `<form:form>` với phương thức `POST` truyền thống.
+  - [x] Sau khi xử lý POST thành công ở Controller, sử dụng `redirect` về trang GET tương ứng để hiển thị trạng thái dữ liệu mới.
+  - [x] Dữ liệu kết quả được đưa vào `ModelMap` và kết xuất thẳng ra HTML thông qua JSP JSTL trên server trước khi trả về cho client.
+  - [x] **Lưu file Upload cục bộ:** Khi tải lên file (ảnh sinh viên, tài liệu), sử dụng `CommonsMultipartResolver` của Spring để nhận file và lưu thẳng vào thư mục cục bộ của máy chủ (ví dụ: `resources/uploads/` thông qua `ServletContext.getRealPath`) bằng hàm `file.transferTo(savedFile)`. Tuyệt đối không dùng các API upload lưu trữ đám mây bên ngoài.
 
 ### 🗄️ 3.4. Stored Procedures với Dynamic Pivot (Tối Ưu Truy Vấn Lớn)
 
 - **Lý do:** Khi cần xuất bảng điểm tổng kết lớp, cấu trúc số cột môn học sẽ thay đổi động tùy thuộc vào số môn lớp đó đã học. Viết SQL thông thường sẽ vô cùng phức tạp và chậm.
 - **Cách áp dụng:**
-  - [ ] Tạo Stored Procedure trên SQL Server sử dụng kỹ thuật **Dynamic Pivot** để xoay ngang dữ liệu điểm số các môn học theo từng sinh viên ngay trên Database.
-  - [ ] Trong Java, gọi procedure bằng `session.createNativeQuery("EXEC sp_LayBangDiemTongKet :maLop")`.
-  - [ ] Dùng `AliasToEntityMapResultTransformer.INSTANCE` để nhận kết quả dạng `List<Map<String, Object>>`, giúp render bảng cột động ở giao diện cực kỳ linh hoạt.
+  - [x] Tạo Stored Procedure trên SQL Server sử dụng kỹ thuật **Dynamic Pivot** để xoay ngang dữ liệu điểm số các môn học theo từng sinh viên ngay trên Database.
+  - [x] Trong Java, gọi procedure bằng `session.createNativeQuery("EXEC sp_LayBangDiemTongKet :maLop")`.
+  - [x] Dùng `AliasToEntityMapResultTransformer.INSTANCE` để nhận kết quả dạng `List<Map<String, Object>>`, giúp render bảng cột động ở giao diện cực kỳ linh hoạt.
 
 ### 🛡️ 3.5. Global Exception Handling (Bắt lỗi tập trung với @ControllerAdvice)
 
 - **Lý do:** Trong đồ án sinh viên, khi code văng lỗi (ví dụ: NullPointerException, đứt cáp Database), màn hình sẽ hiện ra trang báo lỗi mặc định của Tomcat đỏ lòm chứa toàn Stack Trace. Thầy cô cực kỳ ghét điều này vì nó trông rất nghiệp dư và lộ cấu trúc hệ thống. Việc xử lý lỗi tập trung thể hiện sự chuyên nghiệp và chỉn chu trong thiết kế phần mềm.
 - **Cách áp dụng:**
-  - [ ] Tạo một class `GlobalExceptionHandler` gắn `@ControllerAdvice`. Class này sẽ tự động "hứng" mọi Exception văng ra từ bất kỳ Controller nào và redirect người dùng về một trang `shared/error` được thiết kế đẹp mắt.
+  - [x] Tạo một class `GlobalExceptionHandler` gắn `@ControllerAdvice`. Class này sẽ tự động "hứng" mọi Exception văng ra từ bất kỳ Controller nào và redirect người dùng về một trang `shared/error` được thiết kế đẹp mắt.
   ```java
   @ControllerAdvice
   public class GlobalExceptionHandler {
@@ -182,7 +182,7 @@ Dựa trên tài liệu [Tong_hop_kien_thuc.md](./lessons/Tong_hop_kien_thuc.md)
 
 - **Lý do:** Để ghi log lịch sử (Ví dụ: Giảng viên A vừa sửa điểm của Sinh viên B), sinh viên thường phải viết các dòng lệnh `System.out.println` hoặc gọi hàm log rải rác khắp hàng chục class Controller. AOP là một khái niệm nâng cao của Spring giúp tách biệt nghiệp vụ ghi nhật ký hệ thống ra khỏi logic nghiệp vụ chính, giữ cho code sạch sẽ và dễ bảo trì.
 - **Cách áp dụng:**
-  - [ ] Tạo một class `AuditLogAspect`, dùng annotation `@AfterReturning` để lắng nghe mọi hàm có tên bắt đầu bằng `insert`, `update`, `delete` trong package modules. Mỗi khi có ai đó gọi hàm cập nhật điểm hay đăng ký môn, Aspect này tự động chạy ngầm và ghi ra file log hoặc lưu vào DB: "Thời gian X, User Y vừa thực hiện hành động Z".
+  - [x] Tạo một class `AuditLogAspect`, dùng annotation `@AfterReturning` để lắng nghe mọi hàm có tên bắt đầu bằng `insert`, `update`, `delete` trong package modules. Mỗi khi có ai đó gọi hàm cập nhật điểm hay đăng ký môn, Aspect này tự động chạy ngầm và ghi ra file log hoặc lưu vào DB: "Thời gian X, User Y vừa thực hiện hành động Z".
 
 ### 🔒 3.7. Bảo mật Anti-CSRF Token cho Form POST
 

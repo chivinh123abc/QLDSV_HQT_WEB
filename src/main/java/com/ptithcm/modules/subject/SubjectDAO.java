@@ -15,7 +15,8 @@ public class SubjectDAO extends BaseDAO<MonHoc, String> {
     }
 
     public List<String> listTrimmedSubjectIdsFromLtc() {
-        List<String> list = getSession().createQuery("SELECT distinct maMH FROM LopTinChi", String.class).list();
+        List<String> list = getSession().createQuery("SELECT distinct ltc.monHoc.maMH FROM LopTinChi ltc", String.class)
+                .list();
         if (list != null) {
             list.replaceAll(s -> s != null ? s.trim() : null);
         }
@@ -23,7 +24,7 @@ public class SubjectDAO extends BaseDAO<MonHoc, String> {
     }
 
     public Long countLtcBySubject(String maMH) {
-        return getSession().createQuery("SELECT COUNT(*) FROM LopTinChi WHERE maMH = :maMH", Long.class)
+        return getSession().createQuery("SELECT COUNT(*) FROM LopTinChi ltc WHERE ltc.monHoc.maMH = :maMH", Long.class)
                 .setParameter("maMH", maMH).uniqueResult();
     }
 }

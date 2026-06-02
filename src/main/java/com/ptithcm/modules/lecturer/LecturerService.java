@@ -3,11 +3,15 @@ package com.ptithcm.modules.lecturer;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ptithcm.entities.GiangVien;
 import com.ptithcm.entities.Khoa;
+import com.ptithcm.shared.constants.CacheConstant;
+import com.ptithcm.shared.events.CacheEvictEvent;
+import com.ptithcm.shared.services.RedisService;
 
 @Service
 @Transactional
@@ -15,6 +19,12 @@ public class LecturerService {
 
     @Autowired
     private LecturerDAO lecturerDAO;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public List<Khoa> listKhoa() {
         return lecturerDAO.listKhoa();
@@ -25,7 +35,13 @@ public class LecturerService {
     }
 
     public List<GiangVien> listAllGiangVien() {
-        return lecturerDAO.listAllGiangVien();
+        List<GiangVien> cached = redisService.getList(CacheConstant.LECTURER_ALL, GiangVien.class);
+        if (cached != null) {
+            return cached;
+        }
+        List<GiangVien> result = lecturerDAO.listAllGiangVien();
+        redisService.set(CacheConstant.LECTURER_ALL, result, CacheConstant.DEFAULT_TTL_SECONDS);
+        return result;
     }
 
     public List<String> listLtcMaGV() {
@@ -56,6 +72,7 @@ public class LecturerService {
             }
             lecturerDAO.update(gv);
         }
+        eventPublisher.publishEvent(new CacheEvictEvent(this, CacheConstant.LECTURER_ALL));
     }
 
     public void deleteLecturer(String maGV) throws Exception {
@@ -67,6 +84,7 @@ public class LecturerService {
         List<GiangVien> list = lecturerDAO.getLecturerByTrimmedId(maGV);
         if (!list.isEmpty()) {
             lecturerDAO.delete(list.get(0));
+            eventPublisher.publishEvent(new CacheEvictEvent(this, CacheConstant.LECTURER_ALL));
         } else {
             throw new Exception("Không tìm thấy giảng viên để xóa!");
         }

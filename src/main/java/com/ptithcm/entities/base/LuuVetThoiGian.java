@@ -1,5 +1,6 @@
 package com.ptithcm.entities.base;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
@@ -15,7 +16,7 @@ import com.ptithcm.shared.utils.DateUtil;
 // Báo cho Hibernate biết đây không phải là 1 bảng độc lập
 @MappedSuperclass
 @SQLRestriction("ngay_xoa IS NULL")
-public abstract class LuuVetThoiGian {
+public abstract class LuuVetThoiGian implements Serializable {
 
     @Column(name = "ngay_tao", updatable = false)
     private OffsetDateTime ngayTao;

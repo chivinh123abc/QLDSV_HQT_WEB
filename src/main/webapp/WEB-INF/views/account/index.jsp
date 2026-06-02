@@ -114,6 +114,7 @@
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
                                                         <form action="${pageContext.request.contextPath}/account/delete" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này không?');" class="d-inline">
+                                                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                             <input type="hidden" name="userId" value="${item.userId}">
                                                             <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="Tài khoản này không thể xóa"' : ''}>
                                                                 <i class="bi bi-trash3"></i>
@@ -157,6 +158,7 @@
                         <a href="${pageContext.request.contextPath}/account" class="btn-close btn-close-white text-decoration-none"></a>
                     </div>
                     <form action="${pageContext.request.contextPath}/account/save" method="POST">
+                        <input type="hidden" name="csrf_token" value="${csrfToken}" />
                         <div class="modal-body p-4">
                             <div class="row g-3">
                                 <input type="hidden" name="mode" value="${not empty mode ? mode : 'add'}">
