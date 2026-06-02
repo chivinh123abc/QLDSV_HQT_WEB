@@ -202,7 +202,7 @@
                                                                 <form action="${pageContext.request.contextPath}/faculty" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khoa này không? Thao tác này không thể hoàn tác.');" class="d-inline">
                                                                     <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                     <input type="hidden" name="maKhoa" value="${item.maKhoa}">
-                                                                    <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="<s:message code="faculty.cannot.delete"/>"' : ''}>
+                                                                    <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!item.canDelete}">disabled title="<s:message code='faculty.cannot.delete'/>"</c:if>>
                                                                         <i class="bi bi-trash3"></i>
                                                                     </button>
                                                                 </form>

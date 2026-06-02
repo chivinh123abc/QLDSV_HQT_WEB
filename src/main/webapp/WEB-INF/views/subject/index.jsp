@@ -237,8 +237,7 @@
                                                                     <button
                                                                         onclick="event.stopPropagation(); selectSubject('${item.maMH}', 'delete', true)"
                                                                         class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}"
-                                                                        ${!item.canDelete ? 'disabled title="<s:message code="subject.cannot.delete"/>"'
-                                                                        : '' }>
+                                                                        <c:if test="${!item.canDelete}">disabled title="<s:message code='subject.cannot.delete'/>"</c:if>>
                                                                         <i class="bi bi-trash3"></i>
                                                                     </button>
                                                                 </div>
@@ -361,8 +360,7 @@
                                                             <button type="button"
                                                                 onclick="event.stopPropagation(); selectSubject('${m.maMH}', 'delete', true)"
                                                                 class="btn btn-xs btn-outline-danger border-0 p-1 ${!m.canDelete ? 'disabled opacity-25' : ''}"
-                                                                ${!m.canDelete ? 'disabled title="<s:message code="subject.cannot.delete"/>"' : ''
-                                                                }>
+                                                                <c:if test="${!m.canDelete}">disabled title="<s:message code='subject.cannot.delete'/>"</c:if>>
                                                                 <i class="bi bi-trash3"></i>
                                                             </button>
                                                         </div>

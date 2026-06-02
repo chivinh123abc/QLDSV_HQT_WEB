@@ -223,7 +223,7 @@
                                                                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                             <input type="hidden" name="maSV" value="${sv.maSV}">
                                                                             <input type="hidden" name="maLop" value="${maLop}">
-                                                                            <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!sv.canDelete ? 'disabled opacity-25' : ''}" ${!sv.canDelete ? 'disabled title="<s:message code="student.cannot.delete"/>"' : ''}>
+                                                                            <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!sv.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!sv.canDelete}">disabled title="<s:message code='student.cannot.delete'/>"</c:if>>
                                                                                 <i class="bi bi-trash3"></i>
                                                                             </button>
                                                                         </form>

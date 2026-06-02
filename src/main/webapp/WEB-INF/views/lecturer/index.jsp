@@ -222,7 +222,22 @@
                                                             <div class="lecturer-name">${item.ho} ${item.ten}</div>
                                                         </td>
                                                         <td class="text-center">
-                                                            <span class="text-muted small">${item.hocVi} / ${item.hocHam}</span>
+                                                            <span class="text-muted small">
+                                                                <c:choose>
+                                                                    <c:when test="${not empty item.hocVi && not empty item.hocHam}">
+                                                                        ${item.hocVi} / ${item.hocHam}
+                                                                    </c:when>
+                                                                    <c:when test="${not empty item.hocVi}">
+                                                                        ${item.hocVi}
+                                                                    </c:when>
+                                                                    <c:when test="${not empty item.hocHam}">
+                                                                        ${item.hocHam}
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        -
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </span>
                                                         </td>
                                                         <td class="text-center">
                                                             <span class="text-dark small fw-medium">${item.chuyenMon}</span>
@@ -242,7 +257,7 @@
                                                                         <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                         <input type="hidden" name="maGV" value="${item.maGV}">
                                                                         <input type="hidden" name="maKhoa" value="${maKhoa}">
-                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="<s:message code="lecturer.cannot.delete"/>"' : ''}>
+                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!item.canDelete}">disabled title="<s:message code='lecturer.cannot.delete'/>"</c:if>>
                                                                             <i class="bi bi-trash3"></i>
                                                                         </button>
                                                                     </form>
