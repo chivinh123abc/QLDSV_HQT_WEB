@@ -22,15 +22,6 @@
         .table-custom tbody tr:hover { background-color: #f0f7ff !important; }
         .modal-header-custom { background-color: #4361ee; color: white; border-bottom: 0; }
         .modal-header-custom .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
-        .btn-toolbar-add { color: #10b981; border-color: #10b981; }
-        .btn-toolbar-add:hover, .btn-toolbar-add.active { background-color: #10b981; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-        .btn-toolbar-edit { color: #3b82f6; border-color: #3b82f6; }
-        .btn-toolbar-edit:hover, .btn-toolbar-edit.active { background-color: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-        .btn-toolbar-delete { color: #ef4444; border-color: #ef4444; }
-        .btn-toolbar-delete:hover, .btn-toolbar-delete.active { background-color: #ef4444; color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
-        .btn-toolbar-cancel { color: #64748b; border-color: #e2e8f0; }
-        .btn-toolbar-cancel:hover { background-color: #64748b; color: white; }
-        .btn-toolbar-disabled { opacity: 0.4; filter: grayscale(100%); pointer-events: none; }
     </style>
 </head>
 
@@ -48,15 +39,29 @@
                         <h3 class="mb-0 fw-bold text-dark">Quản lý Tài khoản</h3>
                     </div>
 
+                    <!-- FLASH MESSAGES -->
+                    <c:if test="${not empty message}">
+                        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i> ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
+
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                         <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="fw-bold text-primary text-uppercase small mb-1">Danh sách Tài khoản</h6>
                                 <p class="text-muted small mb-0">Quản lý tài khoản đăng nhập cho Giảng viên và Sinh viên</p>
                             </div>
-                            <button class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm" onclick="resetForm()">
+                            <a href="${pageContext.request.contextPath}/account?lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
                                 <i class="bi bi-plus-circle-fill me-1"></i> Cấp Tài khoản mới
-                            </button>
+                            </a>
                         </div>
 
                         <div class="card-body px-4 pb-4">
@@ -83,14 +88,14 @@
                                             <th class="px-3" style="width: 10%;">ID</th>
                                             <th style="width: 15%;">TÊN ĐĂNG NHẬP</th>
                                             <th style="width: 20%;">HỌ TÊN</th>
-                                            <th style="width: 20%;">EMAIL</th>
+                                            <th style="width: 25%;">EMAIL</th>
                                             <th class="text-center" style="width: 15%;">NHÓM QUYỀN</th>
-                                            <th class="text-center" style="width: 20%;">THAO TÁC</th>
+                                            <th class="text-center" style="width: 15%;">THAO TÁC</th>
                                         </tr>
                                     </thead>
                                     <tbody id="user-table-body">
                                         <c:forEach var="item" items="${userList}">
-                                            <tr onclick="selectUser('${item.userId}', 'edit')" data-role="${item.roleId}">
+                                            <tr data-role="${item.roleId}">
                                                 <td class="px-3"><span class="badge-soft-primary">${item.userId}</span></td>
                                                 <td><div class="fw-bold text-dark">${item.username}</div></td>
                                                 <td><div class="text-muted small">${item.fullName}</div></td>
@@ -105,8 +110,15 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex gap-2 justify-content-center">
-                                                        <button onclick="event.stopPropagation(); selectUser('${item.userId}', 'edit', true)" class="btn btn-sm btn-outline-primary border-0 rounded-3"><i class="bi bi-pencil-square"></i></button>
-                                                        <button onclick="event.stopPropagation(); selectUser('${item.userId}', 'delete', true)" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="Tài khoản này không thể xóa (do là chính bạn hoặc chủ sở hữu đang giảng dạy)"' : ''}><i class="bi bi-trash3"></i></button>
+                                                        <a href="${pageContext.request.contextPath}/account?userId=${item.userId}&lnkEdit" class="btn btn-sm btn-outline-primary border-0 rounded-3">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </a>
+                                                        <form action="${pageContext.request.contextPath}/account/delete" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này không?');" class="d-inline">
+                                                            <input type="hidden" name="userId" value="${item.userId}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="Tài khoản này không thể xóa"' : ''}>
+                                                                <i class="bi bi-trash3"></i>
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -129,138 +141,102 @@
         </div>
     </div>
 
-    <!-- ACCOUNT MODAL -->
-    <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
-                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                        <i class="bi bi-shield-lock-fill"></i> Quản lý Tài khoản
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="d-flex gap-2 mb-4 p-2 bg-light rounded-3 border shadow-sm">
-                        <button type="button" id="btn_mode_add" class="btn btn-toolbar-add fw-bold flex-fill py-2" onclick="handleModeClick('add')">
-                            <i class="bi bi-plus-circle"></i> <span class="btn-text">THÊM</span>
-                        </button>
-                        <button type="button" id="btn_mode_edit" class="btn btn-toolbar-edit fw-bold flex-fill py-2" onclick="handleModeClick('edit')">
-                            <i class="bi bi-pencil-square"></i> <span class="btn-text">SỬA</span>
-                        </button>
-                        <button type="button" id="btn_mode_delete" class="btn btn-toolbar-delete fw-bold flex-fill py-2" onclick="handleModeClick('delete')">
-                            <i class="bi bi-trash3"></i> <span class="btn-text">XÓA</span>
-                        </button>
-                        <button type="button" id="btn_mode_cancel" class="btn btn-toolbar-cancel fw-bold flex-fill py-2" onclick="handleModeClick('none')" disabled>
-                            <i class="bi bi-x-circle"></i> HỦY
-                        </button>
+    <!-- ACCOUNT MODAL (SSR) -->
+    <c:if test="${not empty mode || not empty param.lnkAdd}">
+        <div class="modal fade show d-block" id="userModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
+                        <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            <c:choose>
+                                <c:when test="${mode == 'edit'}">Cập nhật Tài khoản</c:when>
+                                <c:otherwise>Cấp Tài khoản Mới</c:otherwise>
+                            </c:choose>
+                        </h5>
+                        <a href="${pageContext.request.contextPath}/account" class="btn-close btn-close-white text-decoration-none"></a>
                     </div>
+                    <form action="${pageContext.request.contextPath}/account/save" method="POST">
+                        <div class="modal-body p-4">
+                            <div class="row g-3">
+                                <input type="hidden" name="mode" value="${not empty mode ? mode : 'add'}">
+                                <input type="hidden" name="userId" value="${account.tenDangNhap}">
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-muted">NHÓM QUYỀN <span class="text-danger">*</span></label>
+                                    <select class="form-select rounded-3" name="roleId" id="inp_roleId" onchange="toggleRoleOptions()" ${mode == 'edit' ? 'disabled' : ''} required>
+                                        <option value="" disabled ${empty account.phanQuyen ? 'selected' : ''}>-- Chọn quyền --</option>
+                                        <option value="1" ${account.phanQuyen == 'PGV' ? 'selected' : ''}>PGV (Phòng Giáo Vụ)</option>
+                                        <option value="2" ${account.phanQuyen == 'KHOA' ? 'selected' : ''}>KHOA</option>
+                                        <option value="3" ${account.phanQuyen == 'SINHVIEN' ? 'selected' : ''}>SINHVIEN (Sinh viên)</option>
+                                    </select>
+                                    <c:if test="${mode == 'edit'}">
+                                        <input type="hidden" name="roleId" value="${account.phanQuyen == 'PGV' ? '1' : (account.phanQuyen == 'KHOA' ? '2' : '3')}">
+                                    </c:if>
+                                </div>
+                                
+                                <c:if test="${empty mode || mode == 'add'}">
+                                    <div class="col-12" id="div_unassigned_sv" style="display: none;">
+                                        <label class="form-label small fw-bold text-muted">CHỌN SINH VIÊN CHƯA CÓ TÀI KHẢN <span class="text-danger">*</span></label>
+                                        <select class="form-select rounded-3" id="sel_unassigned_sv" onchange="selectUnassignedSV()">
+                                            <option value="" disabled selected>-- Chọn sinh viên --</option>
+                                            <c:forEach var="sv" items="${unassignedStudents}">
+                                                <option value="${sv.maSV}">${sv.ho} ${sv.ten} (${sv.maSV})</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <div class="col-12" id="div_unassigned_gv" style="display: none;">
+                                        <label class="form-label small fw-bold text-muted">CHỌN GIẢNG VIÊN CHƯA CÓ TÀI KHẢN <span class="text-danger">*</span></label>
+                                        <select class="form-select rounded-3" id="sel_unassigned_gv" onchange="selectUnassignedGV()">
+                                            <option value="" disabled selected>-- Chọn giảng viên --</option>
+                                            <c:forEach var="gv" items="${unassignedLecturers}">
+                                                <option value="${gv.maGV}">${gv.ho} ${gv.ten} (${gv.maGV})</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                </c:if>
 
-                    <div class="row g-3">
-                        <input type="hidden" id="inp_userId">
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted">NHÓM QUYỀN <span class="text-danger">*</span></label>
-                            <select class="form-select rounded-3" id="inp_roleId" onchange="fetchUnassigned()" disabled>
-                                <option value="" disabled selected>-- Chọn quyền --</option>
-                                <option value="1">PGV (Phòng Giáo Vụ)</option>
-                                <option value="2">KHOA</option>
-                                <option value="3">SINHVIEN (Sinh viên)</option>
-                            </select>
+                                <div class="col-12" id="div_username">
+                                    <label class="form-label small fw-bold text-muted">TÊN ĐĂNG NHẬP <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control rounded-3 bg-light" name="username" id="inp_username" value="${account.tenDangNhap}" placeholder="Tên đăng nhập..." required readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-muted">MẬT KHẨU <c:if test="${empty mode || mode == 'add'}"><span class="text-danger">*</span></c:if></label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control rounded-start-3" name="password" id="inp_password" placeholder="Nhập mật khẩu..." ${mode == 'edit' ? '' : 'required'}>
+                                        <button class="btn btn-outline-secondary rounded-end-3" type="button" id="btnTogglePass" onclick="togglePassword()">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <c:if test="${mode == 'edit'}">
+                                        <small class="text-muted fst-italic">Bỏ trống nếu không muốn đổi mật khẩu.</small>
+                                    </c:if>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-muted">EMAIL <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control rounded-3" name="email" id="inp_email" value="${account.email}" placeholder="Nhập địa chỉ email..." required>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-12" id="div_unassigned" style="display: none;">
-                            <label class="form-label small fw-bold text-muted">CHỌN NGƯỜI CHƯA CÓ TÀI KHOẢN <span class="text-danger">*</span></label>
-                            <select class="form-select rounded-3" id="sel_unassigned" onchange="selectUnassigned()">
-                                <option value="" disabled selected>-- Vui lòng chọn --</option>
-                            </select>
+                        <div class="modal-footer border-0 px-4 pb-4">
+                            <a href="${pageContext.request.contextPath}/account" class="btn btn-light rounded-3 fw-bold">HỦY</a>
+                            <c:choose>
+                                <c:when test="${mode == 'edit'}">
+                                    <button type="submit" class="btn btn-primary rounded-3 fw-bold px-4">GHI (SỬA)</button>
+                                </c:when>
+                                <c:otherwise>
+                                    <button type="submit" class="btn btn-success rounded-3 fw-bold px-4">GHI (THÊM)</button>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
-                        <div class="col-12" id="div_username">
-                            <label class="form-label small fw-bold text-muted">TÊN ĐĂNG NHẬP (MÃ MẶC ĐỊNH) <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control rounded-3 bg-light" id="inp_username" placeholder="Mã mặc định..." required readonly>
-                        </div>
-                        <div class="col-12" id="div_custom_username" style="display: none;">
-                            <label class="form-label small fw-bold text-muted">TÊN ĐĂNG NHẬP TÙY CHỈNH (KHÔNG BẮT BUỘC)</label>
-                            <input type="text" class="form-control rounded-3" id="inp_custom_username" placeholder="Bỏ trống sẽ tự động dùng Mã mặc định...">
-                            <small class="text-muted fst-italic">Nếu điền, tài khoản sẽ đăng nhập bằng tên này thay vì Mã mặc định.</small>
-                        </div>
-                        <div class="col-12">
-                                                            <label class="form-label small fw-bold text-muted">MẬT KHẨU <span class="text-danger">*</span></label>
-                                                            <div class="input-group">
-                                                                <input type="password" class="form-control rounded-start-3" id="inp_password" placeholder="Nhập mật khẩu..." required disabled>
-                                                                <button class="btn btn-outline-secondary rounded-end-3" type="button" id="btnTogglePass" onclick="togglePassword()">
-                                                                    <i class="bi bi-eye"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label class="form-label small fw-bold text-muted">EMAIL <span class="text-danger">*</span></label>
-                                                            <input type="email" class="form-control rounded-3" id="inp_email" placeholder="Nhập địa chỉ email..." required disabled>
-                                                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
+    </c:if>
 
-    <!-- NOTIFICATION MODALS -->
-    <div class="modal fade" id="notifyModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-body text-center p-4">
-                    <div id="notifyIcon" class="mb-3"></div>
-                    <h5 id="notifyTitle" class="fw-bold mb-2"></h5>
-                    <p id="notifyMessage" class="text-muted small mb-4"></p>
-                    <button type="button" class="btn btn-primary w-100 rounded-3 fw-bold" data-bs-dismiss="modal" onclick="reloadPage()">ĐÓNG</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-body text-center p-4">
-                    <div class="mb-3"><i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 3.5rem;"></i></div>
-                    <h5 id="confirmTitle" class="fw-bold mb-2">Xác nhận</h5>
-                    <p id="confirmMessage" class="text-muted small mb-4"></p>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-light w-100 rounded-3 fw-bold" data-bs-dismiss="modal">HỦY</button>
-                        <button type="button" id="confirmOkBtn" class="btn btn-danger w-100 rounded-3 fw-bold shadow-sm">XÓA</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let currentMode = 'none';
-        let currentSelectedId = '';
-        let currentCanDelete = true;
-        let needReload = false;
-        const contextPath = '${pageContext.request.contextPath}';
-        const inputs = ['inp_username', 'inp_password', 'inp_roleId', 'inp_custom_username', 'inp_email'];
-
-        function showNotify(title, message, type = 'success') {
-            document.getElementById('notifyTitle').innerText = title;
-            document.getElementById('notifyMessage').innerText = message;
-            const icon = document.getElementById('notifyIcon');
-            icon.innerHTML = type === 'success' ? '<i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>' :
-                (type === 'error' ? '<i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>' :
-                    '<i class="bi bi-info-circle-fill text-primary" style="font-size: 3.5rem;"></i>');
-            needReload = (type === 'success');
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('notifyModal')).show();
-        }
-
-        function reloadPage() {
-            if (needReload) window.location.reload();
-        }
-
-        function showConfirm(message, onConfirm) {
-            document.getElementById('confirmMessage').innerText = message;
-            const btn = document.getElementById('confirmOkBtn');
-            const confirmModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmModal'));
-            btn.onclick = () => { confirmModal.hide(); onConfirm(); };
-            confirmModal.show();
-        }
-
         function normalizeVN(str) {
             return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd').replace(/\u0110/g, 'D').toLowerCase();
         }
@@ -292,212 +268,51 @@
             }
         }
 
-        async function fetchUnassigned() {
-            if (currentMode !== 'add') return;
+        function toggleRoleOptions() {
             const roleId = document.getElementById('inp_roleId').value;
-            if (!roleId) return;
+            const divSV = document.getElementById('div_unassigned_sv');
+            const divGV = document.getElementById('div_unassigned_gv');
+            const selSV = document.getElementById('sel_unassigned_sv');
+            const selGV = document.getElementById('sel_unassigned_gv');
+            const inpUsername = document.getElementById('inp_username');
 
-            const divUnassigned = document.getElementById('div_unassigned');
-            const selUnassigned = document.getElementById('sel_unassigned');
-            
-            try {
-                const res = await fetch(contextPath + '/account/api/unassigned?roleId=' + roleId);
-                const data = await res.json();
-                
-                selUnassigned.innerHTML = '<option value="" disabled selected>-- Chọn người dùng --</option>';
-                if (data.length === 0) {
-                    selUnassigned.innerHTML += '<option value="" disabled>Không có người nào chưa có tài khoản</option>';
-                } else {
-                    data.forEach(item => {
-                        const id = item.maGV || item.maSV;
-                        const name = (item.ho || '') + ' ' + (item.ten || '');
-                        selUnassigned.innerHTML += `<option value="\${id}">\${name} (\${id})</option>`;
-                    });
-                }
-                divUnassigned.style.display = 'block';
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        function selectUnassigned() {
-            const val = document.getElementById('sel_unassigned').value;
-            if (val) {
-                currentSelectedId = val;
-                document.getElementById('inp_username').value = val;
-            }
-        }
-
-        async function selectUser(userId, mode, forceMode = false) {
-            try {
-                const res = await fetch(contextPath + '/account/api/get?userId=' + userId);
-                const data = await res.json();
-                
-                // Fetch canDelete status from the table row or a separate API. 
-                // Since get?userId returns a Users object which doesn't have canDelete, we'll check the table row.
-                const row = document.querySelector(`#user-table-body tr[onclick*="selectUser('\${userId}'"]`);
-                if (row) {
-                    const btn = row.querySelector('.btn-outline-danger');
-                    currentCanDelete = !btn.disabled;
-                } else {
-                    currentCanDelete = true;
-                }
-
-                fillForm(data);
-                bootstrap.Modal.getOrCreateInstance(document.getElementById('userModal')).show();
-
-                if (forceMode || currentMode === 'none') setMode(mode);
-                else setMode(currentMode);
-            } catch (e) { console.error(e); }
-        }
-
-        function fillForm(data) {
-            document.getElementById('inp_userId').value = data.userId || '';
-            document.getElementById('inp_username').value = data.username || '';
-            currentSelectedId = data.username || '';
-            document.getElementById('inp_password').value = data.password || '';
-            document.getElementById('inp_roleId').value = data.roleId || '';
-            document.getElementById('inp_email').value = data.email || '';
-        }
-
-        function clearForm() {
-            document.getElementById('inp_userId').value = '';
-            currentSelectedId = '';
-            inputs.forEach(id => document.getElementById(id).value = '');
-        }
-
-        function setMode(mode) {
-            currentMode = mode;
-            const btns = { add: 'btn_mode_add', edit: 'btn_mode_edit', delete: 'btn_mode_delete', cancel: 'btn_mode_cancel' };
-            Object.values(btns).forEach(id => {
-                const btn = document.getElementById(id);
-                btn.disabled = false;
-                btn.classList.remove('active', 'btn-toolbar-disabled');
-            });
-            document.getElementById(btns.cancel).disabled = mode === 'none';
-            inputs.forEach(id => {
-                const el = document.getElementById(id);
-                el.disabled = mode === 'none' || mode === 'delete';
-            });
-            document.getElementById('btnTogglePass').disabled = mode === 'none' || mode === 'delete';
-
-            if (mode === 'none') {
-                clearForm();
-                document.getElementById('div_unassigned').style.display = 'none';
-                document.getElementById('div_custom_username').style.display = 'none';
-            }
-            else if (mode === 'add') {
-                document.getElementById('div_custom_username').style.display = 'block';
-                document.getElementById(btns.edit).classList.add('btn-toolbar-disabled');
-                document.getElementById(btns.delete).classList.add('btn-toolbar-disabled');
-                document.getElementById(btns.add).classList.add('active');
-                if (document.getElementById('inp_roleId').value) {
-                    fetchUnassigned();
-                }
-            } else if (mode === 'edit') {
-                document.getElementById(btns.add).classList.add('btn-toolbar-disabled');
-                document.getElementById(btns.delete).classList.add('btn-toolbar-disabled');
-                document.getElementById(btns.edit).classList.add('active');
-                document.getElementById('div_unassigned').style.display = 'none';
-                document.getElementById('div_custom_username').style.display = 'none';
-            } else if (mode === 'delete') {
-                document.getElementById(btns.add).classList.add('btn-toolbar-disabled');
-                document.getElementById(btns.edit).classList.add('btn-toolbar-disabled');
-                document.getElementById(btns.delete).classList.add('active');
-                document.getElementById('div_unassigned').style.display = 'none';
-                document.getElementById('div_custom_username').style.display = 'none';
-            }
-
-            if (currentCanDelete === false) {
-                const delBtn = document.getElementById(btns.delete);
-                delBtn.disabled = true;
-                delBtn.classList.add('btn-toolbar-disabled');
-                delBtn.title = "Tài khoản này không thể xóa (do là chính bạn hoặc chủ sở hữu đang giảng dạy)";
+            if (roleId === '3') { // SINHVIEN
+                if (divSV) divSV.style.display = 'block';
+                if (divGV) divGV.style.display = 'none';
+                if (selSV) { selSV.disabled = false; selSV.required = true; inpUsername.value = selSV.value; }
+                if (selGV) { selGV.disabled = true; selGV.required = false; selGV.value = ''; }
+            } else if (roleId === '1' || roleId === '2') { // PGV / KHOA
+                if (divSV) divSV.style.display = 'none';
+                if (divGV) divGV.style.display = 'block';
+                if (selSV) { selSV.disabled = true; selSV.required = false; selSV.value = ''; }
+                if (selGV) { selGV.disabled = false; selGV.required = true; inpUsername.value = selGV.value; }
             } else {
-                document.getElementById(btns.delete).title = "";
+                if (divSV) divSV.style.display = 'none';
+                if (divGV) divGV.style.display = 'none';
+                if (selSV) { selSV.disabled = true; selSV.required = false; }
+                if (selGV) { selGV.disabled = true; selGV.required = false; }
+                inpUsername.value = '';
             }
         }
 
-        function handleModeClick(mode) {
-            if (mode === 'none') { setMode('none'); return; }
-            if (currentMode === mode) {
-                if (mode === 'delete') performDelete();
-                else performSave();
-            } else if (currentMode === 'none') {
-                setMode(mode);
-                if (mode === 'add') clearForm();
-            }
+        function selectUnassignedSV() {
+            const val = document.getElementById('sel_unassigned_sv').value;
+            document.getElementById('inp_username').value = val;
         }
 
-        async function performSave() {
-            let targetUsername = '';
-            let targetSelectedId = '';
-            
-            if (currentMode === 'add') {
-                const selVal = document.getElementById('sel_unassigned').value;
-                const customVal = document.getElementById('inp_custom_username').value.trim();
-                if (!selVal) {
-                    showNotify('Cảnh báo', 'Vui lòng chọn người dùng cần cấp tài khoản!', 'info');
-                    return;
-                }
-                targetSelectedId = selVal;
-                targetUsername = customVal ? customVal : selVal;
-            } else {
-                targetUsername = document.getElementById('inp_username').value.trim();
-                targetSelectedId = currentSelectedId;
-            }
-
-            const data = {
-                username: targetUsername,
-                selectedId: targetSelectedId,
-                password: document.getElementById('inp_password').value,
-                roleId: document.getElementById('inp_roleId').value,
-                email: document.getElementById('inp_email').value.trim()
-            };
-            if (currentMode === 'edit') {
-                data.userId = document.getElementById('inp_userId').value;
-            }
-
-            if (!data.username || !data.password || !data.roleId || !data.email) { 
-                showNotify('Cảnh báo', 'Vui lòng nhập đầy đủ thông tin!', 'info'); 
-                return; 
-            }
-            try {
-                const res = await fetch(contextPath + '/account/api/save?mode=' + currentMode, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await res.json();
-                if (result.status === 'success') {
-                    bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
-                    showNotify('Thành công', 'Tài khoản đã được lưu thành công.');
-                } else showNotify('Lỗi', result.message, 'error');
-            } catch (e) { showNotify('Lỗi', e.message, 'error'); }
+        function selectUnassignedGV() {
+            const val = document.getElementById('sel_unassigned_gv').value;
+            document.getElementById('inp_username').value = val;
         }
 
-        async function performDelete() {
-            const userId = document.getElementById('inp_userId').value;
-            showConfirm('Bạn có chắc chắn muốn xóa tài khoản này?', async () => {
-                try {
-                    const res = await fetch(contextPath + '/account/api/delete?userId=' + userId, { method: 'POST' });
-                    const result = await res.json();
-                    if (result.status === 'success') {
-                        bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
-                        showNotify('Thành công', 'Tài khoản đã được xóa.');
-                    } else showNotify('Lỗi', result.message, 'error');
-                } catch (e) { showNotify('Lỗi', e.message, 'error'); }
-            });
-        }
-
-        function resetForm() {
-            currentCanDelete = true;
-            clearForm();
-            setMode('none');
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('userModal')).show();
-        }
+        // Initialize display if adding
+        window.addEventListener('DOMContentLoaded', () => {
+            const inpRole = document.getElementById('inp_roleId');
+            if (inpRole && !inpRole.disabled) {
+                toggleRoleOptions();
+            }
+        });
     </script>
 </body>
 
 </html>
-

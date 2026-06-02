@@ -36,7 +36,7 @@ public class LoginController {
         if ("true".equals(activated)) {
             model.addAttribute("success", "Kích hoạt tài khoản thành công! Vui lòng đăng nhập.");
         }
-        return "login";
+        return "auth/login";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -89,7 +89,7 @@ public class LoginController {
 
         model.addAttribute("error", MessageConstant.LOGIN_FAILED);
         model.addAttribute("username", username);
-        return "login";
+        return "auth/login";
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)

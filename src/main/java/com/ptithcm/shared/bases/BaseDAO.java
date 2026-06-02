@@ -40,8 +40,8 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * Cách dùng:
      * 
      * <pre>
-     * public class SinhVienDAO extends BaseDAO&lt;SinhVien, String&gt; {
-     *     public SinhVienDAO() {
+     * public class StudentDAO extends BaseDAO&lt;SinhVien, String&gt; {
+     *     public StudentDAO() {
      *         super(SinhVien.class);
      *     }
      * }
@@ -77,7 +77,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * Cách dùng:
      * 
      * <pre>
-     * List&lt;SinhVien&gt; danhSach = sinhVienDAO.findAll();
+     * List&lt;SinhVien&gt; danhSach = studentDAO.findAll();
      * </pre>
      *
      * @return Danh sách chứa toàn bộ các đối tượng thực thể tìm thấy
@@ -92,7 +92,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * Cách dùng:
      * 
      * <pre>
-     * SinhVien sv = sinhVienDAO.findById("N15DCCN001");
+     * SinhVien sv = studentDAO.findById("N15DCCN001");
      * </pre>
      *
      * @param id
@@ -113,7 +113,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * sv.setMaSV("N15DCCN100");
      * sv.setHo("Nguyễn Văn");
      * sv.setTen("A");
-     * sinhVienDAO.save(sv);
+     * studentDAO.save(sv);
      * </pre>
      *
      * @param entity
@@ -129,9 +129,9 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * Cách dùng:
      * 
      * <pre>
-     * SinhVien sv = sinhVienDAO.findById("N15DCCN001");
+     * SinhVien sv = studentDAO.findById("N15DCCN001");
      * sv.setDiaChi("TP. Hồ Chí Minh");
-     * sinhVienDAO.update(sv);
+     * studentDAO.update(sv);
      * </pre>
      *
      * @param entity
@@ -147,9 +147,9 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * Cách dùng:
      * 
      * <pre>
-     * SinhVien sv = sinhVienDAO.findById("N15DCCN001");
+     * SinhVien sv = studentDAO.findById("N15DCCN001");
      * if (sv != null) {
-     *     sinhVienDAO.delete(sv);
+     *     studentDAO.delete(sv);
      * }
      * </pre>
      *
@@ -179,7 +179,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * Cách dùng:
      * 
      * <pre>
-     * sinhVienDAO.deleteById("N15DCCN001");
+     * studentDAO.deleteById("N15DCCN001");
      * </pre>
      *
      * @param id
@@ -221,7 +221,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * <pre>
      * Map&lt;String, Object&gt; filter = Map.of("maLop", "D15CQCN01");
      * FindOptions options = new FindOptions(Map.of("ten", "ASC"));
-     * SinhVien sv = sinhVienDAO.findOne(filter, options);
+     * SinhVien sv = studentDAO.findOne(filter, options);
      * </pre>
      *
      * @param filter
@@ -265,7 +265,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * 
      * <pre>
      * Map&lt;String, Object&gt; filter = Map.of("daNghiHoc", false);
-     * long activeStudents = sinhVienDAO.count(filter);
+     * long activeStudents = studentDAO.count(filter);
      * </pre>
      *
      * @param filter
@@ -292,7 +292,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      *
      * Map&lt;String, Object&gt; filter = Map.of("maLop", "D15CQCN01");
      *
-     * PaginationResult&lt;SinhVien&gt; res = sinhVienDAO.paginate(dto, filter, null);
+     * PaginationResult&lt;SinhVien&gt; res = studentDAO.paginate(dto, filter, null);
      * List&lt;SinhVien&gt; trang1 = res.getRows();
      * long tongSoSV = res.getTotal();
      * </pre>
@@ -345,7 +345,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * <pre>
      * Map&lt;String, Object&gt; filter = Map.of("maLop", "D15CQCN01");
      * FindOptions options = new FindOptions(Map.of("ten", "ASC", "ho", "ASC"));
-     * List&lt;SinhVien&gt; list = sinhVienDAO.findAll(filter, options);
+     * List&lt;SinhVien&gt; list = studentDAO.findAll(filter, options);
      * </pre>
      *
      * @param filter
@@ -370,7 +370,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * <pre>
      * Map&lt;String, Object&gt; filter = Map.of("maMH", "MH001");
      * MonHoc mhNew = new MonHoc("MH001", "Cấu trúc dữ liệu", 3);
-     * MonHoc mh = monHocDAO.findOneOrCreate(filter, mhNew);
+     * MonHoc mh = subjectDAO.findOneOrCreate(filter, mhNew);
      * </pre>
      *
      * @param filter
@@ -400,7 +400,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * <pre>
      * List&lt;String&gt; studentIds = List.of("N15DCCN001", "N15DCCN002", "N15DCCN003");
      * Map&lt;String, Object&gt; updateFields = Map.of("daNghiHoc", true, "diaChi", "Vắng mặt");
-     * int rowCount = sinhVienDAO.bulkUpdateByIds(studentIds, updateFields);
+     * int rowCount = studentDAO.bulkUpdateByIds(studentIds, updateFields);
      * </pre>
      *
      * @param ids
@@ -468,7 +468,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
      * 
      * <pre>
      * List&lt;DangKy&gt; registList = ...; // Danh sách hàng trăm đăng ký điểm thi
-     * dangKyDAO.saveAll(registList);
+     * registrationDAO.saveAll(registList);
      * </pre>
      *
      * @param entities

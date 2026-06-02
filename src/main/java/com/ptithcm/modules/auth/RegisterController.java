@@ -58,7 +58,7 @@ public class RegisterController {
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String register() {
-        return "register";
+        return "auth/register";
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -74,13 +74,13 @@ public class RegisterController {
         String sessionCaptcha = (String) session.getAttribute("captcha_key");
         if (sessionCaptcha == null || !sessionCaptcha.equalsIgnoreCase(captcha)) {
             model.addAttribute("error", "Mã CAPTCHA không chính xác!");
-            return "register";
+            return "auth/register";
         }
 
         // 2. Kiểm tra mật khẩu khớp
         if (!password.equals(confirmPassword)) {
             model.addAttribute("error", "Mật khẩu xác nhận không khớp!");
-            return "register";
+            return "auth/register";
         }
 
         Session hSession = sessionFactory.getCurrentSession();
@@ -89,7 +89,7 @@ public class RegisterController {
         TaiKhoan existingTk = hSession.get(TaiKhoan.class, username.trim());
         if (existingTk != null) {
             model.addAttribute("error", "Tài khoản cho mã số này đã tồn tại!");
-            return "register";
+            return "auth/register";
         }
 
         // 4. Kiểm tra mã người dùng (Sinh viên hoặc Giảng viên)
@@ -113,7 +113,7 @@ public class RegisterController {
 
         if (phanQuyen == null) {
             model.addAttribute("error", "Mã số người dùng không tồn tại trên hệ thống!");
-            return "register";
+            return "auth/register";
         }
 
         // 5. Tạo tài khoản mới
@@ -140,7 +140,7 @@ public class RegisterController {
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("error", "Lỗi gửi email OTP: " + e.getMessage());
-            return "register";
+            return "auth/register";
         }
 
         return "redirect:/verify?username=" + trimmedUser;
@@ -149,7 +149,7 @@ public class RegisterController {
     @RequestMapping(value = "/verify", method = RequestMethod.GET)
     public String verify(@RequestParam("username") String username, ModelMap model) {
         model.addAttribute("username", username);
-        return "verify";
+        return "auth/verify";
     }
 
     @RequestMapping(value = "/verify", method = RequestMethod.POST)
@@ -161,7 +161,7 @@ public class RegisterController {
 
         if (username == null || username.trim().isEmpty() || otp == null || otp.trim().isEmpty()) {
             model.addAttribute("error", "Vui lòng nhập mã OTP!");
-            return "verify";
+            return "auth/verify";
         }
 
         Session hSession = sessionFactory.getCurrentSession();
@@ -169,24 +169,24 @@ public class RegisterController {
 
         if (tk == null) {
             model.addAttribute("error", "Tài khoản không tồn tại!");
-            return "verify";
+            return "auth/verify";
         }
 
         if (tk.getTrangThai() == TrangThaiTaiKhoan.DA_KICH_HOAT) {
             model.addAttribute("error", "Tài khoản này đã kích hoạt rồi!");
-            return "verify";
+            return "auth/verify";
         }
 
         // Lấy OTP từ Redis
         String storedOtp = redisService.get("otp:activation:" + username.trim());
         if (storedOtp == null) {
             model.addAttribute("error", "Mã OTP đã hết hạn hoặc không tồn tại! Vui lòng đăng ký lại.");
-            return "verify";
+            return "auth/verify";
         }
 
         if (!storedOtp.equals(otp.trim())) {
             model.addAttribute("error", "Mã OTP không chính xác!");
-            return "verify";
+            return "auth/verify";
         }
 
         // Kích hoạt thành công

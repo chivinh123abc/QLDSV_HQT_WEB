@@ -33,12 +33,14 @@ public class DangKyId implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        DangKyId dangKyId = (DangKyId) o;
-        return Objects.equals(lopTinChi, dangKyId.lopTinChi) && Objects.equals(sinhVien, dangKyId.sinhVien);
+        }
+        DangKyId that = (DangKyId) o;
+        return Objects.equals(lopTinChi, that.lopTinChi) && Objects.equals(sinhVien, that.sinhVien);
     }
 
     @Override

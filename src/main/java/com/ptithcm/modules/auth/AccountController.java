@@ -14,11 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.GiangVien;
 import com.ptithcm.entities.SinhVien;
@@ -34,9 +34,11 @@ public class AccountController {
     @Autowired
     private SessionFactory sessionFactory;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     @Transactional
-    public String index(ModelMap model, HttpSession session) {
+    public String index(ModelMap model, HttpSession session,
+            @RequestParam(value = "userId", required = false) String userId,
+            @RequestParam(value = "lnkAdd", required = false) String lnkAdd) {
         Session hSession = sessionFactory.getCurrentSession();
         List<TaiKhoan> list = hSession.createQuery("FROM TaiKhoan", TaiKhoan.class).list();
 
@@ -68,14 +70,14 @@ public class AccountController {
             // Lấy tên hiển thị
             String fullName = "Hệ thống";
             if (roleId == 3) {
-                String svHql = "FROM SinhVien WHERE TRIM(maSV) = :username";
+                String svHql = "FROM SinhVien WHERE maSV = :username";
                 SinhVien sv = hSession.createQuery(svHql, SinhVien.class).setParameter("username", tk.getTenDangNhap())
                         .uniqueResult();
                 if (sv != null) {
                     fullName = sv.getHo() + " " + sv.getTen();
                 }
             } else {
-                String gvHql = "FROM GiangVien WHERE TRIM(maGV) = :username";
+                String gvHql = "FROM GiangVien WHERE maGV = :username";
                 GiangVien gv = hSession.createQuery(gvHql, GiangVien.class)
                         .setParameter("username", tk.getTenDangNhap()).uniqueResult();
                 if (gv != null) {
@@ -91,86 +93,49 @@ public class AccountController {
             userList.add(map);
         }
 
+        // Nạp danh sách chưa gán tài khoản
+        List<SinhVien> unassignedStudents = hSession.createQuery(
+                "FROM SinhVien sv WHERE TRIM(sv.maSV) NOT IN (SELECT TRIM(tk.tenDangNhap) FROM TaiKhoan tk)",
+                SinhVien.class).list();
+        List<GiangVien> unassignedLecturers = hSession.createQuery(
+                "FROM GiangVien gv WHERE TRIM(gv.maGV) NOT IN (SELECT TRIM(tk.tenDangNhap) FROM TaiKhoan tk)",
+                GiangVien.class).list();
+
         model.addAttribute("userList", userList);
+        model.addAttribute("unassignedStudents", unassignedStudents);
+        model.addAttribute("unassignedLecturers", unassignedLecturers);
+
+        // Edit support
+        if (userId != null && !userId.trim().isEmpty()) {
+            TaiKhoan tk = hSession.get(TaiKhoan.class, userId.trim());
+            if (tk != null) {
+                model.addAttribute("account", tk);
+                model.addAttribute("mode", "edit");
+            }
+        } else if (lnkAdd != null) {
+            model.addAttribute("mode", "add");
+        }
+
         return "account/index";
     }
 
-    @RequestMapping(value = "/api/unassigned", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
+    @PostMapping(value = "/save")
     @Transactional
-    public List<Map<String, Object>> getUnassigned(@RequestParam("roleId") int roleId) {
-        Session hSession = sessionFactory.getCurrentSession();
-        List<Map<String, Object>> res = new ArrayList<>();
-
-        if (roleId == 3) {
-            // Sinh viên chưa có tài khoản
-            List<SinhVien> sinhVienList = hSession.createQuery(
-                    "FROM SinhVien sv WHERE TRIM(sv.maSV) NOT IN (SELECT TRIM(tk.tenDangNhap) FROM TaiKhoan tk)",
-                    SinhVien.class).list();
-            for (SinhVien sv : sinhVienList) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("maSV", sv.getMaSV().trim());
-                map.put("ho", sv.getHo());
-                map.put("ten", sv.getTen());
-                res.add(map);
-            }
-        } else {
-            // Giảng viên chưa có tài khoản
-            List<GiangVien> giangVienList = hSession.createQuery(
-                    "FROM GiangVien gv WHERE TRIM(gv.maGV) NOT IN (SELECT TRIM(tk.tenDangNhap) FROM TaiKhoan tk)",
-                    GiangVien.class).list();
-            for (GiangVien gv : giangVienList) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("maGV", gv.getMaGV().trim());
-                map.put("ho", gv.getHo());
-                map.put("ten", gv.getTen());
-                res.add(map);
-            }
-        }
-        return res;
-    }
-
-    @RequestMapping(value = "/api/get", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    @Transactional
-    public Map<String, Object> getAccount(@RequestParam("userId") String userId) {
-        Session hSession = sessionFactory.getCurrentSession();
-        TaiKhoan tk = hSession.get(TaiKhoan.class, userId.trim());
-        Map<String, Object> map = new HashMap<>();
-        if (tk != null) {
-            map.put("userId", tk.getTenDangNhap());
-            map.put("username", tk.getTenDangNhap());
-            map.put("email", tk.getEmail());
-            int roleId = 3;
-            if ("PGV".equals(tk.getPhanQuyen())) {
-                roleId = 1;
-            } else if ("KHOA".equals(tk.getPhanQuyen())) {
-                roleId = 2;
-            }
-            map.put("roleId", roleId);
-            map.put("password", "");
-        }
-        return map;
-    }
-
-    @RequestMapping(value = "/api/save", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
-    @Transactional
-    public Map<String, Object> saveAccount(@RequestBody Map<String, String> body, @RequestParam("mode") String mode) {
-        Map<String, Object> res = new HashMap<>();
+    public String saveAccount(@RequestParam("username") String username,
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam("roleId") String roleIdStr, @RequestParam("email") String email,
+            @RequestParam("mode") String mode, @RequestParam(value = "userId", required = false) String userId,
+            RedirectAttributes redirectAttributes) {
         try {
             Session hSession = sessionFactory.getCurrentSession();
-            String username = body.get("username").trim();
-            String password = body.get("password");
-            String roleIdStr = body.get("roleId");
-            String email = body.get("email").trim();
+            username = username.trim();
+            email = email.trim();
 
             if ("add".equalsIgnoreCase(mode)) {
                 TaiKhoan existing = hSession.get(TaiKhoan.class, username);
                 if (existing != null) {
-                    res.put("status", "error");
-                    res.put("message", "Tên đăng nhập đã tồn tại!");
-                    return res;
+                    redirectAttributes.addFlashAttribute("error", "Tên đăng nhập đã tồn tại!");
+                    return "redirect:/account?lnkAdd=true";
                 }
 
                 TaiKhoan tk = new TaiKhoan();
@@ -188,13 +153,13 @@ public class AccountController {
                 tk.setTrangThai(TrangThaiTaiKhoan.DA_KICH_HOAT); // Admin tạo thì kích hoạt trực tiếp
 
                 hSession.persist(tk);
+                redirectAttributes.addFlashAttribute("message", "Cấp tài khoản [" + username + "] thành công!");
             } else if ("edit".equalsIgnoreCase(mode)) {
-                String userId = body.get("userId").trim();
+                userId = userId.trim();
                 TaiKhoan tk = hSession.get(TaiKhoan.class, userId);
                 if (tk == null) {
-                    res.put("status", "error");
-                    res.put("message", "Không tìm thấy tài khoản!");
-                    return res;
+                    redirectAttributes.addFlashAttribute("error", "Không tìm thấy tài khoản!");
+                    return "redirect:/account";
                 }
 
                 tk.setEmail(email);
@@ -211,32 +176,34 @@ public class AccountController {
                 }
 
                 hSession.merge(tk);
+                redirectAttributes.addFlashAttribute("message", "Cập nhật tài khoản [" + userId + "] thành công!");
             }
-
-            res.put("status", "success");
         } catch (Exception e) {
-            res.put("status", "error");
-            res.put("message", "Lỗi: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
+            if ("add".equalsIgnoreCase(mode)) {
+                return "redirect:/account?lnkAdd=true";
+            } else {
+                return "redirect:/account?userId=" + userId + "&lnkEdit";
+            }
         }
-        return res;
+        return "redirect:/account";
     }
 
-    @RequestMapping(value = "/api/delete", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
+    @PostMapping(value = "/delete")
     @Transactional
-    public Map<String, Object> deleteAccount(@RequestParam("userId") String userId) {
-        Map<String, Object> res = new HashMap<>();
+    public String deleteAccount(@RequestParam("userId") String userId, RedirectAttributes redirectAttributes) {
         try {
             Session hSession = sessionFactory.getCurrentSession();
             TaiKhoan tk = hSession.get(TaiKhoan.class, userId.trim());
             if (tk != null) {
                 hSession.remove(tk);
+                redirectAttributes.addFlashAttribute("message", "Đã xóa tài khoản [" + userId + "] thành công.");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy tài khoản để xóa!");
             }
-            res.put("status", "success");
         } catch (Exception e) {
-            res.put("status", "error");
-            res.put("message", "Lỗi: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
-        return res;
+        return "redirect:/account";
     }
 }

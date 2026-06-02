@@ -49,43 +49,122 @@
                         </div>
                     </div>
 
+                    <!-- FLASH MESSAGES -->
+                    <c:if test="${not empty message}">
+                        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i> ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
+
                     <div class="row g-4">
                         <!-- LEFT SIDE: STUDENT INFO & SEARCH -->
                         <div class="col-lg-4">
                             <div class="card border-0 shadow-sm rounded-4 mb-4">
                                 <div class="card-body p-4">
                                     <h6 class="fw-bold text-primary mb-3">Tra cứu Sinh viên</h6>
-                                    <div class="input-group mb-3 shadow-sm rounded-3 overflow-hidden" <c:if test="${sessionScope.role == 'SINHVIEN'}">style="display:none;"</c:if>>
-                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge"></i></span>
-                                        <input type="text" id="inp_maSV" class="form-control border-start-0 ps-0" placeholder="Nhập Mã SV..." value="${sessionScope.role == 'SINHVIEN' ? sessionScope.user.username : ''}">
-                                        <button class="btn btn-primary fw-bold" type="button" onclick="loadStudentData()">TÌM</button>
-                                    </div>
-                                    <div id="student-info-panel" class="bg-light p-3 rounded-3 d-none">
-                                        <div class="d-flex align-items-center gap-3 mb-3">
-                                            <div class="bg-white p-2 rounded-circle border shadow-sm">
-                                                <i class="bi bi-person-circle fs-3 text-primary"></i>
+                                    
+                                    <!-- Search form for PGV -->
+                                    <c:choose>
+                                        <c:when test="${sessionScope.role == 'SINHVIEN'}">
+                                            <!-- Hidden or read-only student display for student role -->
+                                            <div class="bg-light p-3 rounded-3">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="bg-white p-2 rounded-circle border shadow-sm">
+                                                        <i class="bi bi-person-circle fs-3 text-primary"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h5 class="fw-bold mb-0 text-dark">${selectedStudent.ho} ${selectedStudent.ten}</h5>
+                                                        <span class="badge bg-primary rounded-pill small">${selectedStudent.maSV}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="small text-muted mt-3 mb-1"><i class="bi bi-building me-2"></i>Lớp: <strong class="text-dark">${selectedStudent.maLop}</strong></div>
+                                                <div class="small text-muted"><i class="bi bi-info-circle me-2"></i>Trạng thái: 
+                                                    <span class="badge ${selectedStudent.daNghiHoc ? 'bg-danger' : 'bg-success'} bg-opacity-10 ${selectedStudent.daNghiHoc ? 'text-danger' : 'text-success'} rounded-pill">
+                                                        ${selectedStudent.daNghiHoc ? 'Đã nghỉ học' : 'Đang học'}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h5 id="info-name" class="fw-bold mb-0 text-dark">---</h5>
-                                                <span id="info-maSV" class="badge bg-primary rounded-pill small">---</span>
-                                            </div>
-                                        </div>
-                                        <div class="small text-muted mb-1"><i class="bi bi-building me-2"></i>Lớp: <strong id="info-maLop" class="text-dark">---</strong></div>
-                                        <div class="small text-muted"><i class="bi bi-info-circle me-2"></i>Trạng thái: <span id="info-status" class="badge bg-success bg-opacity-10 text-success rounded-pill">Đang học</span></div>
-                                    </div>
-                                    <div id="no-student-alert" class="text-center py-4 text-muted small">
-                                        <i class="bi bi-search fs-2 d-block mb-2 opacity-25"></i>
-                                        Vui lòng nhập Mã SV để bắt đầu
-                                    </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <!-- Standard search input for staff -->
+                                            <form action="${pageContext.request.contextPath}/registration" method="GET" class="mb-3">
+                                                <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge"></i></span>
+                                                    <input type="text" name="maSV" class="form-control border-start-0 ps-0" placeholder="Nhập Mã SV..." value="${selectedStudent != null ? selectedStudent.maSV : ''}" required>
+                                                    <button class="btn btn-primary fw-bold" type="submit">TÌM</button>
+                                                </div>
+                                            </form>
+                                            
+                                            <c:choose>
+                                                <c:when test="${not empty selectedStudent}">
+                                                    <div class="bg-light p-3 rounded-3">
+                                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                                            <div class="bg-white p-2 rounded-circle border shadow-sm">
+                                                                <i class="bi bi-person-circle fs-3 text-primary"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h5 class="fw-bold mb-0 text-dark">${selectedStudent.ho} ${selectedStudent.ten}</h5>
+                                                                <span class="badge bg-primary rounded-pill small">${selectedStudent.maSV}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="small text-muted mb-1"><i class="bi bi-building me-2"></i>Lớp: <strong class="text-dark">${selectedStudent.maLop}</strong></div>
+                                                        <div class="small text-muted"><i class="bi bi-info-circle me-2"></i>Trạng thái: 
+                                                            <span class="badge ${selectedStudent.daNghiHoc ? 'bg-danger' : 'bg-success'} bg-opacity-10 ${selectedStudent.daNghiHoc ? 'text-danger' : 'text-success'} rounded-pill">
+                                                                ${selectedStudent.daNghiHoc ? 'Đã nghỉ học' : 'Đang học'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="text-center py-4 text-muted small">
+                                                        <i class="bi bi-search fs-2 d-block mb-2 opacity-25"></i>
+                                                        Vui lòng nhập Mã SV để bắt đầu
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
 
+                            <!-- REGISTERED CLASSES LIST -->
                             <div class="card border-0 shadow-sm rounded-4">
                                 <div class="card-body p-4">
                                     <h6 class="fw-bold text-success mb-3">Lớp tín chỉ đã đăng ký</h6>
-                                    <div id="registered-list" class="list-group list-group-flush">
-                                        <div class="text-center py-4 text-muted small">Chưa có dữ liệu</div>
-                                    </div>
+                                    <c:choose>
+                                        <c:when test="${empty selectedStudent}">
+                                            <div class="text-center py-4 text-muted small">Vui lòng tra cứu sinh viên trước</div>
+                                        </c:when>
+                                        <c:when test="${empty myRegistrations}">
+                                            <div class="text-center py-4 text-muted small">Chưa đăng ký môn nào</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="list-group list-group-flush">
+                                                <c:forEach var="reg" items="${myRegistrations}">
+                                                    <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <div class="fw-bold text-dark small">Lớp LTC: ${reg.lopTinChi.maLTC}</div>
+                                                            <div class="text-muted" style="font-size: 0.75rem;">Môn: ${reg.lopTinChi.monHoc.tenMH} (Nhóm ${reg.lopTinChi.nhom})</div>
+                                                        </div>
+                                                        <!-- Pure HTML Form to Cancel Registration (No maSV passed in parameters) -->
+                                                        <form action="${pageContext.request.contextPath}/registration" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đăng ký lớp này không?');">
+                                                            <input type="hidden" name="maLTC" value="${reg.lopTinChi.maLTC}">
+                                                            <button type="submit" name="btnDelete" class="btn btn-xs btn-outline-danger border-0">
+                                                                <i class="bi bi-x-circle-fill"></i> Hủy
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +191,68 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="available-ltc-body">
-                                                <!-- Dynamic Content -->
+                                                <c:forEach var="item" items="${availableClasses}">
+                                                    <c:set var="isRegistered" value="false" />
+                                                    <c:forEach var="regId" items="${registeredLtcIds}">
+                                                        <c:if test="${regId == item.maLTC}">
+                                                            <c:set var="isRegistered" value="true" />
+                                                        </c:if>
+                                                    </c:forEach>
+                                                    
+                                                    <c:set var="isSameSubjectRegistered" value="false" />
+                                                    <c:if test="${not isRegistered}">
+                                                        <c:set var="key" value="${item.monHoc.maMH.trim().toUpperCase()}-${item.nienKhoa.trim().toUpperCase()}-${item.hocKy}" />
+                                                        <c:forEach var="subjSem" items="${registeredSubjectSemesters}">
+                                                            <c:if test="${subjSem == key}">
+                                                                 <c:set var="isSameSubjectRegistered" value="true" />
+                                                            </c:if>
+                                                        </c:forEach>
+                                                    </c:if>
+                                                    
+                                                    <tr>
+                                                        <td class="px-3"><span class="badge-soft-primary">${item.maLTC}</span></td>
+                                                        <td>
+                                                            <div class="fw-bold text-dark">${item.monHoc.maMH} - ${item.monHoc.tenMH}</div>
+                                                            <div class="small text-muted">Nhóm ${item.nhom} | ${item.khoa.tenKhoa}</div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="fw-bold text-dark">${item.nienKhoa}</div>
+                                                            <div class="small text-muted">Học kỳ: ${item.hocKy}</div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <c:choose>
+                                                                <c:when test="${isRegistered}">
+                                                                    <!-- Pure HTML Form to Cancel Registration (No maSV passed in parameters) -->
+                                                                    <form action="${pageContext.request.contextPath}/registration" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đăng ký lớp này không?');">
+                                                                        <input type="hidden" name="maLTC" value="${item.maLTC}">
+                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger rounded-3 px-3">
+                                                                            <i class="bi bi-x-circle me-1"></i> Hủy đăng ký
+                                                                        </button>
+                                                                    </form>
+                                                                </c:when>
+                                                                <c:when test="${isSameSubjectRegistered}">
+                                                                    <button class="btn btn-sm btn-secondary rounded-3 px-3" disabled title="Bạn đã đăng ký một lớp khác của môn này trong học kỳ này">
+                                                                        <i class="bi bi-dash-circle me-1"></i> Đã đăng ký môn này
+                                                                    </button>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <!-- Pure HTML Form to Register (No maSV passed in parameters) -->
+                                                                    <form action="${pageContext.request.contextPath}/registration" method="POST">
+                                                                        <input type="hidden" name="maLTC" value="${item.maLTC}">
+                                                                        <button type="submit" name="btnInsert" class="btn btn-sm btn-primary rounded-3 px-3" <c:if test="${empty selectedStudent}">disabled title="Vui lòng tra cứu sinh viên trước"</c:if>>
+                                                                            <i class="bi bi-plus-circle me-1"></i> Đăng ký
+                                                                        </button>
+                                                                    </form>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                                <c:if test="${empty availableClasses}">
+                                                    <tr>
+                                                        <td colspan="4" class="text-center py-4 text-muted">Không có lớp tín chỉ khả dụng</td>
+                                                    </tr>
+                                                </c:if>
                                             </tbody>
                                         </table>
                                     </div>
@@ -125,223 +265,9 @@
         </div>
     </div>
 
-    <!-- NOTIFICATION MODAL -->
-    <div class="modal fade" id="notifyModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-body text-center p-4">
-                    <div id="notifyIcon" class="mb-3"></div>
-                    <h5 id="notifyTitle" class="fw-bold mb-2"></h5>
-                    <p id="notifyMessage" class="text-muted small mb-4"></p>
-                    <button type="button" class="btn btn-primary w-100 rounded-3 fw-bold" data-bs-dismiss="modal">ĐÓNG</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- CONFIRMATION MODAL -->
-    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-body text-center p-4">
-                    <div class="mb-3 text-warning">
-                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3.5rem;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">Xác nhận</h5>
-                    <p id="confirmMessage" class="text-muted small mb-4">Bạn có chắc chắn muốn hủy đăng ký lớp này không?</p>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-light w-100 rounded-3 fw-bold" data-bs-dismiss="modal">HỦY</button>
-                        <button type="button" id="btnConfirmAction" class="btn btn-danger w-100 rounded-3 fw-bold">ĐỒNG Ý</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const contextPath = '${pageContext.request.contextPath}';
-        let currentStudent = null;
-        let registeredLTCIds = [];
-        let availableLTCList = [];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAvailableLTC();
-            if (document.getElementById('inp_maSV').value) {
-                loadStudentData();
-            }
-        });
-
-        function showNotify(title, message, type = 'success') {
-            document.getElementById('notifyTitle').innerText = title;
-            document.getElementById('notifyMessage').innerText = message;
-            const icon = document.getElementById('notifyIcon');
-            icon.innerHTML = type === 'success' ? '<i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>' : 
-                            (type === 'error' ? '<i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>' : 
-                            '<i class="bi bi-info-circle-fill text-primary" style="font-size: 3.5rem;"></i>');
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('notifyModal')).show();
-        }
-
-        function showConfirm(message, onConfirm) {
-            document.getElementById('confirmMessage').innerText = message;
-            const btn = document.getElementById('btnConfirmAction');
-            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmModal'));
-            btn.onclick = () => {
-                onConfirm();
-                modal.hide();
-            };
-            modal.show();
-        }
-
-        async function loadStudentData() {
-            const maSV = document.getElementById('inp_maSV').value;
-            if (!maSV) return;
-            try {
-                const res = await fetch(contextPath + '/student/api/get?maSV=' + maSV.trim());
-                const student = await res.json();
-                if (student) {
-                    currentStudent = student;
-                    updateStudentPanel(student);
-                    await loadRegisteredLTC(maSV.trim());
-                } else {
-                    showNotify('Thông báo', 'Không tìm thấy sinh viên!', 'info');
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        function updateStudentPanel(sv) {
-            document.getElementById('student-info-panel').classList.remove('d-none');
-            document.getElementById('no-student-alert').classList.add('d-none');
-            document.getElementById('info-name').innerText = sv.ho + ' ' + sv.ten;
-            document.getElementById('info-maSV').innerText = sv.maSV;
-            document.getElementById('info-maLop').innerText = sv.maLop;
-            document.getElementById('info-status').innerText = sv.daNghiHoc ? 'Đã nghỉ học' : 'Đang học';
-            document.getElementById('info-status').className = 'badge ' + (sv.daNghiHoc ? 'bg-danger' : 'bg-success') + ' bg-opacity-10 ' + (sv.daNghiHoc ? 'text-danger' : 'text-success') + ' rounded-pill';
-        }
-
-        async function loadAvailableLTC() {
-            try {
-                if (availableLTCList.length === 0) {
-                    const res = await fetch(contextPath + '/registration/api/available-classes');
-                    availableLTCList = await res.json();
-                }
-                
-                // Helper to get registered subjects in a specific semester
-                const getRegisteredSubjects = (nk, hk) => {
-                    const cleanNk = (nk || '').trim().toUpperCase();
-                    const cleanHk = Number(hk);
-                    return availableLTCList
-                        .filter(ltc => registeredLTCIds.includes(String(ltc.maLTC)) && 
-                                       (ltc.nienKhoa || '').trim().toUpperCase() === cleanNk && 
-                                       Number(ltc.hocKy) === cleanHk)
-                        .map(ltc => (ltc.maMH || '').trim().toUpperCase());
-                };
- 
-                const container = document.getElementById('available-ltc-body');
-                container.innerHTML = availableLTCList.map(item => {
-                    const isRegistered = registeredLTCIds.includes(String(item.maLTC));
-                    const subjectsInSemester = getRegisteredSubjects(item.nienKhoa, item.hocKy);
-                    const cleanMaMH = (item.maMH || '').trim().toUpperCase();
-                    const isSameSubjectRegistered = subjectsInSemester.includes(cleanMaMH);
-                    
-                    let btnHtml = '';
-                    if (isRegistered) {
-                        btnHtml = `
-                            <button class="btn btn-sm btn-outline-danger rounded-3 px-3" onclick="confirmCancel('\${item.maLTC}')">
-                                <i class="bi bi-x-circle me-1"></i> Hủy đăng ký
-                            </button>
-                        `;
-                    } else if (isSameSubjectRegistered) {
-                        btnHtml = `
-                            <button class="btn btn-sm btn-secondary rounded-3 px-3" disabled title="Bạn đã đăng ký một lớp khác của môn này">
-                                <i class="bi bi-dash-circle me-1"></i> Đã đăng ký môn này
-                            </button>
-                        `;
-                    } else {
-                        btnHtml = `
-                            <button class="btn btn-sm btn-primary rounded-3 px-3" onclick="registerLTC('\${item.maLTC}')">
-                                <i class="bi bi-plus-circle me-1"></i> Đăng ký
-                            </button>
-                        `;
-                    }
- 
-                    return `
-                        <tr>
-                            <td class="px-3"><span class="badge-soft-primary">\${item.maLTC}</span></td>
-                            <td>
-                                <div class="fw-bold text-dark">\${item.maMH}</div>
-                                <div class="small text-muted">Nhóm \${item.nhom} | \${item.maKhoa}</div>
-                            </td>
-                            <td>
-                                <div class="fw-bold text-dark">\${item.nienKhoa}</div>
-                                <div class="small text-muted">Học kỳ: \${item.hocKy}</div>
-                            </td>
-                            <td class="text-center">
-                                \${btnHtml}
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (e) { console.error(e); }
-        }
- 
-        async function loadRegisteredLTC(maSV) {
-            try {
-                const res = await fetch(contextPath + '/registration/api/list');
-                const allReg = await res.json();
-                const myReg = allReg.filter(r => (r.maSV || '').trim().toUpperCase() === maSV.trim().toUpperCase() && 
-                                                 !(r.huyDangKy === true || r.huyDangKy === 1 || String(r.huyDangKy) === 'true'));
-                registeredLTCIds = myReg.map(r => String(r.maLTC));
-                
-                const container = document.getElementById('registered-list');
-                if (myReg.length === 0) {
-                    container.innerHTML = '<div class="text-center py-4 text-muted small">Chưa đăng ký môn nào</div>';
-                } else {
-                    container.innerHTML = myReg.map(r => `
-                        <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold text-dark small">Lớp LTC: \${r.maLTC}</div>
-                                <div class="text-muted" style="font-size: 0.75rem;">Trạng thái: Đã đăng ký</div>
-                            </div>
-                            <button class="btn btn-xs btn-outline-danger border-0" onclick="confirmCancel('\${r.maLTC}')">
-                                <i class="bi bi-x-circle-fill"></i> Hủy
-                            </button>
-                        </div>
-                    `).join('');
-                }
-                loadAvailableLTC();
-            } catch (e) { console.error(e); }
-        }
-
-        async function registerLTC(maLTC) {
-            if (!currentStudent) { showNotify('Cảnh báo', 'Vui lòng chọn sinh viên trước!', 'info'); return; }
-            try {
-                const res = await fetch(contextPath + `/registration/api/register?maSV=\${currentStudent.maSV}&maLTC=\${maLTC}`, { method: 'POST' });
-                const result = await res.json();
-                if (result.status === 'success') {
-                    showNotify('Thành công', result.message);
-                    loadRegisteredLTC(currentStudent.maSV);
-                } else showNotify('Lỗi', result.message, 'error');
-            } catch (e) { console.error(e); }
-        }
-
-        function confirmCancel(maLTC) {
-            showConfirm("Bạn có chắc chắn muốn hủy đăng ký lớp tín chỉ này không?", () => cancelReg(maLTC));
-        }
-
-        async function cancelReg(maLTC) {
-            if (!currentStudent) return;
-            try {
-                const res = await fetch(contextPath + `/registration/api/cancel?maSV=\${currentStudent.maSV}&maLTC=\${maLTC}`, { method: 'POST' });
-                const result = await res.json();
-                if (result.status === 'success') {
-                    showNotify('Thành công', result.message);
-                    loadRegisteredLTC(currentStudent.maSV);
-                } else showNotify('Lỗi', result.message, 'error');
-            } catch (e) { console.error(e); }
-        }
-
         function normalizeVN(str) {
             return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd').replace(/\u0110/g, 'D').toLowerCase();
         }
@@ -355,4 +281,3 @@
     </script>
 </body>
 </html>
-

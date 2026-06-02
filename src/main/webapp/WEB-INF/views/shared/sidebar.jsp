@@ -59,9 +59,9 @@
                                     <c:if test="${sessionScope.role == 'SINHVIEN' || sessionScope.role == 'PGV'}">
                                         <li>
                                             <a class="nav-link" href="${pageContext.request.contextPath}/registration">
-                                                <i class="bi bi-pencil-square"></i> Đăng ký môn
-                                            </a>
-                                        </li>
+                                                 <i class="bi bi-pencil-square"></i> Đăng ký môn
+                                             </a>
+                                         </li>
                                     </c:if>
 
                                     <%-- Mark Entry: KHOA and PGV (Full access) --%>

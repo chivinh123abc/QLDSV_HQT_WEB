@@ -102,7 +102,6 @@
                     gap: 6px;
                 }
 
-                /* Premium Toolbar Colors */
                 .btn-toolbar-add {
                     color: #10b981;
                     border-color: #10b981;
@@ -180,6 +179,20 @@
                                 </div>
                             </div>
 
+                            <!-- FLASH MESSAGES -->
+                            <c:if test="${not empty message}">
+                                <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                    <i class="bi bi-check-circle-fill me-2"></i> ${message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </c:if>
+                            <c:if test="${not empty error}">
+                                <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </c:if>
+
                             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                                 <div
                                     class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
@@ -188,10 +201,9 @@
                                         </h6>
                                     </div>
                                     <c:if test="${sessionScope.role == 'PGV'}">
-                                        <button class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm"
-                                            onclick="resetForm()">
+                                        <a href="${pageContext.request.contextPath}/credit-class?maKhoa=${maKhoa}&lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
                                             <i class="bi bi-plus-circle-fill me-1"></i> Mở Lớp Mới
-                                        </button>
+                                        </a>
                                     </c:if>
                                 </div>
 
@@ -204,14 +216,16 @@
                                                     <div class="input-group">
                                                         <span class="input-group-text bg-light border-0"><i
                                                                 class="bi bi-building"></i></span>
-                                                        <select id="khoa-filter"
-                                                            class="form-select bg-light border-0 fw-semibold"
-                                                            onchange="refreshTable()">
-                                                            <option value="all">Tất cả Khoa</option>
-                                                            <c:forEach var="k" items="${khoaList}">
-                                                                <option value="${k.maKhoa}">${k.tenKhoa}</option>
-                                                            </c:forEach>
-                                                        </select>
+                                                        <form action="${pageContext.request.contextPath}/credit-class" method="GET" class="d-inline flex-grow-1">
+                                                            <select name="maKhoa"
+                                                                class="form-select bg-light border-0 fw-semibold"
+                                                                onchange="this.form.submit()">
+                                                                <option value="all">Tất cả Khoa</option>
+                                                                <c:forEach var="k" items="${khoaList}">
+                                                                    <option value="${k.maKhoa}" ${param.maKhoa == k.maKhoa || maKhoa == k.maKhoa ? 'selected' : ''}>${k.tenKhoa}</option>
+                                                                </c:forEach>
+                                                            </select>
+                                                        </form>
                                                     </div>
                                                 </c:when>
                                                 <c:otherwise>
@@ -225,7 +239,7 @@
                                         </div>
                                         <div class="col-md-8 text-end">
                                             <div class="text-muted small fw-medium">
-                                                <i class="bi bi-info-circle me-1"></i> Tìm thấy <strong id="ltc-count"
+                                                <i class="bi bi-info-circle me-1"></i> Tìm thấy <strong
                                                     class="text-primary">${ltcList.size()}</strong> lớp tín chỉ
                                             </div>
                                         </div>
@@ -247,15 +261,15 @@
                                                     </c:if>
                                                 </tr>
                                             </thead>
-                                            <tbody id="ltc-table-body">
+                                            <tbody>
                                                 <c:forEach var="item" items="${ltcList}">
-                                                    <tr <c:if test="${sessionScope.role == 'PGV'}">onclick="selectLTC('${item.maLTC}', 'edit', false)"</c:if>>
+                                                    <tr>
                                                         <td class="px-3"><span
                                                                 class="badge-soft-primary">${item.maLTC}</span></td>
                                                         <td>
-                                                            <div class="ltc-title">${item.maMH}</div>
+                                                            <div class="ltc-title">${item.monHoc.tenMH}</div>
                                                             <div class="ltc-subtitle"><i class="bi bi-building"></i>
-                                                                ${item.maKhoa}</div>
+                                                                ${item.khoa.maKhoa}</div>
                                                         </td>
                                                         <td>
                                                             <div class="fw-bold text-dark">${item.nienKhoa}</div>
@@ -264,7 +278,7 @@
                                                         <td class="text-center"><span class="badge-soft-secondary">Nhóm
                                                                 ${item.nhom}</span></td>
                                                         <td>
-                                                            <div class="fw-semibold text-primary">${item.maGV}</div>
+                                                            <div class="fw-semibold text-primary">${item.giangVien.ho} ${item.giangVien.ten}</div>
                                                             <div class="small text-muted">Tối thiểu:
                                                                 ${item.soSVToiThieu} SV</div>
                                                         </td>
@@ -284,23 +298,31 @@
                                                         <c:if test="${sessionScope.role == 'PGV'}">
                                                             <td class="text-center">
                                                                 <div class="d-flex gap-2 justify-content-center">
-                                                                    <button
-                                                                        onclick="event.stopPropagation(); selectLTC('${item.maLTC}', 'edit', true)"
+                                                                    <a href="${pageContext.request.contextPath}/credit-class?maKhoa=${maKhoa}&maLTC=${item.maLTC}&lnkEdit"
                                                                         class="btn btn-sm btn-outline-primary border-0 rounded-3">
                                                                         <i class="bi bi-pencil-square"></i>
-                                                                    </button>
-                                                                    <button
-                                                                        onclick="event.stopPropagation(); selectLTC('${item.maLTC}', 'delete', true)"
-                                                                        class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}"
-                                                                        ${!item.canDelete ? 'disabled title="Không thể xóa"'
-                                                                        : '' }>
-                                                                        <i class="bi bi-trash3"></i>
-                                                                    </button>
+                                                                    </a>
+                                                                    <form action="${pageContext.request.contextPath}/credit-class" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lớp tín chỉ này không?');" class="d-inline">
+                                                                        <input type="hidden" name="maLTC" value="${item.maLTC}">
+                                                                        <input type="hidden" name="maKhoa" value="${maKhoa}">
+                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}"
+                                                                            ${!item.canDelete ? 'disabled title="Không thể xóa do đã có sinh viên đăng ký"' : ''}>
+                                                                            <i class="bi bi-trash3"></i>
+                                                                        </button>
+                                                                    </form>
                                                                 </div>
                                                             </td>
                                                         </c:if>
                                                     </tr>
                                                 </c:forEach>
+                                                <c:if test="${empty ltcList}">
+                                                    <tr>
+                                                        <td colspan="${sessionScope.role == 'PGV' ? 7 : 6}" class="text-center py-5 text-muted">
+                                                            <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
+                                                            Không tìm thấy lớp tín chỉ nào
+                                                        </td>
+                                                    </tr>
+                                                </c:if>
                                             </tbody>
                                         </table>
                                     </div>
@@ -311,425 +333,97 @@
                 </div>
             </div>
 
-            <!-- MODAL -->
-            <div class="modal fade" id="ltcModal" tabindex="-1">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content border-0 shadow-lg rounded-4">
-                        <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
-                            <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                                <i class="bi bi-layers-fill"></i> Thiết lập Lớp Tín Chỉ
-                            </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <!-- TOOLBAR -->
-                            <div class="d-flex gap-2 mb-4 p-2 bg-light rounded-3 border shadow-sm">
-                                <button type="button" id="btn_mode_add"
-                                    class="btn btn-toolbar-add fw-bold flex-fill py-2" onclick="handleModeClick('add')">
-                                    <i class="bi bi-plus-circle"></i> <span class="btn-text">MỞ LỚP</span>
-                                </button>
-                                <button type="button" id="btn_mode_edit"
-                                    class="btn btn-toolbar-edit fw-bold flex-fill py-2"
-                                    onclick="handleModeClick('edit')">
-                                    <i class="bi bi-pencil-square"></i> <span class="btn-text">SỬA</span>
-                                </button>
-                                <button type="button" id="btn_mode_delete"
-                                    class="btn btn-toolbar-delete fw-bold flex-fill py-2"
-                                    onclick="handleModeClick('delete')">
-                                    <i class="bi bi-trash3"></i> <span class="btn-text">XÓA</span>
-                                </button>
-                                <button type="button" id="btn_mode_cancel"
-                                    class="btn btn-toolbar-cancel fw-bold flex-fill py-2"
-                                    onclick="handleModeClick('none')" disabled>
-                                    <i class="bi bi-x-circle"></i> HỦY
-                                </button>
+            <!-- MODAL (SSR) -->
+            <c:if test="${sessionScope.role == 'PGV' && (not empty mode || not empty param.lnkAdd)}">
+                <div class="modal fade show d-block" id="ltcModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg rounded-4">
+                            <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
+                                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                                    <i class="bi bi-layers-fill"></i>
+                                    <c:choose>
+                                        <c:when test="${mode == 'edit'}">Cập nhật Lớp Tín Chỉ</c:when>
+                                        <c:otherwise>Mở Lớp Tín Chỉ Mới</c:otherwise>
+                                    </c:choose>
+                                </h5>
+                                <a href="${pageContext.request.contextPath}/credit-class?maKhoa=${maKhoa}" class="btn-close btn-close-white text-decoration-none"></a>
                             </div>
-
-                            <div class="row g-3 p-3 bg-white border rounded-3 shadow-sm mb-4">
-                                <input type="hidden" id="inp_maLTC">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">NIÊN KHÓA</label>
-                                    <input type="text" class="form-control" id="inp_nienKhoa"
-                                        placeholder="VD: 2023-2024" required disabled>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small fw-bold text-muted">HỌC KỲ</label>
-                                    <input type="number" class="form-control" id="inp_hocKy" min="1" max="3" value="1"
-                                        required disabled>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small fw-bold text-muted">NHÓM</label>
-                                    <input type="number" class="form-control" id="inp_nhom" min="1" value="1" required
-                                        disabled>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">MÔN HỌC</label>
-                                    <select class="form-select" id="inp_maMH" required disabled>
-                                        <option value="">-- Chọn môn học --</option>
-                                        <c:forEach var="mh" items="${monHocList}">
-                                            <option value="${mh.maMH}">[${mh.maMH}] ${mh.tenMH}</option>
-                                        </c:forEach>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">GIẢNG VIÊN</label>
-                                    <select class="form-select" id="inp_maGV" required disabled>
-                                        <option value="">-- Chọn giảng viên --</option>
-                                        <c:forEach var="gv" items="${giangVienList}">
-                                            <option value="${gv.maGV}">[${gv.maGV}] ${gv.ho} ${gv.ten}</option>
-                                        </c:forEach>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">KHOA QUẢN LÝ</label>
-                                    <select id="inp_maKhoa" class="form-select" disabled>
-                                        <c:forEach var="k" items="${khoaList}">
-                                            <option value="${k.maKhoa}">${k.tenKhoa}</option>
-                                        </c:forEach>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small fw-bold text-muted">SV TỐI THIỂU</label>
-                                    <input type="number" class="form-control" id="inp_soSVToiThieu" min="1" value="1"
-                                        required disabled>
-                                </div>
-                                <div class="col-md-3 d-flex align-items-end pb-1">
-                                    <div class="form-check form-switch mb-2">
-                                        <input class="form-check-input" type="checkbox" id="inp_huyLop" disabled>
-                                        <label class="form-check-label fw-bold text-danger small" for="inp_huyLop">Hủy
-                                            lớp</label>
+                            <form action="${pageContext.request.contextPath}/credit-class" method="POST">
+                                <div class="modal-body p-4">
+                                    <div class="row g-3 p-3 bg-white border rounded-3 shadow-sm mb-4">
+                                        <input type="hidden" name="maLTC" value="${ltc.maLTC}">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-muted">NIÊN KHÓA <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="nienKhoa" value="${ltc.nienKhoa}"
+                                                placeholder="VD: 2023-2024" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-muted">HỌC KỲ <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" name="hocKy" min="1" max="3" value="${not empty ltc.hocKy ? ltc.hocKy : 1}"
+                                                required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-muted">NHÓM <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" name="nhom" min="1" value="${not empty ltc.nhom ? ltc.nhom : 1}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-muted">MÔN HỌC <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="maMH" required>
+                                                <option value="">-- Chọn môn học --</option>
+                                                <c:forEach var="mh" items="${monHocList}">
+                                                    <option value="${mh.maMH}" ${ltc.monHoc.maMH == mh.maMH ? 'selected' : ''}>[${mh.maMH}] ${mh.tenMH}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-muted">GIẢNG VIÊN <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="maGV" required>
+                                                <option value="">-- Chọn giảng viên --</option>
+                                                <c:forEach var="gv" items="${giangVienList}">
+                                                    <option value="${gv.maGV}" ${ltc.giangVien.maGV == gv.maGV ? 'selected' : ''}>[${gv.maGV}] ${gv.ho} ${gv.ten}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-muted">KHOA QUẢN LÝ <span class="text-danger">*</span></label>
+                                            <select name="maKhoa" class="form-select">
+                                                <c:forEach var="k" items="${khoaList}">
+                                                    <option value="${k.maKhoa}" ${(not empty ltc.khoa.maKhoa ? ltc.khoa.maKhoa == k.maKhoa : maKhoa == k.maKhoa) ? 'selected' : ''}>${k.tenKhoa}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-muted">SV TỐI THIỂU <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" name="soSVToiThieu" min="1" value="${not empty ltc.soSVToiThieu ? ltc.soSVToiThieu : 1}"
+                                                required>
+                                        </div>
+                                        <div class="col-md-3 d-flex align-items-end pb-1">
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" name="huyLop" id="inp_huyLop" value="true" ${ltc.huyLop ? 'checked' : ''}>
+                                                <label class="form-check-label fw-bold text-danger small" for="inp_huyLop">Hủy
+                                                    lớp</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- MINI TABLE FOR REFERENCE -->
-                            <div class="mt-4 pt-3 border-top">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <h6 class="fw-bold text-primary mb-0"><i class="bi bi-list-ul"></i> Lớp tín chỉ đã
-                                        mở</h6>
-                                    <div class="input-group" style="max-width:220px;">
-                                        <span class="input-group-text py-1 border-0 bg-white"><i
-                                                class="bi bi-search small text-muted"></i></span>
-                                        <input type="text" id="mini-ltc-search"
-                                            class="form-control form-control-sm border-0 border-bottom"
-                                            placeholder="Lọc nhanh..." onkeyup="filterMiniTable()">
-                                    </div>
+                                <div class="modal-footer border-0 px-4 pb-4">
+                                    <a href="${pageContext.request.contextPath}/credit-class?maKhoa=${maKhoa}" class="btn btn-light rounded-3 fw-bold">HỦY</a>
+                                    <c:choose>
+                                        <c:when test="${mode == 'edit'}">
+                                            <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (SỬA)</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button type="submit" name="btnInsert" class="btn btn-success rounded-3 fw-bold px-4">GHI (THÊM)</button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
-                                <div class="table-responsive rounded-3 border bg-white"
-                                    style="max-height: 200px; overflow-y: auto;">
-                                    <table class="table table-hover table-sm align-middle mb-0">
-                                        <thead class="table-light sticky-top">
-                                            <tr>
-                                                <th class="px-3 small">MÃ LTC</th>
-                                                <th class="small">MÔN / NHÓM</th>
-                                                <th class="small">KỲ / NIÊN KHÓA</th>
-                                                <th class="text-center small">THAO TÁC</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="mini-table-body">
-                                            <c:forEach var="m" items="${ltcList}">
-                                                <tr <c:if test="${sessionScope.role == 'PGV'}">onclick="selectLTC('${m.maLTC}', 'edit', false)"</c:if>>
-                                                    <td class="px-3 small fw-bold text-primary">${m.maLTC}</td>
-                                                    <td class="small">
-                                                        <div class="fw-bold text-dark">${m.maMH}</div>
-                                                        <div class="text-muted">Nhóm ${m.nhom}</div>
-                                                    </td>
-                                                    <td class="small">
-                                                        <div>Kỳ ${m.hocKy}</div>
-                                                        <div class="text-muted">${m.nienKhoa}</div>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div class="d-flex justify-content-center gap-1">
-                                                            <button type="button"
-                                                                onclick="event.stopPropagation(); selectLTC('${m.maLTC}', 'edit', true)"
-                                                                class="btn btn-xs btn-outline-primary border-0 p-1">
-                                                                <i class="bi bi-pencil-square"></i>
-                                                            </button>
-                                                            <button type="button"
-                                                                onclick="event.stopPropagation(); selectLTC('${m.maLTC}', 'delete', true)"
-                                                                class="btn btn-xs btn-outline-danger border-0 p-1 ${!m.canDelete ? 'disabled opacity-25' : ''}"
-                                                                ${!m.canDelete ? 'disabled title="Không thể xóa"' : ''
-                                                                }>
-                                                                <i class="bi bi-trash3"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </c:forEach>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- NOTIFICATION & CONFIRM MODALS -->
-            <div class="modal fade" id="notifyModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-sm">
-                    <div class="modal-content border-0 shadow-lg rounded-4">
-                        <div class="modal-body text-center p-4">
-                            <div id="notifyIcon" class="mb-3"></div>
-                            <h5 id="notifyTitle" class="fw-bold mb-2"></h5>
-                            <p id="notifyMessage" class="text-muted small mb-4"></p>
-                            <button type="button" class="btn btn-primary w-100 rounded-3 fw-bold"
-                                data-bs-dismiss="modal">ĐÓNG</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-sm">
-                    <div class="modal-content border-0 shadow-lg rounded-4">
-                        <div class="modal-body text-center p-4">
-                            <div class="mb-3"><i class="bi bi-exclamation-triangle-fill text-warning"
-                                    style="font-size: 3.5rem;"></i></div>
-                            <h5 id="confirmTitle" class="fw-bold mb-2">Xác nhận</h5>
-                            <p id="confirmMessage" class="text-muted small mb-4"></p>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-light w-100 rounded-3 fw-bold"
-                                    data-bs-dismiss="modal">HỦY</button>
-                                <button type="button" id="confirmOkBtn"
-                                    class="btn btn-danger w-100 rounded-3 fw-bold shadow-sm">XÓA</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </c:if>
 
             <!-- Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-            <script>
-                let currentMode = 'none';
-                const contextPath = '${pageContext.request.contextPath}';
-                const inputs = ['inp_nienKhoa', 'inp_hocKy', 'inp_nhom', 'inp_maMH', 'inp_maGV', 'inp_maKhoa', 'inp_soSVToiThieu', 'inp_huyLop'];
-
-                function showNotify(title, message, type = 'success') {
-                    document.getElementById('notifyTitle').innerText = title;
-                    document.getElementById('notifyMessage').innerText = message;
-                    const icon = document.getElementById('notifyIcon');
-                    icon.innerHTML = type === 'success' ? '<i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>' :
-                        (type === 'error' ? '<i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>' :
-                            '<i class="bi bi-info-circle-fill text-primary" style="font-size: 3.5rem;"></i>');
-                    bootstrap.Modal.getOrCreateInstance(document.getElementById('notifyModal')).show();
-                }
-
-                function showConfirm(message, onConfirm) {
-                    document.getElementById('confirmMessage').innerText = message;
-                    const btn = document.getElementById('confirmOkBtn');
-                    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmModal'));
-                    btn.onclick = () => { modal.hide(); onConfirm(); };
-                    modal.show();
-                }
-
-                async function refreshTable() {
-                    const maKhoa = document.getElementById('khoa-filter').value;
-                    try {
-                        const response = await fetch(contextPath + '/credit-class/api/list?maKhoa=' + maKhoa);
-                        const data = await response.json();
-                        renderTable(data);
-                        renderMiniTable(data);
-                    } catch (e) { console.error(e); }
-                }
-
-                function renderTable(data) {
-                    const container = document.getElementById('ltc-table-body');
-                    document.getElementById('ltc-count').innerText = data.length;
-                    if (data.length === 0) {
-                        container.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Không tìm thấy lớp tín chỉ nào</td></tr>';
-                        return;
-                    }
-                    container.innerHTML = data.map(item => `
-                        <tr onclick="selectLTC('\${item.maLTC}', 'edit', false)">
-                            <td class="px-3"><span class="badge-soft-primary">\${item.maLTC}</span></td>
-                            <td>
-                                <div class="ltc-title">\${item.maMH}</div>
-                                <div class="ltc-subtitle"><i class="bi bi-building"></i> \${item.maKhoa}</div>
-                            </td>
-                            <td>
-                                <div class="fw-bold text-dark">\${item.nienKhoa}</div>
-                                <div class="small text-muted">Học kỳ: \${item.hocKy}</div>
-                            </td>
-                            <td class="text-center"><span class="badge-soft-secondary">Nhóm \${item.nhom}</span></td>
-                            <td>
-                                <div class="fw-semibold text-primary">\${item.maGV}</div>
-                                <div class="small text-muted">Tối thiểu: \${item.soSVToiThieu} SV</div>
-                            </td>
-                            <td class="text-center">
-                                \${item.huyLop ? 
-                                    '<span class="badge-soft-danger small"><i class="bi bi-x-circle"></i> Đã hủy</span>' : 
-                                    '<span class="badge-soft-success small"><i class="bi bi-check-circle"></i> Đang mở</span>'}
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex gap-2 justify-content-center">
-                                    <button onclick="event.stopPropagation(); selectLTC('\${item.maLTC}', 'edit', true)" class="btn btn-sm btn-outline-primary border-0 rounded-3"><i class="bi bi-pencil-square"></i></button>
-                                     <button onclick="event.stopPropagation(); selectLTC('\${item.maLTC}', 'delete', true)" class="btn btn-sm btn-outline-danger border-0 rounded-3 \${!item.canDelete ? 'disabled opacity-25' : ''}" \${!item.canDelete ? 'disabled title="Không thể xóa"' : ''}><i class="bi bi-trash3"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-
-                function renderMiniTable(data) {
-                    const container = document.getElementById('mini-table-body');
-                    container.innerHTML = data.map(item => `
-                        <tr onclick="selectLTC('\${item.maLTC}', 'edit', false)">
-                            <td class="px-3 small fw-bold text-primary">\${item.maLTC}</td>
-                            <td class="small">
-                                <div class="fw-bold text-dark">\${item.maMH}</div>
-                                <div class="text-muted">Nhóm \${item.nhom}</div>
-                            </td>
-                            <td class="small">
-                                <div>Kỳ \${item.hocKy}</div>
-                                <div class="text-muted">\${item.nienKhoa}</div>
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-1">
-                                    <button type="button" onclick="event.stopPropagation(); selectLTC('\${item.maLTC}', 'edit', true)" class="btn btn-xs btn-outline-primary border-0 p-1">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                     <button type="button" onclick="event.stopPropagation(); selectLTC('\${item.maLTC}', 'delete', true)" class="btn btn-xs btn-outline-danger border-0 p-1 \${!item.canDelete ? 'disabled opacity-25' : ''}" \${!item.canDelete ? 'disabled title="Không thể xóa"' : ''}>
-                                         <i class="bi bi-trash3"></i>
-                                     </button>
-                                  </div>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-
-                async function selectLTC(maLTC, mode, forceMode = false) {
-                    try {
-                        const res = await fetch(contextPath + '/credit-class/api/get?maLTC=' + maLTC);
-                        const data = await res.json();
-                        fillForm(data);
-                        bootstrap.Modal.getOrCreateInstance(document.getElementById('ltcModal')).show();
-                        if (forceMode || currentMode === 'none') setMode(mode);
-                        else setMode(currentMode);
-                    } catch (e) { console.error(e); }
-                }
-
-                function fillForm(data) {
-                    document.getElementById('inp_maLTC').value = data.maLTC || '';
-                    document.getElementById('inp_nienKhoa').value = data.nienKhoa || '';
-                    document.getElementById('inp_hocKy').value = data.hocKy || 1;
-                    document.getElementById('inp_nhom').value = data.nhom || 1;
-                    document.getElementById('inp_maMH').value = data.maMH || '';
-                    document.getElementById('inp_maGV').value = data.maGV || '';
-                    document.getElementById('inp_maKhoa').value = data.maKhoa || '';
-                    document.getElementById('inp_soSVToiThieu').value = data.soSVToiThieu || 1;
-                    document.getElementById('inp_huyLop').checked = data.huyLop || false;
-                }
-
-                function clearForm() {
-                    document.getElementById('inp_maLTC').value = '';
-                    inputs.forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el.type === 'checkbox') el.checked = false;
-                        else el.value = (id === 'inp_hocKy' || id === 'inp_nhom' || id === 'inp_soSVToiThieu') ? 1 : '';
-                    });
-                }
-
-                function setMode(mode) {
-                    currentMode = mode;
-                    const btns = { add: 'btn_mode_add', edit: 'btn_mode_edit', delete: 'btn_mode_delete', cancel: 'btn_mode_cancel' };
-                    Object.values(btns).forEach(id => {
-                        const btn = document.getElementById(id);
-                        btn.disabled = false;
-                        btn.classList.remove('active', 'btn-toolbar-disabled');
-                    });
-                    document.getElementById(btns.cancel).disabled = mode === 'none';
-                    inputs.forEach(id => {
-                        document.getElementById(id).disabled = mode === 'none' || mode === 'delete';
-                    });
-
-                    if (mode === 'none') clearForm();
-                    else if (mode === 'add') {
-                        ['edit', 'delete'].forEach(m => document.getElementById(btns[m]).classList.add('btn-toolbar-disabled'));
-                        document.getElementById(btns.add).classList.add('active');
-                    } else if (mode === 'edit') {
-                        ['add', 'delete'].forEach(m => document.getElementById(btns[m]).classList.add('btn-toolbar-disabled'));
-                        document.getElementById(btns.edit).classList.add('active');
-                    } else if (mode === 'delete') {
-                        ['add', 'edit'].forEach(m => document.getElementById(btns[m]).classList.add('btn-toolbar-disabled'));
-                        document.getElementById(btns.delete).classList.add('active');
-                    }
-                }
-
-                function handleModeClick(mode) {
-                    if (mode === 'none') { setMode('none'); return; }
-                    if (currentMode === mode) {
-                        if (mode === 'delete') performDelete();
-                        else performSave();
-                    } else if (currentMode === 'none') {
-                        setMode(mode);
-                        if (mode === 'add') clearForm();
-                    }
-                }
-
-                async function performSave() {
-                    const data = {
-                        maLTC: document.getElementById('inp_maLTC').value,
-                        nienKhoa: document.getElementById('inp_nienKhoa').value,
-                        hocKy: parseInt(document.getElementById('inp_hocKy').value),
-                        nhom: parseInt(document.getElementById('inp_nhom').value),
-                        maMH: document.getElementById('inp_maMH').value,
-                        maGV: document.getElementById('inp_maGV').value,
-                        maKhoa: document.getElementById('inp_maKhoa').value,
-                        soSVToiThieu: parseInt(document.getElementById('inp_soSVToiThieu').value),
-                        huyLop: document.getElementById('inp_huyLop').checked
-                    };
-                    if (!data.nienKhoa || !data.maMH || !data.maGV) { showNotify('Cảnh báo', 'Vui lòng điền đủ Niên khóa, Môn học, Giảng viên!', 'info'); return; }
-                    try {
-                        const res = await fetch(contextPath + '/credit-class/api/save?mode=' + currentMode, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(data)
-                        });
-                        const result = await res.json();
-                        if (result.status === 'success') {
-                            await refreshTable();
-                            setMode('none');
-                            bootstrap.Modal.getInstance(document.getElementById('ltcModal')).hide();
-                            showNotify('Thành công', 'Thông tin lớp tín chỉ đã được ghi.');
-                        } else showNotify('Lỗi', result.message, 'error');
-                    } catch (e) { showNotify('Lỗi', e.message, 'error'); }
-                }
-
-                async function performDelete() {
-                    const maLTC = document.getElementById('inp_maLTC').value;
-                    showConfirm('Xác nhận xóa lớp tín chỉ này?', async () => {
-                        try {
-                            const res = await fetch(contextPath + '/credit-class/api/delete?maLTC=' + maLTC, { method: 'POST' });
-                            const result = await res.json();
-                            if (result.status === 'success') {
-                                await refreshTable();
-                                setMode('none');
-                                bootstrap.Modal.getInstance(document.getElementById('ltcModal')).hide();
-                                showNotify('Thành công', 'Lớp tín chỉ đã được xóa.');
-                            } else showNotify('Lỗi', result.message, 'error');
-                        } catch (e) { showNotify('Lỗi', e.message, 'error'); }
-                    });
-                }
-
-                function normalizeVN(str) {
-                    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd').replace(/\u0110/g, 'D').toLowerCase();
-                }
-
-                function filterMiniTable() {
-                    const val = normalizeVN(document.getElementById('mini-ltc-search').value);
-                    document.querySelectorAll('#mini-table-body tr').forEach(row => {
-                        row.style.display = normalizeVN(row.innerText).includes(val) ? '' : 'none';
-                    });
-                }
-
-                function resetForm() {
-                    clearForm();
-                    setMode('none');
-                    bootstrap.Modal.getOrCreateInstance(document.getElementById('ltcModal')).show();
-                }
-            </script>
         </body>
-
         </html>

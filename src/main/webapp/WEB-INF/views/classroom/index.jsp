@@ -6,7 +6,7 @@
         <head>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Quản lý Giảng viên - QLDSV_HTC_WEB</title>
+            <title>Quản lý Lớp - QLDSV_HTC_WEB</title>
             <!-- Bootstrap CSS -->
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
             <!-- Bootstrap Icons -->
@@ -21,6 +21,14 @@
                     border-radius: 20px;
                     font-weight: 600;
                     padding: 6px 12px;
+                }
+
+                .badge-soft-secondary {
+                    background-color: #f1f5f9;
+                    color: #475569;
+                    border-radius: 20px;
+                    padding: 6px 12px;
+                    font-weight: 500;
                 }
 
                 .table-custom th {
@@ -41,13 +49,13 @@
                     background-color: #f8fafc;
                 }
 
-                .lecturer-name {
+                .class-title {
                     font-weight: 700;
                     color: #1e293b;
                     margin-bottom: 2px;
                 }
 
-                .lecturer-info {
+                .class-subtitle {
                     font-size: 0.8rem;
                     color: #94a3b8;
                     display: flex;
@@ -74,6 +82,20 @@
                     filter: invert(1) grayscale(100%) brightness(200%);
                 }
 
+                .toolbar-btn {
+                    font-weight: 600;
+                    padding: 6px 12px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+
+                .toolbar-btn:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                /* Premium Toolbar Colors (matching student page) */
                 .btn-toolbar-add {
                     color: #10b981;
                     border-color: #10b981;
@@ -130,16 +152,20 @@
 
         <body>
             <div class="app-layout">
+                <!-- SIDEBAR -->
                 <jsp:include page="/WEB-INF/views/shared/sidebar.jsp" />
 
                 <div class="app-main">
+                    <!-- HEADER -->
                     <jsp:include page="/WEB-INF/views/shared/header.jsp" />
 
+                    <!-- MAIN CONTENT -->
                     <main id="main-content" class="app-content p-4 bg-light">
                         <div class="container-fluid max-w-7xl mx-auto">
+
                             <div class="d-flex align-items-center gap-2 mb-4">
-                                <i class="bi bi-person-badge-fill text-primary fs-3"></i>
-                                <h3 class="mb-0 fw-bold text-dark">Quản lý Giảng viên</h3>
+                                <i class="bi bi-building-fill text-primary fs-3"></i>
+                                <h3 class="mb-0 fw-bold text-dark">Quản lý Lớp học</h3>
                             </div>
 
                             <!-- FLASH MESSAGES -->
@@ -157,34 +183,45 @@
                             </c:if>
 
                             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                                <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                                <div
+                                    class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="fw-bold text-primary text-uppercase small mb-1">Danh sách Giảng viên</h6>
-                                        <p class="text-muted small mb-0">Quản lý thông tin giảng viên theo từng khoa</p>
+                                        <h6 class="fw-bold text-primary text-uppercase small mb-1">Danh mục Lớp</h6>
+                                        <p class="text-muted small mb-0">Quản lý thông tin các lớp học theo từng khoa
+                                        </p>
                                     </div>
                                     <c:if test="${sessionScope.role == 'PGV'}">
                                         <!-- GET link to open add modal -->
-                                        <a href="${pageContext.request.contextPath}/lecturer?maKhoa=${maKhoa}&lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
-                                            <i class="bi bi-plus-circle-fill me-1"></i> Thêm Giảng viên
+                                        <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}&lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
+                                            <i class="bi bi-plus-circle-fill me-1"></i> Thêm Lớp
                                         </a>
                                     </c:if>
                                 </div>
 
                                 <div class="card-body px-4 pb-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                                    <!-- SEARCH & FILTER TOOLBAR -->
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                                         <div class="input-group" style="max-width: 300px;">
-                                            <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                            <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="Tìm tên giảng viên..." onkeyup="filterLocal()">
+                                            <span class="input-group-text bg-light border-0"><i
+                                                    class="bi bi-search text-muted"></i></span>
+                                            <input type="text" id="search-input"
+                                                class="form-control bg-light border-0 small"
+                                                placeholder="Tìm mã hoặc tên lớp..." onkeyup="filterLocal()">
                                         </div>
                                         <div class="d-flex gap-3 align-items-center">
-                                            <label class="fw-bold small text-muted text-uppercase mb-0">Lọc theo khoa:</label>
+                                            <label class="fw-bold small text-muted text-uppercase mb-0">Lọc theo
+                                                khoa:</label>
                                             <c:choose>
                                                 <c:when test="${sessionScope.role == 'PGV'}">
-                                                    <form action="${pageContext.request.contextPath}/lecturer" method="GET" class="d-inline">
-                                                        <select name="maKhoa" class="form-select form-select-sm border-0 bg-light text-primary fw-bold" style="min-width: 200px;" onchange="this.form.submit()">
+                                                    <form action="${pageContext.request.contextPath}/class" method="GET" class="d-inline">
+                                                        <select name="maKhoa"
+                                                            class="form-select form-select-sm border-0 bg-light text-primary fw-bold"
+                                                            style="min-width: 200px;" onchange="this.form.submit()">
                                                             <option value="all">-- Tất cả khoa --</option>
                                                             <c:forEach var="k" items="${khoaList}">
-                                                                <option value="${k.maKhoa}" ${param.maKhoa == k.maKhoa || maKhoa == k.maKhoa ? 'selected' : ''}>${k.tenKhoa}</option>
+                                                                <option value="${k.maKhoa}" ${param.maKhoa == k.maKhoa || maKhoa == k.maKhoa ? 'selected' : ''}>
+                                                                    ${k.tenKhoa}</option>
                                                             </c:forEach>
                                                         </select>
                                                     </form>
@@ -199,48 +236,51 @@
                                         </div>
                                     </div>
 
+                                    <!-- TABLE -->
                                     <div class="table-responsive rounded-3 border">
                                         <table class="table table-custom align-middle mb-0">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th class="px-3">MÃ GV</th>
-                                                    <th>HỌ TÊN</th>
-                                                    <th class="text-center">HỌC VỊ/HÀM</th>
-                                                    <th class="text-center">CHUYÊN MÔN</th>
+                                                    <th class="px-3">MÃ LỚP</th>
+                                                    <th>TÊN LỚP</th>
+                                                    <th class="text-center">KHÓA HỌC</th>
                                                     <th class="text-center">KHOA</th>
                                                     <c:if test="${sessionScope.role == 'PGV'}">
                                                         <th class="text-center">THAO TÁC</th>
                                                     </c:if>
                                                 </tr>
                                             </thead>
-                                            <tbody id="gv-table-body">
-                                                <c:forEach var="item" items="${gvList}">
+                                            <tbody id="class-table-body">
+                                                <c:forEach var="item" items="${lopList}">
                                                     <tr>
-                                                        <td class="px-3"><span class="badge bg-primary bg-opacity-10 text-primary fw-bold">${item.maGV}</span></td>
+                                                        <td class="px-3">
+                                                            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">${item.maLop}</span>
+                                                        </td>
                                                         <td>
-                                                            <div class="lecturer-name">${item.ho} ${item.ten}</div>
+                                                            <div class="class-title">${item.tenLop}</div>
+                                                            <div class="class-subtitle">
+                                                                <i class="bi bi-info-circle"></i> Hệ chính quy
+                                                            </div>
                                                         </td>
                                                         <td class="text-center">
-                                                            <span class="text-muted small">${item.hocVi} / ${item.hocHam}</span>
+                                                            <span class="badge-soft-secondary">${item.khoaHoc}</span>
                                                         </td>
                                                         <td class="text-center">
-                                                            <span class="text-dark small fw-medium">${item.chuyenMon}</span>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="badge border border-info text-info rounded-pill px-3 py-1 fw-bold small">${item.maKhoa}</span>
+                                                            <span
+                                                                class="badge border border-info text-info rounded-pill px-3 py-1 fw-bold small">${item.maKhoa}</span>
                                                         </td>
                                                         <c:if test="${sessionScope.role == 'PGV'}">
                                                             <td class="text-center">
                                                                 <div class="d-flex gap-2 justify-content-center">
-                                                                    <!-- Edit GET Link -->
-                                                                    <a href="${pageContext.request.contextPath}/lecturer?maKhoa=${maKhoa}&maGV=${item.maGV}&lnkEdit" class="btn btn-sm btn-outline-primary border-0 rounded-3">
+                                                                    <!-- Edit Link GET -->
+                                                                    <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}&maLop=${item.maLop}&lnkEdit" class="btn btn-sm btn-outline-primary border-0 rounded-3">
                                                                         <i class="bi bi-pencil-square"></i>
                                                                     </a>
-                                                                    <!-- Delete POST Form -->
-                                                                    <form action="${pageContext.request.contextPath}/lecturer" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa giảng viên này không?');" class="d-inline">
-                                                                        <input type="hidden" name="maGV" value="${item.maGV}">
+                                                                    <!-- Delete Form POST -->
+                                                                    <form action="${pageContext.request.contextPath}/class" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lớp này không?');" class="d-inline">
+                                                                        <input type="hidden" name="maLop" value="${item.maLop}">
                                                                         <input type="hidden" name="maKhoa" value="${maKhoa}">
-                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="Giảng viên đang có dữ liệu, không thể xóa"' : ''}>
+                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="Không thể xóa do lớp có dữ liệu liên quan"' : ''}>
                                                                             <i class="bi bi-trash3"></i>
                                                                         </button>
                                                                     </form>
@@ -249,11 +289,11 @@
                                                         </c:if>
                                                     </tr>
                                                 </c:forEach>
-                                                <c:if test="${empty gvList}">
+                                                <c:if test="${empty lopList}">
                                                     <tr>
-                                                        <td colspan="${sessionScope.role == 'PGV' ? 6 : 5}" class="text-center py-5 text-muted">
+                                                        <td colspan="${sessionScope.role == 'PGV' ? 5 : 4}" class="text-center py-5 text-muted">
                                                             <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
-                                                            Chưa có dữ liệu giảng viên
+                                                            Chưa có dữ liệu lớp học
                                                         </td>
                                                     </tr>
                                                 </c:if>
@@ -261,7 +301,8 @@
                                         </table>
                                     </div>
                                     <div class="mt-3 text-muted small px-1">
-                                        <i class="bi bi-info-circle me-1"></i> Hiển thị <strong id="gv-count">${gvList.size()}</strong> giảng viên
+                                        <i class="bi bi-info-circle me-1"></i> Hiển thị <strong
+                                            id="class-count">${lopList.size()}</strong> lớp học
                                     </div>
                                 </div>
                             </div>
@@ -270,61 +311,57 @@
                 </div>
             </div>
 
-            <!-- GV MODAL -->
+            <!-- CLASS MODAL -->
             <c:if test="${sessionScope.role == 'PGV' && (not empty mode || not empty param.lnkAdd)}">
-                <div class="modal fade show d-block" id="gvModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+                <div class="modal fade show d-block" id="classModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
                     <div class="modal-dialog modal-lg modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg rounded-4">
                             <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
                                 <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                                    <i class="bi bi-person-lines-fill"></i>
+                                    <i class="bi bi-mortarboard-fill"></i>
                                     <c:choose>
-                                        <c:when test="${mode == 'edit'}">Cập nhật Giảng viên</c:when>
-                                        <c:otherwise>Thêm mới Giảng viên</c:otherwise>
+                                        <c:when test="${mode == 'edit'}">Cập nhật Lớp học</c:when>
+                                        <c:otherwise>Thêm mới Lớp học</c:otherwise>
                                     </c:choose>
                                 </h5>
-                                <a href="${pageContext.request.contextPath}/lecturer?maKhoa=${maKhoa}" class="btn-close btn-close-white text-decoration-none"></a>
+                                <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}" class="btn-close btn-close-white text-decoration-none"></a>
                             </div>
-                            <form action="${pageContext.request.contextPath}/lecturer" method="POST">
+                            <form action="${pageContext.request.contextPath}/class" method="POST">
                                 <div class="modal-body p-4">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">MÃ GV <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="maGV" value="${giangVien.maGV}" placeholder="VD: GV01" required ${mode == 'edit' ? 'readonly' : ''}>
+                                            <label class="form-label small fw-bold text-muted">MÃ LỚP <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control rounded-3" name="maLop" value="${lop.maLop}" placeholder="VD: D15CQCN01-N" required ${mode == 'edit' ? 'readonly' : ''}>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-muted">TÊN LỚP <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control rounded-3" name="tenLop" value="${lop.tenLop}" placeholder="VD: Công nghệ thông tin 01" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-muted">KHÓA HỌC <span class="text-danger">*</span></label>
+                                            <div class="position-relative d-flex align-items-center" style="max-width: 240px;">
+                                                <button id="btn_year_down" class="btn btn-sm btn-light rounded-circle border shadow-sm p-0 position-absolute start-0 ms-2 d-flex align-items-center justify-content-center" style="z-index: 5; width: 28px; height: 28px;" type="button" onclick="adjustYear(-1)">
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                                <input type="text" class="form-control rounded-pill text-center fw-bold bg-white" style="padding-left: 40px; padding-right: 40px; height: 42px; border-color: #e2e8f0;" name="khoaHoc" id="inp_khoaHoc" value="${not empty lop.khoaHoc ? lop.khoaHoc : '2025-2026'}" required>
+                                                <button id="btn_year_up" class="btn btn-sm btn-light rounded-circle border shadow-sm p-0 position-absolute end-0 me-2 d-flex align-items-center justify-content-center" style="z-index: 5; width: 28px; height: 28px;" type="button" onclick="adjustYear(1)">
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold text-muted">KHOA <span class="text-danger">*</span></label>
                                             <select class="form-select rounded-3" name="maKhoa" required>
                                                 <option value="" disabled selected>-- Chọn khoa --</option>
                                                 <c:forEach var="k" items="${khoaList}">
-                                                    <option value="${k.maKhoa}" ${(not empty giangVien.maKhoa ? giangVien.maKhoa == k.maKhoa : maKhoa == k.maKhoa) ? 'selected' : ''}>${k.tenKhoa}</option>
+                                                    <option value="${k.maKhoa}" ${(not empty lop.maKhoa ? lop.maKhoa == k.maKhoa : maKhoa == k.maKhoa) ? 'selected' : ''}>${k.tenKhoa}</option>
                                                 </c:forEach>
                                             </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">HỌ LÓT <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="ho" value="${giangVien.ho}" placeholder="VD: Nguyễn Văn" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">TÊN <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="ten" value="${giangVien.ten}" placeholder="VD: A" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted">HỌC VỊ</label>
-                                            <input type="text" class="form-control rounded-3" name="hocVi" value="${giangVien.hocVi}" placeholder="VD: Thạc sĩ">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted">HỌC HÀM</label>
-                                            <input type="text" class="form-control rounded-3" name="hocHam" value="${giangVien.hocHam}" placeholder="VD: PGS">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted">CHUYÊN MÔN</label>
-                                            <input type="text" class="form-control rounded-3" name="chuyenMon" value="${giangVien.chuyenMon}" placeholder="VD: Công nghệ phần mềm">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0 px-4 pb-4">
-                                    <a href="${pageContext.request.contextPath}/lecturer?maKhoa=${maKhoa}" class="btn btn-light rounded-3 fw-bold">HỦY</a>
+                                    <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}" class="btn btn-light rounded-3 fw-bold">HỦY</a>
                                     <c:choose>
                                         <c:when test="${mode == 'edit'}">
                                             <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (SỬA)</button>
@@ -340,6 +377,7 @@
                 </div>
             </c:if>
 
+            <!-- Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
             <script>
                 function normalizeVN(str) {
@@ -348,10 +386,24 @@
 
                 function filterLocal() {
                     const val = normalizeVN(document.getElementById('search-input').value);
-                    document.querySelectorAll('#gv-table-body tr').forEach(row => {
+                    document.querySelectorAll('#class-table-body tr').forEach(row => {
                         row.style.display = normalizeVN(row.innerText).includes(val) ? '' : 'none';
                     });
                 }
+
+                function adjustYear(val) {
+                    const input = document.getElementById('inp_khoaHoc');
+                    const parts = input.value.split('-');
+                    if (parts.length === 2) {
+                        let start = parseInt(parts[0]);
+                        let end = parseInt(parts[1]);
+                        if (!isNaN(start) && !isNaN(end)) {
+                            start += val;
+                            end += val;
+                            input.value = start + '-' + end;
+                        }
+                    }
+                }
             </script>
         </body>
-</html>
+        </html>

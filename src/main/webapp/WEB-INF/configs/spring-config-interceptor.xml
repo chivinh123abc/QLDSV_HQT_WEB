@@ -16,9 +16,10 @@
             <!-- Protect all application paths -->
             <mvc:mapping path="/**" />
             <!-- Exclude public paths -->
-            <mvc:exclude-mapping path="/login.htm" />
-            <mvc:exclude-mapping path="/auth/login.htm" />
-            <mvc:exclude-mapping path="/captcha.htm" />
+            <mvc:exclude-mapping path="/login" />
+            <mvc:exclude-mapping path="/register" />
+            <mvc:exclude-mapping path="/captcha" />
+            <mvc:exclude-mapping path="/verify" />
             <mvc:exclude-mapping path="/resources/**" />
             <bean class="com.ptithcm.shared.interceptors.AuthInterceptor" />
         </mvc:interceptor>

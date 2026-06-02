@@ -146,10 +146,10 @@ QLDSV_HQT_WEB
         │               │   ├── SecurityUtil.java
         │               │   └── SessionUtil.java
         │               └── validator/       # Bộ xác thực dữ liệu đầu vào (Validation)
-        │                   ├── LopTinChiValidator.java
-        │                   ├── LopValidator.java
-        │                   ├── MonHocValidator.java
-        │                   └── SinhVienValidator.java
+        │                   ├── CreditClassValidator.java
+        │                   ├── ClassroomValidator.java
+        │                   ├── SubjectValidator.java
+        │                   └── StudentValidator.java
         └── webapp
             ├── resources                    # Thư mục chứa CSS, Javascript tĩnh
             │   ├── css
@@ -303,8 +303,8 @@ Bạn có thể chạy dự án bằng một trong hai cách:
   ```
 - **Sử dụng lệnh Maven trực tiếp:**
   `bash
-  mvn clean package cargo:run
-  `
+mvn clean package cargo:run
+`
   _Lệnh này sẽ tải các thư viện phụ thuộc, biên dịch mã nguồn Java, đóng gói file `.war`, khởi chạy Tomcat nhúng ở cổng `8080`._
 
 ### Bước 4: Kiểm tra và Đăng nhập hệ thống

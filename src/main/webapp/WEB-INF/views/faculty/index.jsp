@@ -119,9 +119,7 @@
                     pointer-events: none;
                 }
             </style>
-        </head>
-
-        <body>
+        </head>        <body>
             <div class="app-layout">
                 <!-- SIDEBAR -->
                 <jsp:include page="/WEB-INF/views/shared/sidebar.jsp" />
@@ -139,29 +137,37 @@
                                 <h3 class="mb-0 fw-bold text-dark">Quản lý Khoa</h3>
                             </div>
 
+                            <!-- FLASH MESSAGES -->
+                            <c:if test="${not empty message}">
+                                <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                    <i class="bi bi-check-circle-fill me-2"></i> ${message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </c:if>
+                            <c:if test="${not empty error}">
+                                <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </c:if>
+
                             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                                <div
-                                    class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                                <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="fw-bold text-primary text-uppercase small mb-1">Danh mục Khoa</h6>
                                         <p class="text-muted small mb-0">Quản lý thông tin các khoa trong trường</p>
                                     </div>
-                                    <button class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm"
-                                        onclick="resetForm()">
-                                        <i class="bi bi-plus-circle-fill me-1"></i> Cập nhật Khoa
-                                    </button>
+                                    <a href="${pageContext.request.contextPath}/faculty?lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
+                                        <i class="bi bi-plus-circle-fill me-1"></i> Thêm Khoa
+                                    </a>
                                 </div>
 
                                 <div class="card-body px-4 pb-4">
                                     <!-- SEARCH & FILTER TOOLBAR -->
-                                    <div
-                                        class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                                         <div class="input-group" style="max-width: 300px;">
-                                            <span class="input-group-text bg-light border-0"><i
-                                                    class="bi bi-search text-muted"></i></span>
-                                            <input type="text" id="search-input"
-                                                class="form-control bg-light border-0 small"
-                                                placeholder="Tìm mã hoặc tên khoa..." onkeyup="filterLocal()">
+                                            <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
+                                            <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="Tìm mã hoặc tên khoa..." onkeyup="filterLocal()">
                                         </div>
                                     </div>
 
@@ -177,27 +183,26 @@
                                             </thead>
                                             <tbody id="faculty-table-body">
                                                 <c:forEach var="item" items="${khoaList}">
-                                                    <tr onclick="selectFaculty('${item.maKhoa}', 'edit')">
+                                                    <tr>
                                                         <td class="px-3">
-                                                            <span class="badge-soft-primary">${item.maKhoa}</span>
+                                                            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">${item.maKhoa}</span>
                                                         </td>
                                                         <td>
                                                             <div class="faculty-title">${item.tenKhoa}</div>
                                                         </td>
                                                         <td class="text-center">
                                                             <div class="d-flex gap-2 justify-content-center">
-                                                                <button
-                                                                    onclick="event.stopPropagation(); selectFaculty('${item.maKhoa}', 'edit', true)"
-                                                                    class="btn btn-sm btn-outline-primary border-0 rounded-3">
+                                                                <!-- Edit Link GET -->
+                                                                <a href="${pageContext.request.contextPath}/faculty?maKhoa=${item.maKhoa}&lnkEdit" class="btn btn-sm btn-outline-primary border-0 rounded-3">
                                                                     <i class="bi bi-pencil-square"></i>
-                                                                </button>
-                                                                <button
-                                                                    onclick="event.stopPropagation(); selectFaculty('${item.maKhoa}', 'delete', true)"
-                                                                    class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}"
-                                                                    ${!item.canDelete ? 'disabled title="Không thể xóa"'
-                                                                    : '' }>
-                                                                    <i class="bi bi-trash3"></i>
-                                                                </button>
+                                                                </a>
+                                                                <!-- Delete Form POST -->
+                                                                <form action="${pageContext.request.contextPath}/faculty" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khoa này không? Thao tác này không thể hoàn tác.');" class="d-inline">
+                                                                    <input type="hidden" name="maKhoa" value="${item.maKhoa}">
+                                                                    <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled title="Không thể xóa do khoa đang có lớp, giảng viên, hoặc lớp tín chỉ liên quan"' : ''}>
+                                                                        <i class="bi bi-trash3"></i>
+                                                                    </button>
+                                                                </form>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -221,129 +226,53 @@
             </div>
 
             <!-- FACULTY MODAL -->
-            <div class="modal fade" id="facultyModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow-lg rounded-4">
-                        <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
-                            <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                                <i class="bi bi-diagram-3"></i> Quản lý Thông tin Khoa
-                            </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <!-- TOOLBAR -->
-                            <div class="d-flex gap-2 mb-4 p-2 bg-light rounded-3 border shadow-sm">
-                                <button type="button" id="btn_mode_add"
-                                    class="btn btn-toolbar-add fw-bold flex-fill py-2" onclick="handleModeClick('add')">
-                                    <i class="bi bi-plus-circle"></i> <span class="btn-text">THÊM</span>
-                                </button>
-                                <button type="button" id="btn_mode_edit"
-                                    class="btn btn-toolbar-edit fw-bold flex-fill py-2"
-                                    onclick="handleModeClick('edit')">
-                                    <i class="bi bi-pencil-square"></i> <span class="btn-text">SỬA</span>
-                                </button>
-                                <button type="button" id="btn_mode_delete"
-                                    class="btn btn-toolbar-delete fw-bold flex-fill py-2"
-                                    onclick="handleModeClick('delete')">
-                                    <i class="bi bi-trash3"></i> <span class="btn-text">XÓA</span>
-                                </button>
-                                <button type="button" id="btn_mode_cancel"
-                                    class="btn btn-toolbar-cancel fw-bold flex-fill py-2"
-                                    onclick="handleModeClick('none')" disabled>
-                                    <i class="bi bi-x-circle"></i> HỦY
-                                </button>
+            <c:if test="${not empty mode || not empty param.lnkAdd}">
+                <div class="modal fade show d-block" id="facultyModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg rounded-4">
+                            <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
+                                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                                    <i class="bi bi-diagram-3"></i>
+                                    <c:choose>
+                                        <c:when test="${mode == 'edit'}">Cập nhật Khoa</c:when>
+                                        <c:otherwise>Thêm mới Khoa</c:otherwise>
+                                    </c:choose>
+                                </h5>
+                                <a href="${pageContext.request.contextPath}/faculty" class="btn-close btn-close-white text-decoration-none"></a>
                             </div>
-
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted">MÃ KHOA <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control rounded-3" id="inp_maKhoa"
-                                        placeholder="VD: CNTT" required disabled>
+                            <form action="${pageContext.request.contextPath}/faculty" method="POST">
+                                <div class="modal-body p-4">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold text-muted">MÃ KHOA <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control rounded-3" name="maKhoa" value="${khoa.maKhoa}" placeholder="VD: CNTT" required ${mode == 'edit' ? 'readonly' : ''}>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold text-muted">TÊN KHOA <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control rounded-3" name="tenKhoa" value="${khoa.tenKhoa}" placeholder="VD: Công nghệ thông tin" required>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted">TÊN KHOA <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control rounded-3" id="inp_tenKhoa"
-                                        placeholder="VD: Công nghệ thông tin" required disabled>
+                                <div class="modal-footer border-0 px-4 pb-4">
+                                    <a href="${pageContext.request.contextPath}/faculty" class="btn btn-light rounded-3 fw-bold">HỦY</a>
+                                    <c:choose>
+                                        <c:when test="${mode == 'edit'}">
+                                            <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (SỬA)</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button type="submit" name="btnInsert" class="btn btn-success rounded-3 fw-bold px-4">GHI (THÊM)</button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- NOTIFICATION & CONFIRM MODALS -->
-            <div class="modal fade" id="notifyModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-sm">
-                    <div class="modal-content border-0 shadow-lg rounded-4">
-                        <div class="modal-body text-center p-4">
-                            <div id="notifyIcon" class="mb-3"></div>
-                            <h5 id="notifyTitle" class="fw-bold mb-2"></h5>
-                            <p id="notifyMessage" class="text-muted small mb-4"></p>
-                            <button type="button" class="btn btn-primary w-100 rounded-3 fw-bold"
-                                data-bs-dismiss="modal" onclick="reloadPage()">ĐÓNG</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-sm">
-                    <div class="modal-content border-0 shadow-lg rounded-4">
-                        <div class="modal-body text-center p-4">
-                            <div class="mb-3"><i class="bi bi-exclamation-triangle-fill text-warning"
-                                    style="font-size: 3.5rem;"></i></div>
-                            <h5 id="confirmTitle" class="fw-bold mb-2">Xác nhận</h5>
-                            <p id="confirmMessage" class="text-muted small mb-4"></p>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-light w-100 rounded-3 fw-bold"
-                                    data-bs-dismiss="modal">HỦY</button>
-                                <button type="button" id="confirmOkBtn"
-                                    class="btn btn-danger w-100 rounded-3 fw-bold shadow-sm">XÓA</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </c:if>
 
             <!-- Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
             <script>
-                let currentMode = 'none';
-                let needReload = false;
-                const contextPath = '${pageContext.request.contextPath}';
-                const inputs = ['inp_maKhoa', 'inp_tenKhoa'];
-
-                function showNotify(title, message, type = 'success') {
-                    document.getElementById('notifyTitle').innerText = title;
-                    document.getElementById('notifyMessage').innerText = message;
-                    const icon = document.getElementById('notifyIcon');
-                    icon.innerHTML = type === 'success' ? '<i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>' :
-                        (type === 'error' ? '<i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>' :
-                            '<i class="bi bi-info-circle-fill text-primary" style="font-size: 3.5rem;"></i>');
-                    const notifyModalElement = document.getElementById('notifyModal');
-                    const notifyModal = bootstrap.Modal.getOrCreateInstance(notifyModalElement);
-                    needReload = (type === 'success');
-                    notifyModal.show();
-                }
-
-                function reloadPage() {
-                    if (needReload) {
-                        window.location.reload();
-                    }
-                }
-
-                function showConfirm(message, onConfirm) {
-                    document.getElementById('confirmMessage').innerText = message;
-                    const btn = document.getElementById('confirmOkBtn');
-                    const confirmModalElement = document.getElementById('confirmModal');
-                    const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalElement);
-                    btn.onclick = () => { confirmModal.hide(); onConfirm(); };
-                    confirmModal.show();
-                }
-
                 function normalizeVN(str) {
                     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd').replace(/\u0110/g, 'D').toLowerCase();
                 }
@@ -354,126 +283,6 @@
                         row.style.display = normalizeVN(row.innerText).includes(val) ? '' : 'none';
                     });
                 }
-
-                async function selectFaculty(maKhoa, mode, forceMode = false) {
-                    try {
-                        const res = await fetch(contextPath + '/faculty/api/get?maKhoa=' + maKhoa);
-                        const data = await res.json();
-                        fillForm(data);
-                        const facultyModalElement = document.getElementById('facultyModal');
-                        const facultyModal = bootstrap.Modal.getOrCreateInstance(facultyModalElement);
-                        facultyModal.show();
-
-                        if (forceMode || currentMode === 'none') {
-                            setMode(mode);
-                        } else {
-                            setMode(currentMode);
-                        }
-                    } catch (e) { console.error(e); }
-                }
-
-                function fillForm(data) {
-                    document.getElementById('inp_maKhoa').value = data.maKhoa || '';
-                    document.getElementById('inp_tenKhoa').value = data.tenKhoa || '';
-                }
-
-                function clearForm() {
-                    inputs.forEach(id => {
-                        document.getElementById(id).value = '';
-                    });
-                }
-
-                function setMode(mode) {
-                    currentMode = mode;
-                    const btns = { add: 'btn_mode_add', edit: 'btn_mode_edit', delete: 'btn_mode_delete', cancel: 'btn_mode_cancel' };
-                    Object.values(btns).forEach(id => {
-                        const btn = document.getElementById(id);
-                        btn.disabled = false;
-                        btn.classList.remove('active', 'btn-toolbar-disabled');
-                    });
-                    document.getElementById(btns.cancel).disabled = mode === 'none';
-                    inputs.forEach(id => {
-                        const el = document.getElementById(id);
-                        el.disabled = mode === 'none' || mode === 'delete';
-                        if (mode === 'edit' && id === 'inp_maKhoa') el.readOnly = true;
-                        else el.readOnly = false;
-                    });
-
-                    if (mode === 'none') clearForm();
-                    else if (mode === 'add') {
-                        document.getElementById(btns.edit).classList.add('btn-toolbar-disabled');
-                        document.getElementById(btns.delete).classList.add('btn-toolbar-disabled');
-                        document.getElementById(btns.add).classList.add('active');
-                    } else if (mode === 'edit') {
-                        document.getElementById(btns.add).classList.add('btn-toolbar-disabled');
-                        document.getElementById(btns.delete).classList.add('btn-toolbar-disabled');
-                        document.getElementById(btns.edit).classList.add('active');
-                    } else if (mode === 'delete') {
-                        document.getElementById(btns.add).classList.add('btn-toolbar-disabled');
-                        document.getElementById(btns.edit).classList.add('btn-toolbar-disabled');
-                        document.getElementById(btns.delete).classList.add('active');
-                    }
-                }
-
-                function handleModeClick(mode) {
-                    if (mode === 'none') { setMode('none'); return; }
-                    if (currentMode === mode) {
-                        if (mode === 'delete') performDelete();
-                        else performSave();
-                    } else if (currentMode === 'none') {
-                        setMode(mode);
-                        if (mode === 'add') clearForm();
-                    }
-                }
-
-                async function performSave() {
-                    const data = {
-                        maKhoa: document.getElementById('inp_maKhoa').value,
-                        tenKhoa: document.getElementById('inp_tenKhoa').value
-                    };
-                    if (!data.maKhoa || !data.tenKhoa) { showNotify('Cảnh báo', 'Vui lòng nhập đầy đủ thông tin!', 'info'); return; }
-                    try {
-                        let url = contextPath + '/faculty/api/save?mode=' + currentMode;
-
-                        const res = await fetch(url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(data)
-                        });
-                        const result = await res.json();
-                        if (result.status === 'success') {
-                            const facultyModalElement = document.getElementById('facultyModal');
-                            const facultyModal = bootstrap.Modal.getOrCreateInstance(facultyModalElement);
-                            facultyModal.hide();
-                            showNotify('Thành công', 'Thông tin khoa đã được lưu.');
-                        } else showNotify('Lỗi', result.message, 'error');
-                    } catch (e) { showNotify('Lỗi', e.message, 'error'); }
-                }
-
-                async function performDelete() {
-                    const maKhoa = document.getElementById('inp_maKhoa').value;
-                    showConfirm('Bạn có chắc chắn muốn xóa khoa này?', async () => {
-                        try {
-                            const res = await fetch(contextPath + '/faculty/api/delete?maKhoa=' + maKhoa, { method: 'POST' });
-                            const result = await res.json();
-                            if (result.status === 'success') {
-                                const facultyModalElement = document.getElementById('facultyModal');
-                                const facultyModal = bootstrap.Modal.getOrCreateInstance(facultyModalElement);
-                                facultyModal.hide();
-                                showNotify('Thành công', 'Khoa đã được xóa.');
-                            } else showNotify('Lỗi', result.message, 'error');
-                        } catch (e) { showNotify('Lỗi', e.message, 'error'); }
-                    });
-                }
-
-                function resetForm() {
-                    clearForm();
-                    setMode('none');
-                    const facultyModalElement = document.getElementById('facultyModal');
-                    const facultyModal = bootstrap.Modal.getOrCreateInstance(facultyModalElement);
-                    facultyModal.show();
-                }
             </script>
         </body>
-
-        </html>
+</html>
