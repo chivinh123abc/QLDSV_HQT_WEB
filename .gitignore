@@ -45,6 +45,7 @@ Thumbs.db
 *.tmp
 *.bak
 *.swp
+*.docx
 *~
 
 # Bỏ qua file môi trường chứa thông tin nhạy cảm

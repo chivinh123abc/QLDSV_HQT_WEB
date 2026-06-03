@@ -49,7 +49,7 @@
 	<!-- Khai báo CKFinder Connector Servlet -->
 	<servlet>
 		<servlet-name>CKFinderConnector</servlet-name>
-		<servlet-class>com.ckfinder.connector.ConnectorServlet</servlet-class>
+		<servlet-class>com.cksource.ckfinder.servlet.CKFinderServlet</servlet-class>
 		<init-param>
 			<param-name>XMLConfig</param-name>
 			<param-value>classpath:ckfinder.json</param-value>
