@@ -51,5 +51,6 @@ Thumbs.db
 database.properties
 gmail.properties
 redis.properties
+pusher.properties
 
 *.dbdiagram

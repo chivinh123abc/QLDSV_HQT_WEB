@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 public class CsrfInterceptor implements HandlerInterceptor {
@@ -16,9 +17,18 @@ public class CsrfInterceptor implements HandlerInterceptor {
     private static final String CSRF_TOKEN_SESSION_ATTR = "CSRF_TOKEN";
     private static final String CSRF_TOKEN_REQ_PARAM = "csrf_token";
 
+    @Value("${pusher.key}")
+    private String pusherKey;
+
+    @Value("${pusher.cluster}")
+    private String pusherCluster;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+        request.setAttribute("pusherKey", pusherKey);
+        request.setAttribute("pusherCluster", pusherCluster);
+
         HttpSession session = request.getSession();
         String method = request.getMethod();
 

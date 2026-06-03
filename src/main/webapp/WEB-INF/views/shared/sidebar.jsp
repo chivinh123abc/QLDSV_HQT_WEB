@@ -16,6 +16,11 @@
                             <i class="bi bi-house-door"></i> <s:message code="global.menu.home"/>
                         </a>
                     </li>
+                    <li>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/announcements">
+                            <i class="bi bi-bell"></i> <s:message code="announcement.menu"/>
+                        </a>
+                    </li>
 
                     <%-- Student Marks: Students only --%>
                     <c:if test="${sessionScope.role == 'SINHVIEN'}">
