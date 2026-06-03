@@ -30,6 +30,15 @@ public class LecturerController {
     @Autowired
     private LecturerService lecturerService;
 
+    @ModelAttribute("giangVien")
+    public LecturerDTO getGiangVienDefault(@RequestParam(value = "maKhoa", required = false) String maKhoa) {
+        LecturerDTO dto = new LecturerDTO();
+        if (maKhoa != null && !maKhoa.equals("all")) {
+            dto.setMaKhoa(maKhoa);
+        }
+        return dto;
+    }
+
     @GetMapping
     public String index(ModelMap model, @RequestParam(value = "maKhoa", required = false) String maKhoa,
             HttpSession httpSession) {
@@ -184,7 +193,17 @@ public class LecturerController {
     public String edit(ModelMap model, @RequestParam("maGV") String maGV, @RequestParam("maKhoa") String maKhoa,
             HttpSession httpSession) {
         GiangVien gv = lecturerService.getLecturerById(maGV);
-        model.addAttribute("giangVien", gv);
+        // Chuyển entity GiangVien sang LecturerDTO để Spring Form Taglib binding
+        LecturerDTO dto = new LecturerDTO();
+        dto.setMaGV(gv.getMaGV());
+        dto.setHo(gv.getHo());
+        dto.setTen(gv.getTen());
+        dto.setMaKhoa(gv.getMaKhoa());
+        dto.setHocVi(gv.getHocVi());
+        dto.setHocHam(gv.getHocHam());
+        dto.setChuyenMon(gv.getChuyenMon());
+        dto.setVersion(gv.getVersion());
+        model.addAttribute("giangVien", dto);
         model.addAttribute("mode", "edit");
         return index(model, maKhoa, httpSession);
     }

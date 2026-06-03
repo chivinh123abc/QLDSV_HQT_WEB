@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Load MoMo Properties -->
+    <context:property-placeholder location="classpath:momo.properties" ignore-unresolvable="true" />
+
+    <!-- Configuration Properties Bean (Pure POJO) -->
+    <bean id="moMoProperties" class="com.ptithcm.modules.payment.configs.MoMoProperties">
+        <property name="partnerCode" value="${momo.partnerCode}" />
+        <property name="accessKey" value="${momo.accessKey}" />
+        <property name="secretKey" value="${momo.secretKey}" />
+        <property name="endpoint" value="${momo.endpoint}" />
+        <property name="requestType" value="${momo.requestType}" />
+    </bean>
+
+    <!-- Concrete Payment Providers (Strategies) -->
+    <bean id="moMoPaymentProvider" class="com.ptithcm.modules.payment.providers.MoMoPaymentProvider">
+        <property name="moMoProperties" ref="moMoProperties" />
+    </bean>
+    <bean id="zaloPayPaymentProvider" class="com.ptithcm.modules.payment.providers.ZaloPayPaymentProvider" />
+
+    <!-- Strategy Registry Map -->
+    <bean id="paymentProviderRegistry" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="momo" value-ref="moMoPaymentProvider" />
+                <entry key="zalopay" value-ref="zaloPayPaymentProvider" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+</beans>

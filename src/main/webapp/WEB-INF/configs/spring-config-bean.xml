@@ -8,4 +8,7 @@
     <!-- Enable AOP AspectJ Auto-proxying -->
     <aop:aspectj-autoproxy />
 
+    <!-- Import Payment Configuration -->
+    <import resource="spring-config-payment.xml" />
+
 </beans>

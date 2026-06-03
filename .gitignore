@@ -53,5 +53,6 @@ database.properties
 gmail.properties
 redis.properties
 pusher.properties
+momo.properties
 
 *.dbdiagram

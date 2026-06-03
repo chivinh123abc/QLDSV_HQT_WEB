@@ -274,7 +274,7 @@
                                                         </td>
                                                         <td>
                                                             <div class="fw-bold text-dark">${item.nienKhoa}</div>
-                                                            <div class="small text-muted"><s:message code="credit-class.semester"/></div>
+                                                            <div class="small text-muted"><s:message code="credit-class.semester" arguments="${item.hocKy}"/></div>
                                                         </td>
                                                         <td class="text-center"><span class="badge-soft-secondary"><s:message code="global.lbl.group"/>
                                                                 ${item.nhom}</span></td>

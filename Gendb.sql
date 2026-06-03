@@ -104,6 +104,8 @@ CREATE TABLE [dbo].[dang_ky] (
     [diem_giua_ky] FLOAT NULL,
     [diem_cuoi_ky] FLOAT NULL,
     [trang_thai_dang_ky] NVARCHAR(20) NOT NULL DEFAULT 'HIEU_LUC',
+    [da_thanh_toan] BIT NOT NULL DEFAULT 0,
+    [ngay_thanh_toan] DATETIMEOFFSET NULL,
     [ngay_tao] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [ngay_cap_nhat] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [ngay_xoa] DATETIMEOFFSET NULL,

@@ -29,6 +29,11 @@
                                 <i class="bi bi-bookmark-star"></i> <s:message code="sidebar.menu.viewGrades"/>
                             </a>
                         </li>
+                        <li>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/payment">
+                                <i class="bi bi-credit-card"></i> Thanh Toán Học Phí
+                            </a>
+                        </li>
                     </c:if>
 
                         <%-- Student Management & Classes: PGV and KHOA --%>
@@ -96,6 +101,12 @@
                                                         <a class="nav-link"
                                                             href="${pageContext.request.contextPath}/report">
                                                             <i class="bi bi-file-earmark-text"></i> <s:message code="sidebar.menu.reports"/>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="nav-link"
+                                                            href="${pageContext.request.contextPath}/payment/stats">
+                                                            <i class="bi bi-pie-chart"></i> Thống Kê Học Phí
                                                         </a>
                                                     </li>
                                                 </c:if>

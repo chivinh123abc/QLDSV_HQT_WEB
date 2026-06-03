@@ -40,6 +40,12 @@ public class DangKy extends LuuVetThoiGian {
     @Column(name = "trang_thai_dang_ky")
     private TrangThaiDangKy trangThaiDangKy = TrangThaiDangKy.HIEU_LUC;
 
+    @Column(name = "da_thanh_toan")
+    private boolean daThanhToan = false;
+
+    @Column(name = "ngay_thanh_toan")
+    private java.time.OffsetDateTime ngayThanhToan;
+
     public LopTinChi getLopTinChi() {
         return lopTinChi;
     }
@@ -102,5 +108,21 @@ public class DangKy extends LuuVetThoiGian {
 
     public void setTrangThaiDangKy(TrangThaiDangKy trangThaiDangKy) {
         this.trangThaiDangKy = trangThaiDangKy;
+    }
+
+    public boolean isDaThanhToan() {
+        return daThanhToan;
+    }
+
+    public void setDaThanhToan(boolean daThanhToan) {
+        this.daThanhToan = daThanhToan;
+    }
+
+    public java.time.OffsetDateTime getNgayThanhToan() {
+        return ngayThanhToan;
+    }
+
+    public void setNgayThanhToan(java.time.OffsetDateTime ngayThanhToan) {
+        this.ngayThanhToan = ngayThanhToan;
     }
 }

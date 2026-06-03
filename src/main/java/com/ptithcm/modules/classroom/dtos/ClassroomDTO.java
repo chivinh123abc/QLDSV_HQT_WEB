@@ -15,6 +15,8 @@ public class ClassroomDTO {
     @NotBlank(message = "Mã khoa không được để trống!")
     private String maKhoa;
 
+    private String khoaHoc;
+
     public String getMaLop() {
         return maLop;
     }
@@ -37,5 +39,13 @@ public class ClassroomDTO {
 
     public void setMaKhoa(String maKhoa) {
         this.maKhoa = maKhoa;
+    }
+
+    public String getKhoaHoc() {
+        return khoaHoc;
+    }
+
+    public void setKhoaHoc(String khoaHoc) {
+        this.khoaHoc = khoaHoc;
     }
 }

@@ -1,8 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <!DOCTYPE html>
-        <html lang="vi">
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<!DOCTYPE html>
+<html lang="vi">
 
         <head>
             <meta charset="utf-8" />
@@ -302,43 +304,52 @@
                                 </h5>
                                 <a href="${pageContext.request.contextPath}/lecturer?maKhoa=${maKhoa}" class="btn-close btn-close-white text-decoration-none"></a>
                             </div>
-                            <form action="${pageContext.request.contextPath}/lecturer" method="POST">
+                            <%-- Spring Form Taglib: form:form bind modelAttribute="giangVien" (LecturerDTO) --%>
+                            <form:form action="${pageContext.request.contextPath}/lecturer" method="POST" modelAttribute="giangVien">
                                 <input type="hidden" name="csrf_token" value="${csrfToken}" />
-                                <input type="hidden" name="version" value="${giangVien.version}" />
+                                <%-- form:hidden giữ version để hỗ trợ optimistic locking --%>
+                                <form:hidden path="version"/>
                                 <div class="modal-body p-4">
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.code"/> <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="maGV" value="${giangVien.maGV}" placeholder="VD: GV01" required ${mode == 'edit' ? 'readonly' : ''}>
+                                            <%-- form:input tự động điền lại giá trị khi form lỗi (giữ dữ liệu đã nhập) --%>
+                                            <form:input path="maGV" cssClass="form-control rounded-3"
+                                                placeholder="VD: GV01"
+                                                readonly="${mode == 'edit'}"/>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold text-muted">KHOA <span class="text-danger">*</span></label>
-                                            <select class="form-select rounded-3" name="maKhoa" required>
-                                                <option value="" disabled selected><s:message code="lecturer.select.faculty"/></option>
-                                                <c:forEach var="k" items="${khoaList}">
-                                                    <option value="${k.maKhoa}" ${(not empty giangVien.maKhoa ? giangVien.maKhoa == k.maKhoa : maKhoa == k.maKhoa) ? 'selected' : ''}>${k.tenKhoa}</option>
-                                                </c:forEach>
-                                            </select>
+                                            <%-- form:select với items, itemValue, itemLabel để đổ dữ liệu combobox động từ DB --%>
+                                            <form:select path="maKhoa" cssClass="form-select rounded-3">
+                                                <form:option value="" label="--- Chọn khoa ---"/>
+                                                <form:options items="${khoaList}" itemValue="maKhoa" itemLabel="tenKhoa"/>
+                                            </form:select>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.lastName.required"/> <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="ho" value="${giangVien.ho}" placeholder="<s:message code="lecturer.example.name"/>" required>
+                                            <form:input path="ho" cssClass="form-control rounded-3"
+                                                placeholder="VD: Nguyễn Văn"/>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.firstName.required"/> <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="ten" value="${giangVien.ten}" placeholder="VD: A" required>
+                                            <form:input path="ten" cssClass="form-control rounded-3"
+                                                placeholder="VD: A"/>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.academicDegree"/></label>
-                                            <input type="text" class="form-control rounded-3" name="hocVi" value="${giangVien.hocVi}" placeholder="<s:message code="lecturer.example.degree"/>">
+                                            <form:input path="hocVi" cssClass="form-control rounded-3"
+                                                placeholder="VD: TS"/>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.academicRank"/></label>
-                                            <input type="text" class="form-control rounded-3" name="hocHam" value="${giangVien.hocHam}" placeholder="VD: PGS">
+                                            <form:input path="hocHam" cssClass="form-control rounded-3"
+                                                placeholder="VD: PGS"/>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.specialization"/></label>
-                                            <input type="text" class="form-control rounded-3" name="chuyenMon" value="${giangVien.chuyenMon}" placeholder="<s:message code="lecturer.example.specialty"/>">
+                                            <form:input path="chuyenMon" cssClass="form-control rounded-3"
+                                                placeholder="VD: Lập trình Java"/>
                                         </div>
                                     </div>
                                 </div>
@@ -353,7 +364,7 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </div>
-                            </form>
+                            </form:form>
                         </div>
                     </div>
                 </div>

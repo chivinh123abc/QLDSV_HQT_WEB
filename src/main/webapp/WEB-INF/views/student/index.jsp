@@ -2,6 +2,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -268,7 +269,7 @@
                 <div class="modal-content border-0 shadow-lg rounded-4">
                     <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
                         <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                            <i class="bi bi-person-vcard"></i> 
+                            <i class="bi bi-person-vcard"></i>
                             <c:choose>
                                 <c:when test="${mode == 'edit'}"><s:message code="student.update.profile"/></c:when>
                                 <c:otherwise><s:message code="student.add.new"/></c:otherwise>
@@ -276,54 +277,66 @@
                         </h5>
                         <a href="${pageContext.request.contextPath}/student?maLop=${maLop}" class="btn-close btn-close-white text-decoration-none"></a>
                     </div>
-                    
-                    <form action="${pageContext.request.contextPath}/student" method="POST">
+
+                    <%-- Spring Form Taglib: form:form bind modelAttribute="sinhVien" (StudentDTO) --%>
+                    <form:form action="${pageContext.request.contextPath}/student" method="POST" modelAttribute="sinhVien">
                         <input type="hidden" name="csrf_token" value="${csrfToken}" />
-                        <input type="hidden" name="version" value="${sinhVien.version}" />
+                        <%-- form:hidden giữ version để hỗ trợ optimistic locking --%>
+                        <form:hidden path="version"/>
                         <div class="modal-body p-4">
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.studentId.form"/></label>
-                                    <input type="text" class="form-control rounded-3" id="inp_maSV" name="maSV" value="${sinhVien.maSV}" placeholder="VD: N23DCCN001" required ${mode == 'edit' ? 'readonly' : ''}>
+                                    <%-- form:input tự động điền lại giá trị khi form lỗi (giữ dữ liệu đã nhập) --%>
+                                    <form:input path="maSV" cssClass="form-control rounded-3"
+                                        id="inp_maSV" placeholder="VD: N23DCCN001"
+                                        readonly="${mode == 'edit'}"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.lastName"/></label>
-                                    <input type="text" class="form-control rounded-3" id="inp_ho" name="ho" value="${sinhVien.ho}" placeholder="<s:message code="student.example.name"/>" required>
+                                    <form:input path="ho" cssClass="form-control rounded-3"
+                                        id="inp_ho" placeholder="VD: Nguyễn Văn"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.firstName.required"/></label>
-                                    <input type="text" class="form-control rounded-3" id="inp_ten" name="ten" value="${sinhVien.ten}" placeholder="VD: An" required>
+                                    <form:input path="ten" cssClass="form-control rounded-3"
+                                        id="inp_ten" placeholder="VD: An"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.gender.upper"/></label>
-                                    <select class="form-select rounded-3" id="inp_phai" name="phai">
-                                        <option value="Nam" ${sinhVien.phai == 'Nam' ? 'selected' : ''}>Nam</option>
-                                        <option value="<s:message code="global.gender.female"/>" ${sinhVien.phai == 'Nữ' ? 'selected' : ''}><s:message code="global.gender.female"/></option>
-                                    </select>
+                                    <%-- form:select tự động chọn đúng option theo giá trị hiện tại --%>
+                                    <form:select path="phai" cssClass="form-select rounded-3" id="inp_phai">
+                                        <form:option value="Nam" label="Nam"/>
+                                        <form:option value="Nữ" label="Nữ"/>
+                                    </form:select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.dob.upper"/></label>
+                                    <%-- fmt:formatDate để format ngày sinh sang yyyy-MM-dd cho input[type=date] --%>
                                     <fmt:formatDate var="fmtDate" value="${sinhVien.ngaySinh}" pattern="yyyy-MM-dd" />
-                                    <!-- Fallback to param values if bindingResult failed and format wasn't parsed -->
-                                    <input type="date" class="form-control rounded-3" id="inp_ngaySinh" name="ngaySinh" value="${not empty fmtDate ? fmtDate : param.ngaySinh}" required>
+                                    <input type="date" class="form-control rounded-3" id="inp_ngaySinh" name="ngaySinh" value="${fmtDate}" />
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.currentClass"/></label>
-                                    <input type="text" class="form-control rounded-3 bg-light" name="maLop" value="${maLop}" readonly>
+                                    <%-- form:input path="maLop" readonly vì lớp được chọn từ sidebar, không cho sửa --%>
+                                    <form:input path="maLop" cssClass="form-control rounded-3 bg-light" readonly="true"/>
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.address"/></label>
-                                    <input type="text" class="form-control rounded-3" id="inp_diaChi" name="diaChi" value="${sinhVien.diaChi}" placeholder="<s:message code="student.example.address"/>">
+                                    <form:input path="diaChi" cssClass="form-control rounded-3"
+                                        id="inp_diaChi" placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM"/>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-check form-switch p-0 d-flex align-items-center gap-2">
-                                        <input class="form-check-input ms-0 mt-0" type="checkbox" role="switch" id="daNghiHoc" name="daNghiHoc" value="true" ${sinhVien.daNghiHoc ? 'checked' : ''}>
+                                        <%-- form:checkbox tự động render checked dựa vào giá trị boolean --%>
+                                        <form:checkbox path="daNghiHoc" cssClass="form-check-input ms-0 mt-0"
+                                            id="daNghiHoc" value="true"/>
                                         <label class="form-check-label fw-bold text-danger" for="daNghiHoc"><s:message code="student.status.dropped"/></label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="modal-footer border-0 px-4 pb-4">
                             <a href="${pageContext.request.contextPath}/student?maLop=${maLop}" class="btn btn-light rounded-3 fw-bold"><s:message code="global.btn.cancel"/></a>
                             <c:choose>
@@ -335,7 +348,7 @@
                                 </c:otherwise>
                             </c:choose>
                         </div>
-                    </form>
+                    </form:form>
                 </div>
             </div>
         </div>
