@@ -32,6 +32,15 @@
         <button id="themeToggleBtn" class="btn btn-link text-secondary p-2 rounded-circle hover-bg-light border-0" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" aria-label="Chuyển chế độ sáng/tối">
             <i class="bi bi-sun-fill fs-5" id="themeToggleIcon"></i>
         </button>
+
+        <!-- Notification Bell -->
+        <div class="position-relative d-inline-flex me-2 text-secondary p-2 rounded-circle hover-bg-light" style="cursor: pointer; width: 40px; height: 40px; align-items: center; justify-content: center;" onclick="window.location.href='${pageContext.request.contextPath}/announcements'" title="<s:message code="announcement.bellTitle"/>">
+            <i class="bi bi-bell-fill fs-5"></i>
+            <span id="unreadBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                  style="${unreadCount > 0 ? '' : 'display: none;'} font-size: 0.65rem; padding: 0.25em 0.5em;">
+                ${unreadCount}
+            </span>
+        </div>
         
         <div class="header-user" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
             <div class="header-user-info d-none d-sm-block">
@@ -73,4 +82,65 @@
         // Điều hướng lại trang với URL mới
         window.location.href = currentUrl.href;
     }
+</script>
+
+<!-- Toastr and Pusher Integration for Real-time System Notifications -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://js.pusher.com/8.0/pusher.min.js"></script>
+
+<script>
+    // 1. ÉP PUSHER PHẢI LOG RA CONSOLE ĐỂ DEBUG
+    Pusher.logToConsole = true;
+
+    // 2. Chờ HTML và jQuery load xong 100% mới chạy
+    $(document).ready(function() {
+        try {
+            // Khởi tạo Pusher Client
+            const pusher = new Pusher('${pusherKey}', {
+                cluster: '${pusherCluster}',
+                forceTLS: true // Bắt buộc dùng HTTPS, rất quan trọng!
+            });
+
+            // Bắt sự kiện kết nối để biết chắc chắn Frontend đã thông với Cloud
+            pusher.connection.bind('connected', function() {
+                console.log('✅ [Pusher] Đã kết nối thành công tới Server!');
+            });
+
+            // Subscribe and Bind events
+            const channel = pusher.subscribe('student-channel');
+            channel.bind('new-announcement', function(data) {
+                console.log('🔥 [Pusher] BẮT ĐƯỢC DATA TỪ BACKEND:', data);
+                
+                // 1. Logic UX: Hiệu ứng nảy số ở dấu chấm đỏ (Chuông)
+                let badge = $('#unreadBadge');
+                let currentCount = parseInt(badge.text().trim()) || 0;
+                badge.text(currentCount + 1).show();
+                
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": function() {
+                        window.location.href = "${pageContext.request.contextPath}/announcements/detail?id=" + data.id;
+                    },
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "10000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                toastr.info('<s:message code="announcement.newNotice"/>' + data.title, '<s:message code="announcement.systemNotice"/>');
+            });
+        } catch (err) {
+            console.error("❌ [Lỗi Hệ Thống] Không thể khởi tạo Pusher hoặc Toastr:", err);
+        }
+    });
 </script>

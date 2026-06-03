@@ -45,11 +45,13 @@ Thumbs.db
 *.tmp
 *.bak
 *.swp
+*.docx
 *~
 
 # Bỏ qua file môi trường chứa thông tin nhạy cảm
 database.properties
 gmail.properties
 redis.properties
+pusher.properties
 
 *.dbdiagram

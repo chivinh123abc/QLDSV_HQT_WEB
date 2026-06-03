@@ -218,5 +218,26 @@ REFERENCES [dbo].[lop_tin_chi] ([id]);
 ALTER TABLE [dbo].[dang_ky] WITH CHECK ADD CONSTRAINT [FK_dang_ky_sinh_vien] FOREIGN KEY([sinh_vien_id])
 REFERENCES [dbo].[sinh_vien] ([id]);
 
+CREATE TABLE [dbo].[thong_bao] (
+    [id] VARCHAR(36) NOT NULL,
+    [tieu_de] NVARCHAR(255) NOT NULL,
+    [noi_dung] NVARCHAR(MAX) NOT NULL,
+    [ngay_tao] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [ngay_cap_nhat] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [ngay_xoa] DATETIMEOFFSET NULL,
+    [nguoi_tao] NVARCHAR(50) NOT NULL,
+    [version] INT NOT NULL DEFAULT 0,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [FK_thong_bao_tai_khoan] FOREIGN KEY ([nguoi_tao]) REFERENCES [dbo].[tai_khoan] ([ten_dang_nhap])
+);
+
+CREATE TABLE [dbo].[thong_bao_da_doc] (
+    [id_thong_bao] VARCHAR(36) NOT NULL,
+    [ten_dang_nhap] NVARCHAR(50) NOT NULL,
+    PRIMARY KEY CLUSTERED ([id_thong_bao] ASC, [ten_dang_nhap] ASC),
+    CONSTRAINT [FK_da_doc_thong_bao] FOREIGN KEY ([id_thong_bao]) REFERENCES [dbo].[thong_bao] ([id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_da_doc_tai_khoan] FOREIGN KEY ([ten_dang_nhap]) REFERENCES [dbo].[tai_khoan] ([ten_dang_nhap]) ON DELETE CASCADE
+);
+
 USE [master]
 GO

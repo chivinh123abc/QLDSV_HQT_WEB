@@ -1,0 +1,6 @@
+# Cấu hình Pusher mẫu (Thay đổi thông tin thật trong pusher.properties)
+
+pusher.appId=YOUR_PUSHER_APP_ID
+pusher.key=YOUR_PUSHER_KEY
+pusher.secret=YOUR_PUSHER_SECRET
+pusher.cluster=YOUR_PUSHER_CLUSTER
