@@ -105,7 +105,7 @@
                         <c:when test="${sessionScope.role == 'SINHVIEN'}">
                             <!-- WELCOME BANNER FOR STUDENT -->
                             <div class="welcome-banner shadow-lg" style="background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'); background-size: cover; background-position: center;">
-                                <h1 class="display-5 fw-bold mb-2"><s:message code="dashboard.welcome.student"/></h1>
+                                <h1 class="display-5 fw-bold mb-2"><s:message code="dashboard.welcome.student" arguments="${sessionScope.studentProfile.ho},${sessionScope.studentProfile.ten}"/></h1>
                                 <p class="lead opacity-75 mb-4"><s:message code="dashboard.student.portal"/></p>
                                 <div class="d-flex gap-3">
                                     <a href="${pageContext.request.contextPath}/registration" class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm">
@@ -166,7 +166,7 @@
                                                     </div>
                                                     <div>
                                                         <h6 class="text-muted mb-1"><s:message code="dashboard.registered.credit.classes"/></h6>
-                                                        <h2 class="fw-bold text-dark mb-0"><s:message code="dashboard.subjects.count"/></h2>
+                                                        <h2 class="fw-bold text-dark mb-0"><s:message code="dashboard.subjects.count" arguments="${registeredCount != null ? registeredCount : 0}"/></h2>
                                                     </div>
                                                 </div>
                                             </div>

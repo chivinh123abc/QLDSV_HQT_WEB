@@ -1,8 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <!DOCTYPE html>
-        <html lang="vi">
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<!DOCTYPE html>
+<html lang="vi">
 
         <head>
             <meta charset="utf-8" />
@@ -313,72 +315,78 @@
                 </div>
             </div>
 
-            <!-- CLASS MODAL -->
-            <c:if test="${sessionScope.role == 'PGV' && (not empty mode || not empty param.lnkAdd)}">
-                <div class="modal fade show d-block" id="classModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg rounded-4">
-                            <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
-                                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                                    <i class="bi bi-mortarboard-fill"></i>
-                                    <c:choose>
-                                        <c:when test="${mode == 'edit'}"><s:message code="classroom.update"/></c:when>
-                                        <c:otherwise><s:message code="classroom.add.new"/></c:otherwise>
-                                    </c:choose>
-                                </h5>
-                                <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}" class="btn-close btn-close-white text-decoration-none"></a>
-                            </div>
-                            <form action="${pageContext.request.contextPath}/class" method="POST">
-                                <input type="hidden" name="csrf_token" value="${csrfToken}" />
-                                <div class="modal-body p-4">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.classCode"/> <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="maLop" value="${lop.maLop}" placeholder="VD: D15CQCN01-N" required ${mode == 'edit' ? 'readonly' : ''}>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.className"/> <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="tenLop" value="${lop.tenLop}" placeholder="<s:message code="classroom.example.name"/>" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.academicTerm"/> <span class="text-danger">*</span></label>
-                                            <div class="position-relative d-flex align-items-center" style="max-width: 240px;">
-                                                <button id="btn_year_down" class="btn btn-sm btn-light rounded-circle border shadow-sm p-0 position-absolute start-0 ms-2 d-flex align-items-center justify-content-center" style="z-index: 5; width: 28px; height: 28px;" type="button" onclick="adjustYear(-1)">
-                                                    <i class="bi bi-dash"></i>
-                                                </button>
-                                                <input type="text" class="form-control rounded-pill text-center fw-bold bg-white" style="padding-left: 40px; padding-right: 40px; height: 42px; border-color: #e2e8f0;" name="khoaHoc" id="inp_khoaHoc" value="${not empty lop.khoaHoc ? lop.khoaHoc : '2025-2026'}" required>
-                                                <button id="btn_year_up" class="btn btn-sm btn-light rounded-circle border shadow-sm p-0 position-absolute end-0 me-2 d-flex align-items-center justify-content-center" style="z-index: 5; width: 28px; height: 28px;" type="button" onclick="adjustYear(1)">
-                                                    <i class="bi bi-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">KHOA <span class="text-danger">*</span></label>
-                                            <select class="form-select rounded-3" name="maKhoa" required>
-                                                <option value="" disabled selected><s:message code="classroom.select.faculty"/></option>
-                                                <c:forEach var="k" items="${khoaList}">
-                                                    <option value="${k.maKhoa}" ${(not empty lop.maKhoa ? lop.maKhoa == k.maKhoa : maKhoa == k.maKhoa) ? 'selected' : ''}>${k.tenKhoa}</option>
-                                                </c:forEach>
-                                            </select>
+        <!-- CLASS MODAL -->
+        <c:if test="${sessionScope.role == 'PGV' && (not empty mode || not empty param.lnkAdd)}">
+            <div class="modal fade show d-block" id="classModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-4">
+                        <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
+                            <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                                <i class="bi bi-mortarboard-fill"></i>
+                                <c:choose>
+                                    <c:when test="${mode == 'edit'}"><s:message code="classroom.update"/></c:when>
+                                    <c:otherwise><s:message code="classroom.add.new"/></c:otherwise>
+                                </c:choose>
+                            </h5>
+                            <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}" class="btn-close btn-close-white text-decoration-none"></a>
+                        </div>
+                        <%-- Spring Form Taglib: form:form bind modelAttribute="lop" (ClassroomDTO) --%>
+                        <form:form action="${pageContext.request.contextPath}/class" method="POST" modelAttribute="lop">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}" />
+                            <div class="modal-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.classCode"/> <span class="text-danger">*</span></label>
+                                        <%-- form:input tự động điền lại giá trị khi form lỗi (giữ dữ liệu người dùng đã nhập) --%>
+                                        <form:input path="maLop" cssClass="form-control rounded-3"
+                                            placeholder="VD: D15CQCN01-N"
+                                            readonly="${mode == 'edit'}"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.className"/> <span class="text-danger">*</span></label>
+                                        <form:input path="tenLop" cssClass="form-control rounded-3"
+                                            placeholder="VD: CNTT Khóa 25 - Nhóm 1"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.academicTerm"/> <span class="text-danger">*</span></label>
+                                        <div class="position-relative d-flex align-items-center" style="max-width: 240px;">
+                                            <button id="btn_year_down" class="btn btn-sm btn-light rounded-circle border shadow-sm p-0 position-absolute start-0 ms-2 d-flex align-items-center justify-content-center" style="z-index: 5; width: 28px; height: 28px;" type="button" onclick="adjustYear(-1)">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <form:input path="khoaHoc" cssClass="form-control rounded-pill text-center fw-bold bg-white"
+                                                style="padding-left: 40px; padding-right: 40px; height: 42px; border-color: #e2e8f0;"
+                                                id="inp_khoaHoc" placeholder="2025-2026"/>
+                                            <button id="btn_year_up" class="btn btn-sm btn-light rounded-circle border shadow-sm p-0 position-absolute end-0 me-2 d-flex align-items-center justify-content-center" style="z-index: 5; width: 28px; height: 28px;" type="button" onclick="adjustYear(1)">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">KHOA <span class="text-danger">*</span></label>
+                                        <%-- form:select với items, itemValue, itemLabel để đổ dữ liệu combobox động từ DB --%>
+                                        <form:select path="maKhoa" cssClass="form-select rounded-3">
+                                            <form:option value="" label="--- Chọn khoa ---"/>
+                                            <form:options items="${khoaList}" itemValue="maKhoa" itemLabel="tenKhoa"/>
+                                        </form:select>
+                                    </div>
                                 </div>
-                                <div class="modal-footer border-0 px-4 pb-4">
-                                    <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}" class="btn btn-light rounded-3 fw-bold"><s:message code="global.btn.cancel"/></a>
-                                    <c:choose>
-                                        <c:when test="${mode == 'edit'}">
-                                            <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.edit"/>)</button>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <button type="submit" name="btnInsert" class="btn btn-success rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.add"/>)</button>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="modal-footer border-0 px-4 pb-4">
+                                <a href="${pageContext.request.contextPath}/class?maKhoa=${maKhoa}" class="btn btn-light rounded-3 fw-bold"><s:message code="global.btn.cancel"/></a>
+                                <c:choose>
+                                    <c:when test="${mode == 'edit'}">
+                                        <button type="submit" name="btnUpdate" class="btn btn-primary rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.edit"/>)</button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button type="submit" name="btnInsert" class="btn btn-success rounded-3 fw-bold px-4">GHI (<s:message code="global.btn.add"/>)</button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </form:form>
                     </div>
                 </div>
-            </c:if>
+            </div>
+        </c:if>
 
             <!-- Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

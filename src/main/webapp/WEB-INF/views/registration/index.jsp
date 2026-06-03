@@ -151,8 +151,8 @@
                                                 <c:forEach var="reg" items="${myRegistrations}">
                                                     <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
                                                         <div>
-                                                            <div class="fw-bold text-dark small"><s:message code="registration.credit.class.id"/></div>
-                                                            <div class="text-muted" style="font-size: 0.75rem;"><s:message code="registration.subject.group"/></div>
+                                                            <div class="fw-bold text-dark small"><s:message code="registration.credit.class.id" arguments="${reg.lopTinChi.maLTC}"/></div>
+                                                            <div class="text-muted" style="font-size: 0.75rem;"><s:message code="registration.subject.group" arguments="${reg.lopTinChi.monHoc.tenMH},${reg.lopTinChi.nhom}"/></div>
                                                         </div>
                                                         <!-- Pure HTML Form to Cancel Registration (No maSV passed in parameters) -->
                                                         <form action="${pageContext.request.contextPath}/registration" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đăng ký lớp này không?');">
@@ -215,11 +215,11 @@
                                                         <td class="px-3"><span class="badge-soft-primary">${item.maLTC}</span></td>
                                                         <td>
                                                             <div class="fw-bold text-dark">${item.monHoc.maMH} - ${item.monHoc.tenMH}</div>
-                                                            <div class="small text-muted"><s:message code="registration.group.info"/></div>
+                                                            <div class="small text-muted"><s:message code="registration.group.info" arguments="${item.nhom},${item.khoa.tenKhoa}"/></div>
                                                         </td>
                                                         <td>
                                                             <div class="fw-bold text-dark">${item.nienKhoa}</div>
-                                                            <div class="small text-muted"><s:message code="registration.semester"/></div>
+                                                            <div class="small text-muted"><s:message code="registration.semester" arguments="${item.hocKy}"/></div>
                                                         </td>
                                                         <td class="text-center">
                                                             <c:choose>

@@ -30,6 +30,15 @@ public class ClassroomController {
     @Autowired
     private ClassroomService classroomService;
 
+    @ModelAttribute("lop")
+    public ClassroomDTO getLopDefault(@RequestParam(value = "maKhoa", required = false) String maKhoa) {
+        ClassroomDTO lop = new ClassroomDTO();
+        if (maKhoa != null && !maKhoa.equals("all")) {
+            lop.setMaKhoa(maKhoa);
+        }
+        return lop;
+    }
+
     @GetMapping
     public String index(ModelMap model, @RequestParam(value = "maKhoa", required = false) String maKhoa,
             HttpSession httpSession) {
@@ -107,6 +116,7 @@ public class ClassroomController {
             lop.setMaLop(classroomDto.getMaLop());
             lop.setTenLop(classroomDto.getTenLop());
             lop.setMaKhoa(classroomDto.getMaKhoa());
+            lop.setKhoaHoc(classroomDto.getKhoaHoc());
             classroomService.saveClass(lop, "add");
             redirectAttributes.addFlashAttribute("message", "Thêm lớp [" + lop.getMaLop() + "] thành công!");
         } catch (Exception e) {
@@ -135,6 +145,7 @@ public class ClassroomController {
             lop.setMaLop(classroomDto.getMaLop());
             lop.setTenLop(classroomDto.getTenLop());
             lop.setMaKhoa(classroomDto.getMaKhoa());
+            lop.setKhoaHoc(classroomDto.getKhoaHoc());
             classroomService.saveClass(lop, "edit");
             redirectAttributes.addFlashAttribute("message", "Cập nhật lớp [" + lop.getMaLop() + "] thành công!");
         } catch (Exception e) {
@@ -162,7 +173,13 @@ public class ClassroomController {
     public String edit(ModelMap model, @RequestParam("maLop") String maLop, @RequestParam("maKhoa") String maKhoa,
             HttpSession httpSession) {
         Lop lop = classroomService.getLopById(maLop);
-        model.addAttribute("lop", lop);
+        // Chuyển entity Lop sang ClassroomDTO để Spring Form Taglib binding
+        ClassroomDTO dto = new ClassroomDTO();
+        dto.setMaLop(lop.getMaLop());
+        dto.setTenLop(lop.getTenLop());
+        dto.setMaKhoa(lop.getMaKhoa());
+        dto.setKhoaHoc(lop.getKhoaHoc());
+        model.addAttribute("lop", dto);
         model.addAttribute("mode", "edit");
         return index(model, maKhoa, httpSession);
     }

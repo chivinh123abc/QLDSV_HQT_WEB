@@ -86,4 +86,8 @@ public class MonHoc extends LuuVetThoiGian {
     public void setCanDelete(boolean canDelete) {
         this.canDelete = canDelete;
     }
+
+    public int getSoTinChi() {
+        return (soTietLT / 15) + (soTietTH / 30);
+    }
 }

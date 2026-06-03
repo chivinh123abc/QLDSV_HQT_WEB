@@ -32,6 +32,15 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
+    @ModelAttribute("sinhVien")
+    public StudentDTO getSinhVienDefault(@RequestParam(value = "maLop", required = false) String maLop) {
+        StudentDTO dto = new StudentDTO();
+        if (maLop != null) {
+            dto.setMaLop(maLop);
+        }
+        return dto;
+    }
+
     @GetMapping
     public String index(ModelMap model, @RequestParam(value = "maLop", required = false) String maLop,
             @RequestParam(value = "maKhoa", required = false) String maKhoa, HttpSession httpSession) {
@@ -183,7 +192,18 @@ public class StudentController {
     public String edit(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop,
             HttpSession httpSession) {
         SinhVien sv = studentService.getStudentById(maSV);
-        model.addAttribute("sinhVien", sv);
+        // Chuyển entity SinhVien sang StudentDTO để Spring Form Taglib binding
+        StudentDTO dto = new StudentDTO();
+        dto.setMaSV(sv.getMaSV());
+        dto.setHo(sv.getHo());
+        dto.setTen(sv.getTen());
+        dto.setPhai(sv.getPhai());
+        dto.setDiaChi(sv.getDiaChi());
+        dto.setNgaySinh(sv.getNgaySinh());
+        dto.setMaLop(sv.getMaLop());
+        dto.setDaNghiHoc(sv.isDaNghiHoc());
+        dto.setVersion(sv.getVersion());
+        model.addAttribute("sinhVien", dto);
         model.addAttribute("mode", "edit");
         return index(model, maLop, null, httpSession);
     }
@@ -192,7 +212,17 @@ public class StudentController {
     public String deleteInit(ModelMap model, @RequestParam("maSV") String maSV, @RequestParam("maLop") String maLop,
             HttpSession httpSession) {
         SinhVien sv = studentService.getStudentById(maSV);
-        model.addAttribute("sinhVien", sv);
+        StudentDTO dto = new StudentDTO();
+        dto.setMaSV(sv.getMaSV());
+        dto.setHo(sv.getHo());
+        dto.setTen(sv.getTen());
+        dto.setPhai(sv.getPhai());
+        dto.setDiaChi(sv.getDiaChi());
+        dto.setNgaySinh(sv.getNgaySinh());
+        dto.setMaLop(sv.getMaLop());
+        dto.setDaNghiHoc(sv.isDaNghiHoc());
+        dto.setVersion(sv.getVersion());
+        model.addAttribute("sinhVien", dto);
         model.addAttribute("mode", "delete");
         return index(model, maLop, null, httpSession);
     }

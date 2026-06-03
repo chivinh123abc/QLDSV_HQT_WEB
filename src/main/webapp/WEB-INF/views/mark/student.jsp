@@ -118,7 +118,7 @@
                             </div>
                             <div>
                                 <h3 class="mb-0 fw-bold text-dark"><s:message code="mark.student.personal.results"/></h3>
-                                <p class="text-muted small mb-0"><s:message code="mark.student.grade.profile"/> <strong class="text-primary">${student.ho} ${student.ten}</strong> <s:message code="mark.student.class.info"/></p>
+                                <p class="text-muted small mb-0"><s:message code="mark.student.grade.profile"/> <strong class="text-primary">${student.ho} ${student.ten}</strong> <s:message code="mark.student.class.info" arguments="${student.maSV},${student.maLop}"/></p>
                             </div>
                         </div>
                         <button class="btn btn-outline-primary fw-bold rounded-pill px-4" onclick="window.print()">
