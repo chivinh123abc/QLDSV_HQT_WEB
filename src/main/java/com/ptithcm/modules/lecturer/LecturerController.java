@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.GiangVien;
 import com.ptithcm.entities.Khoa;
+import com.ptithcm.modules.lecturer.dtos.LecturerDTO;
 import com.ptithcm.shared.constants.SessionConstant;
 import com.ptithcm.shared.enums.RoleEnum;
 
@@ -84,31 +88,84 @@ public class LecturerController {
     }
 
     @PostMapping(params = "btnInsert")
-    public String insert(ModelMap model, GiangVien gv, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+    public String insert(ModelMap model, @Valid @ModelAttribute("giangVien") LecturerDTO lecturerDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("error",
+                    "Lỗi nhập liệu giảng viên: " + bindingResult.getFieldErrors().stream()
+                            .map(org.springframework.validation.FieldError::getDefaultMessage)
+                            .collect(Collectors.joining("<br>")));
+            model.addAttribute("giangVien", lecturerDto);
+            model.addAttribute("mode", "add");
+            return index(model, lecturerDto.getMaKhoa(), httpSession);
+        }
         try {
+            GiangVien gv = new GiangVien();
+            gv.setMaGV(lecturerDto.getMaGV());
+            gv.setHo(lecturerDto.getHo());
+            gv.setTen(lecturerDto.getTen());
+            gv.setMaKhoa(lecturerDto.getMaKhoa());
+            gv.setHocVi(lecturerDto.getHocVi());
+            gv.setHocHam(lecturerDto.getHocHam());
+            gv.setChuyenMon(lecturerDto.getChuyenMon());
             lecturerService.saveLecturer(gv, "add");
             redirectAttributes.addFlashAttribute("message", "Thêm giảng viên [" + gv.getMaGV() + "] thành công!");
         } catch (Exception e) {
             model.addAttribute("error", "Lỗi: " + e.getMessage());
-            model.addAttribute("giangVien", gv);
+            model.addAttribute("giangVien", lecturerDto);
             model.addAttribute("mode", "add");
-            return index(model, gv.getMaKhoa(), httpSession);
+            return index(model, lecturerDto.getMaKhoa(), httpSession);
         }
-        return "redirect:/lecturer?maKhoa=" + gv.getMaKhoa();
+        return "redirect:/lecturer?maKhoa=" + lecturerDto.getMaKhoa();
     }
 
     @PostMapping(params = "btnUpdate")
-    public String update(ModelMap model, GiangVien gv, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+    public String update(ModelMap model, @Valid @ModelAttribute("giangVien") LecturerDTO lecturerDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("error",
+                    "Lỗi nhập liệu giảng viên: " + bindingResult.getFieldErrors().stream()
+                            .map(org.springframework.validation.FieldError::getDefaultMessage)
+                            .collect(Collectors.joining("<br>")));
+            model.addAttribute("giangVien", lecturerDto);
+            model.addAttribute("mode", "edit");
+            return index(model, lecturerDto.getMaKhoa(), httpSession);
+        }
         try {
+            GiangVien gv = new GiangVien();
+            gv.setMaGV(lecturerDto.getMaGV());
+            gv.setHo(lecturerDto.getHo());
+            gv.setTen(lecturerDto.getTen());
+            gv.setMaKhoa(lecturerDto.getMaKhoa());
+            gv.setHocVi(lecturerDto.getHocVi());
+            gv.setHocHam(lecturerDto.getHocHam());
+            gv.setChuyenMon(lecturerDto.getChuyenMon());
+            gv.setVersion(lecturerDto.getVersion());
             lecturerService.saveLecturer(gv, "edit");
             redirectAttributes.addFlashAttribute("message", "Cập nhật giảng viên [" + gv.getMaGV() + "] thành công!");
         } catch (Exception e) {
-            model.addAttribute("error", "Lỗi: " + e.getMessage());
-            model.addAttribute("giangVien", gv);
+            Throwable t = e;
+            boolean isOptimisticLock = false;
+            while (t != null) {
+                if (t instanceof jakarta.persistence.OptimisticLockException
+                        || t.getClass().getName().contains("StaleObjectStateException")
+                        || t.getClass().getName().contains("ObjectOptimisticLockingFailureException")) {
+                    isOptimisticLock = true;
+                    break;
+                }
+                t = t.getCause();
+            }
+            if (isOptimisticLock) {
+                model.addAttribute("error",
+                        "Dữ liệu giảng viên đã bị chỉnh sửa bởi một quản trị viên khác. Vui lòng tải lại trang và thực hiện lại!");
+            } else {
+                model.addAttribute("error", "Lỗi: " + e.getMessage());
+            }
+            model.addAttribute("giangVien", lecturerDto);
             model.addAttribute("mode", "edit");
-            return index(model, gv.getMaKhoa(), httpSession);
+            return index(model, lecturerDto.getMaKhoa(), httpSession);
         }
-        return "redirect:/lecturer?maKhoa=" + gv.getMaKhoa();
+        return "redirect:/lecturer?maKhoa=" + lecturerDto.getMaKhoa();
     }
 
     @PostMapping(params = "btnDelete")

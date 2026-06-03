@@ -37,13 +37,19 @@ public class RegistrationService {
             throw new Exception(MessageConstant.STUDENT_ON_LEAVE);
         }
 
-        // 2. Kiểm tra Lớp tín chỉ
-        LopTinChi ltc = registrationDAO.getLtcById(maLTC);
+        // 2. Kiểm tra Lớp tín chỉ (sử dụng khóa bi quan)
+        LopTinChi ltc = registrationDAO.getLtcByIdWithLock(maLTC);
         if (ltc == null) {
             throw new Exception(MessageConstant.CLASS_NOT_EXIST);
         }
         if (ltc.isHuyLop()) {
             throw new Exception(MessageConstant.CLASS_CANCELLED);
+        }
+
+        // Kiểm tra số lượng sinh viên tối đa đã đăng ký
+        Long activeCount = registrationDAO.countActiveRegistrations(maLTC);
+        if (activeCount >= ltc.getSoSVToiDa()) {
+            throw new Exception("Lớp tín chỉ đã đạt số lượng sinh viên tối đa!");
         }
 
         // 3. Kiểm tra ràng buộc môn học: Không thể đăng ký cùng một môn học trong cùng

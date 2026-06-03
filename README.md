@@ -190,6 +190,66 @@ Hệ thống cung cấp cơ chế phân quyền dựa trên 3 nhóm vai trò (Ro
 
 ---
 
+## 📋 Danh Sách Tính Năng Hệ Thống (Feature Checklist)
+
+Dưới đây là danh sách chi tiết các tính năng nghiệp vụ cốt lõi, cơ chế bắt buộc và kỹ thuật nâng cao đã được triển khai hoàn chỉnh trong dự án:
+
+### 🛠️ 1. Các Tính Năng Nghiệp Vụ Cốt Lõi (Core Features)
+
+- [x] **Quản lý danh mục (Category Management):**
+  - [x] Quản lý thông tin Khoa.
+  - [x] Quản lý thông tin Lớp học (Regular Class).
+  - [x] Quản lý thông tin Sinh viên.
+  - [x] Quản lý thông tin Giảng viên.
+  - [x] Quản lý danh mục Môn học.
+  - [x] Đảm bảo toàn vẹn dữ liệu (ràng buộc khóa chính, khóa ngoại, unique constraints trong CSDL quan hệ).
+- [x] **Quản lý Lớp tín chỉ (Credit Class Management):**
+  - [x] Mở lớp tín chỉ theo: Niên khóa, Học kỳ, Môn học, Nhóm.
+  - [x] Cấu hình số lượng sinh viên tối thiểu (Min size) và tối đa (Max size) của lớp.
+  - [x] Cho phép hủy lớp tín chỉ nếu không đủ số sinh viên tối thiểu.
+- [x] **Đăng ký Lớp tín chỉ (Course Registration):**
+  - [x] Sinh viên đăng nhập bằng mã sinh viên để đăng ký.
+  - [x] Lọc và hiển thị danh sách lớp tín chỉ đang mở theo Niên khóa và Học kỳ.
+  - [x] Hỗ trợ Đăng ký lớp & Hủy đăng ký trực tuyến.
+  - [x] Hiển thị real-time số lượng sinh viên đã đăng ký, tên môn học và giảng viên phụ trách.
+- [x] **Quản lý Điểm số (Marks Entry):**
+  - [x] Giáo vụ hoặc Giảng viên nhập điểm cho sinh viên theo lớp tín chỉ.
+  - [x] Hỗ trợ nhập 3 cột điểm: Điểm chuyên cần (diemCC - 10%), Điểm giữa kỳ (diemGK - 30%), Điểm cuối kỳ (diemCK - 60%).
+  - [x] Tự động tính toán điểm hết môn: $\text{Điểm hết môn} = \text{diemCC} \times 0.1 + \text{diemGK} \times 0.3 + \text{diemCK} \times 0.6$ (lưu dạng số thập phân `Float`).
+  - [x] Ràng buộc bảo mật: Cấm sinh viên hủy đăng ký lớp tín chỉ một khi đã có bất kỳ cột điểm nào được nhập.
+- [x] **In ấn Báo cáo (Reports Generation):**
+  - [x] Xuất danh sách lớp tín chỉ.
+  - [x] Xuất danh sách sinh viên đăng ký lớp tín chỉ.
+  - [x] Xuất bảng điểm lớp tín chỉ.
+  - [x] Xuất phiếu điểm cá nhân cho sinh viên.
+  - [x] Xuất bảng điểm tổng kết của lớp học (xoay ngang cột môn học bằng Dynamic Pivot).
+
+### ⚙️ 2. Các Cơ Chế & Kỹ Thuật Bắt Buộc (Mandatory Core Features)
+
+- [x] **Đa ngôn ngữ (i18n):** Chuyển đổi giao diện linh hoạt giữa Tiếng Việt (`vi`) và Tiếng Anh (`en`) sử dụng `ReloadableResourceBundleMessageSource`, `CookieLocaleResolver` và `LocaleChangeInterceptor` của Spring.
+- [x] **Chế độ Sáng/Tối (Light/Dark Mode):** Cho phép chuyển đổi giao diện sáng/tối và lưu trạng thái cục bộ vào LocalStorage để đồng bộ hiển thị mà không bị nhấp nháy trang.
+- [x] **Gửi Email tự động (Email Service):** Cấu hình thư viện `javax.mail` và `JavaMailSenderImpl` sử dụng Gmail SMTP thật để gửi email thông báo điểm số cho sinh viên.
+- [x] **Xác thực CAPTCHA cục bộ (Local Image CAPTCHA):** Sinh ảnh CAPTCHA ngẫu nhiên hoàn toàn trên server bằng `BufferedImage` và lưu đáp án vào `HttpSession` để xác thực form đăng nhập (loại bỏ reCAPTCHA bên thứ ba).
+
+### 🚀 3. Các Cơ Chế Nâng Cao & Tối Ưu Hệ Thống (Advanced Features)
+
+- [x] **Mô hình kiến trúc 3-Tier chuẩn:** Tổ chức mã nguồn chặt chẽ theo lớp: Entity ➡️ DAO (Data Access Object) ➡️ Service ➡️ Controller.
+- [x] **Chống lỗ hổng Mass Assignment:** Loại bỏ việc nhận trực tiếp các Entity từ form submit ở Controller, thay thế bằng các lớp DTO (Data Transfer Objects) có chú thích xác thực Jakarta Bean Validation để lọc sạch dữ liệu đầu vào.
+- [x] **Bảo mật mã hóa mật khẩu:** Sử dụng thuật toán băm **BCrypt** độ an toàn cao để mã hóa mật khẩu người dùng thay vì lưu plain text.
+- [x] **Bảo mật chống tấn công CSRF (Anti-CSRF Protection):** Triển khai `CsrfInterceptor` sinh CSRF token lưu trong session và chèn hidden input `csrf_token` vào tất cả các form POST để kiểm tra chống giả mạo request.
+- [x] **Xử lý Race Condition (Concurrency Control):** Áp dụng cơ chế khóa bi quan (Pessimistic Locking) ở tầng Cơ sở dữ liệu nhằm ngăn chặn tình trạng đăng ký vượt quá giới hạn số lượng sinh viên tối đa khi có nhiều yêu cầu gửi lên cùng lúc.
+- [x] **Chống Spam & Rate Limiting (Bucket4j):** Triển khai `RateLimitInterceptor` chặn spam tối đa 5 requests/giây đối với các yêu cầu ghi dữ liệu (`POST`, `PUT`, `DELETE`) trên mỗi Session/IP, tự động chuyển hướng qua trang lỗi thân thiện [429.jsp](file:///d:/CODE%20PLAYGROUND/Projects/Thi%20LTW/QLDSV_HQT_WEB/src/main/webapp/WEB-INF/views/shared/429.jsp).
+- [x] **Kiểm soát phiên bản dữ liệu (Optimistic Locking):** Áp dụng cột `@Version` (`INT` trong Database) trên các thực thể quan trọng (`SinhVien`, `GiangVien`, `TaiKhoan`) và các DTO tương ứng để bắt và xử lý `OptimisticLockException`, hiển thị thông báo lỗi khi có xung đột ghi đè dữ liệu.
+- [x] **Hàng đợi đăng ký tín chỉ không đồng bộ (Redis Queue):** Khi sinh viên gửi yêu cầu đăng ký tín chỉ, hệ thống sẽ đẩy payload vào Redis List (`QUEUE_DANG_KY`), lưu trạng thái tạm thời `PROCESSING` và chuyển hướng tới trang chờ polling tự động refresh. Tiến trình chạy ngầm (`RegistrationWorker`) tiêu thụ hàng đợi tuần tự kết hợp khóa bi quan (`PESSIMISTIC_WRITE`) trên lớp tín chỉ để đảm bảo sĩ số an toàn.
+- [x] **Bắt lỗi tập trung (Global Exception Handling):** Sử dụng `@ControllerAdvice` để bắt toàn bộ exception của ứng dụng và điều hướng hiển thị trang báo lỗi thân thiện `shared/error.jsp`.
+- [x] **Ghi vết hệ thống (Audit Logging via AOP):** Sử dụng Spring AOP để tự động ghi nhật ký lịch sử các hành động thay đổi dữ liệu nhạy cảm (như nhập điểm, cập nhật sinh viên).
+- [x] **UUID Khóa chính:** Sử dụng chuỗi định danh duy nhất UUID thay cho ID tự tăng truyền thống nhằm gia tăng tính bảo mật cho các bảng quan trọng (như `LopTinChi`).
+- [x] **Tích hợp Audit Trails (Lưu vết thời gian):** Kế thừa `@MappedSuperclass` `LuuVetThoiGian` với các trường `createdAt`, `updatedAt` tự động điền giá trị bằng `@PrePersist` và `@PreUpdate`.
+- [x] **Dynamic Pivot Procedure:** Tạo stored procedure xoay ngang dữ liệu môn học linh hoạt trên SQL Server để xuất bảng điểm tổng kết lớp học.
+- [x] **Clean View Layer:** Loại bỏ hoàn toàn mã scriptlet Java khỏi giao diện JSP, sử dụng 100% EL và JSTL.
+
+---
+
 ## 🔄 Quy Trình & Luồng Xử Lý Tính Năng (Feature Flows)
 
 ### 1. Luồng Đăng Nhập & Tái Lập Phiên Làm Việc (Authentication Flow)

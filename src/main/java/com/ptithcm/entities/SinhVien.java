@@ -154,6 +154,18 @@ public class SinhVien extends LuuVetThoiGian {
         this.trangThaiHoc = trangThaiHoc;
     }
 
+    @jakarta.persistence.Version
+    @Column(name = "version")
+    private Integer version = 0;
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
     public boolean isCanDelete() {
         return canDelete;
     }

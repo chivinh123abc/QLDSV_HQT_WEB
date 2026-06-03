@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ptithcm.entities.Khoa;
 import com.ptithcm.entities.SinhVien;
+import com.ptithcm.modules.mark.dtos.SaveMarkDTO;
 import com.ptithcm.shared.enums.RoleEnum;
 import com.ptithcm.shared.utils.SessionUtil;
 
@@ -95,21 +100,25 @@ public class MarkController {
     }
 
     @RequestMapping(value = "/save-marks", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String, Object> saveMarks(@RequestParam("maLTC") String maLTC, @RequestParam("maSV") String maSV,
-            @RequestParam(value = "diemCC", required = false) Float diemCC,
-            @RequestParam(value = "diemGK", required = false) Float diemGK,
-            @RequestParam(value = "diemCK", required = false) Float diemCK) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            markService.saveMark(maLTC, maSV, diemCC, diemGK, diemCK);
-            response.put("success", true);
-            response.put("message", "Đã lưu điểm cho sinh viên " + maSV);
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "Lỗi: " + e.getMessage());
+    public void saveMarks(@Valid @ModelAttribute("saveMarkDto") SaveMarkDTO dto, BindingResult bindingResult,
+            HttpServletResponse response) throws java.io.IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        java.io.PrintWriter out = response.getWriter();
+        if (bindingResult.hasErrors()) {
+            String errorMsg = bindingResult.getFieldErrors().stream()
+                    .map(org.springframework.validation.FieldError::getDefaultMessage)
+                    .collect(java.util.stream.Collectors.joining(", "));
+            out.print("{\"success\":false,\"message\":\"Lỗi nhập liệu: " + errorMsg + "\"}");
+            out.flush();
+            return;
         }
-        return response;
+        try {
+            markService.saveMark(dto.getMaLTC(), dto.getMaSV(), dto.getDiemCC(), dto.getDiemGK(), dto.getDiemCK());
+            out.print("{\"success\":true,\"message\":\"Đã lưu điểm cho sinh viên " + dto.getMaSV() + "\"}");
+        } catch (Exception e) {
+            out.print("{\"success\":false,\"message\":\"Lỗi: " + e.getMessage() + "\"}");
+        }
+        out.flush();
     }
 
     @RequestMapping(value = "/save-all", method = RequestMethod.POST)

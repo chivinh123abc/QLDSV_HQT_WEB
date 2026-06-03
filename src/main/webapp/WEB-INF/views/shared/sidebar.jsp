@@ -97,13 +97,13 @@
 
                                                 <%-- Role Management: PGV only --%>
                                                     <c:if test="${sessionScope.role == 'PGV'}">
-                                                        <li>
-                                                            <a class="nav-link"
-                                                                href="${pageContext.request.contextPath}/account">
-                                                                <i class="bi bi-person-lines-fill"></i> <s:message code="sidebar.menu.accountRoles"/>
-                                                            </a>
-                                                        </li>
-                                                    </c:if>
+                                                         <li>
+                                                             <a class="nav-link"
+                                                                 href="${pageContext.request.contextPath}/accounts">
+                                                                 <i class="bi bi-person-lines-fill"></i> <s:message code="sidebar.menu.accountRoles"/>
+                                                             </a>
+                                                         </li>
+                                                     </c:if>
                 </ul>
             </nav>
 

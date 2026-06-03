@@ -24,6 +24,14 @@ public class AuthDAO {
         return sessionFactory.getCurrentSession();
     }
 
+    public TaiKhoan findTaiKhoanByUsername(String username) {
+        if (username == null) {
+            return null;
+        }
+        String hql = "FROM TaiKhoan WHERE tenDangNhap = :username";
+        return getSession().createQuery(hql, TaiKhoan.class).setParameter("username", username.trim()).uniqueResult();
+    }
+
     public UserSession findUserByUsernameAndPassword(String username, String password) {
         if (username == null || password == null) {
             return null;

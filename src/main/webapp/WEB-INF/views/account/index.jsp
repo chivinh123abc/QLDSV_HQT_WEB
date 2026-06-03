@@ -110,11 +110,20 @@
                                                 <s:message code="account.management.desc" />
                                             </p>
                                         </div>
-                                        <a href="${pageContext.request.contextPath}/account?lnkAdd=true"
-                                            class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
-                                            <i class="bi bi-plus-circle-fill me-1"></i>
-                                            <s:message code="account.grant.new.btn" />
-                                        </a>
+                                        <div class="d-flex gap-2">
+                                            <form action="${pageContext.request.contextPath}/accounts/import" method="POST" enctype="multipart/form-data" class="d-inline-flex gap-1 align-items-center mb-0">
+                                                <input type="hidden" name="csrf_token" value="${csrfToken}" />
+                                                <input type="file" name="file" accept=".csv" required class="form-control form-control-sm rounded-3" style="max-width: 200px;" />
+                                                <button type="submit" class="btn btn-outline-success btn-sm rounded-3 fw-bold shadow-sm">
+                                                    <i class="bi bi-file-earmark-arrow-up-fill me-1"></i> <s:message code="account.import.csv" />
+                                                </button>
+                                            </form>
+                                            <a href="${pageContext.request.contextPath}/accounts?lnkAdd=true"
+                                                class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm d-inline-flex align-items-center">
+                                                <i class="bi bi-plus-circle-fill me-1"></i>
+                                                <s:message code="account.grant.new.btn" />
+                                            </a>
+                                        </div>
                                     </div>
 
                                     <div class="card-body px-4 pb-4">
@@ -125,7 +134,7 @@
                                                         class="bi bi-search text-muted"></i></span>
                                                 <input type="text" id="search-input"
                                                     class="form-control bg-light border-0 small"
-                                                    placeholder="<s:message code=" account.search.username" />"
+                                                    placeholder="<s:message code="account.search.username" />"
                                                 onkeyup="filterLocal()">
                                             </div>
                                             <div class="d-flex gap-3 align-items-center">
@@ -138,9 +147,9 @@
                                                     <option value="all">
                                                         <s:message code="account.all.roles" />
                                                     </option>
-                                                    <option value="1">PGV</option>
-                                                    <option value="2">KHOA</option>
-                                                    <option value="3">SINHVIEN</option>
+                                                    <option value="1"><s:message code="account.role.pgv" /></option>
+                                                    <option value="2"><s:message code="account.role.faculty" /></option>
+                                                    <option value="3"><s:message code="account.role.student" /></option>
                                                 </select>
                                             </div>
                                         </div>
@@ -183,28 +192,28 @@
                                                             <td class="text-center">
                                                                 <c:choose>
                                                                     <c:when test="${item.roleId == 1}"><span
-                                                                            class="badge bg-danger">PGV</span></c:when>
+                                                                            class="badge bg-danger"><s:message code="account.role.pgv.short" /></span></c:when>
                                                                     <c:when test="${item.roleId == 2}"><span
-                                                                            class="badge bg-warning text-dark">KHOA</span>
+                                                                            class="badge bg-warning text-dark"><s:message code="account.role.faculty.short" /></span>
                                                                     </c:when>
                                                                     <c:when test="${item.roleId == 3}"><span
-                                                                            class="badge bg-success">SINHVIEN</span>
+                                                                            class="badge bg-success"><s:message code="account.role.student.short" /></span>
                                                                     </c:when>
                                                                     <c:otherwise><span
-                                                                            class="badge bg-secondary">UNKNOWN</span>
+                                                                            class="badge bg-secondary"><s:message code="account.role.unknown.short" /></span>
                                                                     </c:otherwise>
                                                                 </c:choose>
                                                             </td>
                                                             <td class="text-center">
                                                                 <div class="d-flex gap-2 justify-content-center">
-                                                                    <a href="${pageContext.request.contextPath}/account?userId=${item.userId}&lnkEdit"
+                                                                    <a href="${pageContext.request.contextPath}/accounts?userId=${item.userId}&lnkEdit"
                                                                         class="btn btn-sm btn-outline-primary border-0 rounded-3">
                                                                         <i class="bi bi-pencil-square"></i>
                                                                     </a>
                                                                     <form
-                                                                        action="${pageContext.request.contextPath}/account/delete"
+                                                                        action="${pageContext.request.contextPath}/accounts/delete"
                                                                         method="POST"
-                                                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này không?');"
+                                                                        onsubmit="return confirm('<s:message code="account.js.confirmDelete" />');"
                                                                         class="d-inline">
                                                                         <input type="hidden" name="csrf_token"
                                                                             value="${csrfToken}" />
@@ -259,11 +268,12 @@
                                             </c:otherwise>
                                         </c:choose>
                                     </h5>
-                                    <a href="${pageContext.request.contextPath}/account"
+                                    <a href="${pageContext.request.contextPath}/accounts"
                                         class="btn-close btn-close-white text-decoration-none"></a>
                                 </div>
-                                <form action="${pageContext.request.contextPath}/account/save" method="POST">
+                                <form action="${pageContext.request.contextPath}/accounts/save" method="POST">
                                     <input type="hidden" name="csrf_token" value="${csrfToken}" />
+                                    <input type="hidden" name="version" value="${account.version}" />
                                     <div class="modal-body p-4">
                                         <div class="row g-3">
                                             <input type="hidden" name="mode" value="${not empty mode ? mode : 'add'}">
@@ -274,7 +284,7 @@
                                                         class="text-danger">*</span>
                                                 </label>
                                                 <select class="form-select rounded-3" name="roleId" id="inp_roleId"
-                                                    onchange="toggleRoleOptions()" ${mode=='edit' ? 'disabled' : '' }
+                                                    onchange="toggleRoleOptions()" <c:if test="${mode == 'edit'}">disabled</c:if>
                                                     required>
                                                     <option value="" disabled ${empty account.phanQuyen ? 'selected'
                                                         : '' }>
@@ -284,7 +294,7 @@
                                                         <s:message code="account.role.pgv" />
                                                     </option>
                                                     <option value="2" ${account.phanQuyen=='KHOA' ? 'selected' : '' }>
-                                                        KHOA</option>
+                                                        <s:message code="account.role.faculty" /></option>
                                                     <option value="3" ${account.phanQuyen=='SINHVIEN' ? 'selected' : ''
                                                         }>
                                                         <s:message code="account.role.student" />
@@ -338,7 +348,7 @@
                                                 </label>
                                                 <input type="text" class="form-control rounded-3 bg-light"
                                                     name="username" id="inp_username" value="${account.tenDangNhap}"
-                                                    placeholder="<s:message code=" account.username.label" />" required
+                                                    placeholder="<s:message code="account.username.label" />" required
                                                 readonly>
                                             </div>
                                             <div class="col-12">
@@ -349,8 +359,7 @@
                                                 </label>
                                                 <div class="input-group">
                                                     <input type="password" class="form-control rounded-start-3"
-                                                        name="password" id="inp_password" placeholder="<s:message code="
-                                                        account.enter.password" />" ${mode == 'edit' ? '' : 'required'}>
+                                                        name="password" id="inp_password" placeholder="<s:message code="account.enter.password" />" ${mode == 'edit' ? '' : 'required'}>
                                                     <button class="btn btn-outline-secondary rounded-end-3"
                                                         type="button" id="btnTogglePass" onclick="togglePassword()">
                                                         <i class="bi bi-eye"></i>
@@ -367,24 +376,24 @@
                                                         class="text-danger">*</span></label>
                                                 <input type="email" class="form-control rounded-3" name="email"
                                                     id="inp_email" value="${account.email}"
-                                                    placeholder="<s:message code=" account.enter.email" />" required>
+                                                    placeholder="<s:message code="account.enter.email" />" required>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="modal-footer border-0 px-4 pb-4">
-                                        <a href="${pageContext.request.contextPath}/account"
+                                        <a href="${pageContext.request.contextPath}/accounts"
                                             class="btn btn-light rounded-3 fw-bold">
                                             <s:message code="global.btn.cancel" />
                                         </a>
                                         <c:choose>
                                             <c:when test="${mode == 'edit'}">
-                                                <button type="submit" class="btn btn-primary rounded-3 fw-bold px-4">GHI
+                                                <button type="submit" class="btn btn-primary rounded-3 fw-bold px-4"><s:message code="global.btn.save.action" />
                                                     (
                                                     <s:message code="global.btn.edit" />)
                                                 </button>
                                             </c:when>
                                             <c:otherwise>
-                                                <button type="submit" class="btn btn-success rounded-3 fw-bold px-4">GHI
+                                                <button type="submit" class="btn btn-success rounded-3 fw-bold px-4"><s:message code="global.btn.save.action" />
                                                     (
                                                     <s:message code="global.btn.add" />)
                                                 </button>

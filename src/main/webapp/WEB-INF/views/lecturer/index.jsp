@@ -304,6 +304,7 @@
                             </div>
                             <form action="${pageContext.request.contextPath}/lecturer" method="POST">
                                 <input type="hidden" name="csrf_token" value="${csrfToken}" />
+                                <input type="hidden" name="version" value="${giangVien.version}" />
                                 <div class="modal-body p-4">
                                     <div class="row g-3">
                                         <div class="col-md-6">

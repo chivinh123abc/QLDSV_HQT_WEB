@@ -1,17 +1,23 @@
 package com.ptithcm.modules.faculty;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.Khoa;
+import com.ptithcm.modules.faculty.dtos.FacultyDTO;
 
 @Controller
 @RequestMapping("/faculty")
@@ -29,13 +35,26 @@ public class FacultyController {
     }
 
     @PostMapping(params = "btnInsert")
-    public String insert(ModelMap model, Khoa khoa, RedirectAttributes redirectAttributes) {
+    public String insert(ModelMap model, @Valid @ModelAttribute("khoa") FacultyDTO facultyDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("error",
+                    "Lỗi nhập liệu khoa: " + bindingResult.getFieldErrors().stream()
+                            .map(org.springframework.validation.FieldError::getDefaultMessage)
+                            .collect(Collectors.joining("<br>")));
+            model.addAttribute("khoa", facultyDto);
+            model.addAttribute("mode", "add");
+            return index(model);
+        }
         try {
+            Khoa khoa = new Khoa();
+            khoa.setMaKhoa(facultyDto.getMaKhoa());
+            khoa.setTenKhoa(facultyDto.getTenKhoa());
             facultyService.saveKhoa(khoa, "add");
             redirectAttributes.addFlashAttribute("message", "Thêm khoa [" + khoa.getMaKhoa() + "] thành công!");
         } catch (Exception e) {
             model.addAttribute("error", "Lỗi: " + e.getMessage());
-            model.addAttribute("khoa", khoa);
+            model.addAttribute("khoa", facultyDto);
             model.addAttribute("mode", "add");
             return index(model);
         }
@@ -43,13 +62,26 @@ public class FacultyController {
     }
 
     @PostMapping(params = "btnUpdate")
-    public String update(ModelMap model, Khoa khoa, RedirectAttributes redirectAttributes) {
+    public String update(ModelMap model, @Valid @ModelAttribute("khoa") FacultyDTO facultyDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("error",
+                    "Lỗi nhập liệu khoa: " + bindingResult.getFieldErrors().stream()
+                            .map(org.springframework.validation.FieldError::getDefaultMessage)
+                            .collect(Collectors.joining("<br>")));
+            model.addAttribute("khoa", facultyDto);
+            model.addAttribute("mode", "edit");
+            return index(model);
+        }
         try {
+            Khoa khoa = new Khoa();
+            khoa.setMaKhoa(facultyDto.getMaKhoa());
+            khoa.setTenKhoa(facultyDto.getTenKhoa());
             facultyService.saveKhoa(khoa, "edit");
             redirectAttributes.addFlashAttribute("message", "Cập nhật khoa [" + khoa.getMaKhoa() + "] thành công!");
         } catch (Exception e) {
             model.addAttribute("error", "Lỗi: " + e.getMessage());
-            model.addAttribute("khoa", khoa);
+            model.addAttribute("khoa", facultyDto);
             model.addAttribute("mode", "edit");
             return index(model);
         }

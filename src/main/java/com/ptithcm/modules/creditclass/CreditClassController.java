@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,9 +21,9 @@ import com.ptithcm.entities.GiangVien;
 import com.ptithcm.entities.Khoa;
 import com.ptithcm.entities.LopTinChi;
 import com.ptithcm.entities.MonHoc;
+import com.ptithcm.modules.creditclass.dtos.CreditClassDTO;
 import com.ptithcm.shared.constants.SessionConstant;
 import com.ptithcm.shared.enums.RoleEnum;
-import com.ptithcm.shared.validators.CreditClassValidator;
 
 @Controller
 @RequestMapping("/credit-class")
@@ -29,9 +31,6 @@ public class CreditClassController {
 
     @Autowired
     private CreditClassService creditClassService;
-
-    @Autowired
-    private CreditClassValidator lopTinChiValidator;
 
     @GetMapping
     public String index(ModelMap model, @RequestParam(value = "maKhoa", required = false) String maKhoa,
@@ -88,54 +87,76 @@ public class CreditClassController {
     }
 
     @PostMapping(params = "btnInsert")
-    public String insert(ModelMap model, LopTinChi ltc, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes, HttpSession httpSession) {
-        lopTinChiValidator.validate(ltc, bindingResult);
+    public String insert(ModelMap model, @Valid @ModelAttribute("ltc") CreditClassDTO creditClassDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error",
                     "Lỗi nhập liệu: " + bindingResult.getFieldErrors().stream()
                             .map(org.springframework.validation.FieldError::getDefaultMessage)
                             .collect(Collectors.joining("<br>")));
-            redirectAttributes.addFlashAttribute("ltc", ltc);
+            redirectAttributes.addFlashAttribute("ltc", creditClassDto);
             redirectAttributes.addFlashAttribute("mode", "add");
-            return "redirect:/credit-class?maKhoa=" + ltc.getMaKhoa() + "&lnkAdd=true";
+            return "redirect:/credit-class?maKhoa=" + creditClassDto.getMaKhoa() + "&lnkAdd=true";
         }
+        LopTinChi ltc = new LopTinChi();
         try {
+            ltc.setMaLTC(creditClassDto.getMaLTC());
+            ltc.setNienKhoa(creditClassDto.getNienKhoa());
+            ltc.setHocKy(creditClassDto.getHocKy());
+            ltc.setMaMH(creditClassDto.getMaMH());
+            ltc.setNhom(creditClassDto.getNhom());
+            ltc.setMaGV(creditClassDto.getMaGV());
+            ltc.setMaKhoa(creditClassDto.getMaKhoa());
+            ltc.setSoSVToiThieu(creditClassDto.getSoSVToiThieu());
+            ltc.setSoSVToiDa(creditClassDto.getSoSVToiDa());
+            ltc.setHuyLop(creditClassDto.isHuyLop());
             creditClassService.saveLtc(ltc, "add");
             redirectAttributes.addFlashAttribute("message", "Đã mở lớp tín chỉ mới thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("ltc", ltc);
+            redirectAttributes.addFlashAttribute("ltc", creditClassDto);
             redirectAttributes.addFlashAttribute("mode", "add");
-            return "redirect:/credit-class?maKhoa=" + ltc.getMaKhoa() + "&lnkAdd=true";
+            return "redirect:/credit-class?maKhoa=" + creditClassDto.getMaKhoa() + "&lnkAdd=true";
         }
-        return "redirect:/credit-class?maKhoa=" + ltc.getMaKhoa();
+        return "redirect:/credit-class?maKhoa=" + creditClassDto.getMaKhoa();
     }
 
     @PostMapping(params = "btnUpdate")
-    public String update(ModelMap model, LopTinChi ltc, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes, HttpSession httpSession) {
-        lopTinChiValidator.validate(ltc, bindingResult);
+    public String update(ModelMap model, @Valid @ModelAttribute("ltc") CreditClassDTO creditClassDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error",
                     "Lỗi nhập liệu: " + bindingResult.getFieldErrors().stream()
                             .map(org.springframework.validation.FieldError::getDefaultMessage)
                             .collect(Collectors.joining("<br>")));
-            redirectAttributes.addFlashAttribute("ltc", ltc);
+            redirectAttributes.addFlashAttribute("ltc", creditClassDto);
             redirectAttributes.addFlashAttribute("mode", "edit");
-            return "redirect:/credit-class?maKhoa=" + ltc.getMaKhoa() + "&maLTC=" + ltc.getMaLTC() + "&lnkEdit";
+            return "redirect:/credit-class?maKhoa=" + creditClassDto.getMaKhoa() + "&maLTC=" + creditClassDto.getMaLTC()
+                    + "&lnkEdit";
         }
+        LopTinChi ltc = new LopTinChi();
         try {
+            ltc.setMaLTC(creditClassDto.getMaLTC());
+            ltc.setNienKhoa(creditClassDto.getNienKhoa());
+            ltc.setHocKy(creditClassDto.getHocKy());
+            ltc.setMaMH(creditClassDto.getMaMH());
+            ltc.setNhom(creditClassDto.getNhom());
+            ltc.setMaGV(creditClassDto.getMaGV());
+            ltc.setMaKhoa(creditClassDto.getMaKhoa());
+            ltc.setSoSVToiThieu(creditClassDto.getSoSVToiThieu());
+            ltc.setSoSVToiDa(creditClassDto.getSoSVToiDa());
+            ltc.setHuyLop(creditClassDto.isHuyLop());
             creditClassService.saveLtc(ltc, "edit");
             redirectAttributes.addFlashAttribute("message",
                     "Đã cập nhật lớp tín chỉ [" + ltc.getMaLTC() + "] thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("ltc", ltc);
+            redirectAttributes.addFlashAttribute("ltc", creditClassDto);
             redirectAttributes.addFlashAttribute("mode", "edit");
-            return "redirect:/credit-class?maKhoa=" + ltc.getMaKhoa() + "&maLTC=" + ltc.getMaLTC() + "&lnkEdit";
+            return "redirect:/credit-class?maKhoa=" + creditClassDto.getMaKhoa() + "&maLTC=" + creditClassDto.getMaLTC()
+                    + "&lnkEdit";
         }
-        return "redirect:/credit-class?maKhoa=" + ltc.getMaKhoa();
+        return "redirect:/credit-class?maKhoa=" + creditClassDto.getMaKhoa();
     }
 
     @PostMapping(params = "btnDelete")

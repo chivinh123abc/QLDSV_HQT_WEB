@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,9 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.Khoa;
 import com.ptithcm.entities.Lop;
+import com.ptithcm.modules.classroom.dtos.ClassroomDTO;
 import com.ptithcm.shared.constants.SessionConstant;
 import com.ptithcm.shared.enums.RoleEnum;
-import com.ptithcm.shared.validators.ClassroomValidator;
 
 @Controller
 @RequestMapping("/class")
@@ -27,9 +29,6 @@ public class ClassroomController {
 
     @Autowired
     private ClassroomService classroomService;
-
-    @Autowired
-    private ClassroomValidator lopValidator;
 
     @GetMapping
     public String index(ModelMap model, @RequestParam(value = "maKhoa", required = false) String maKhoa,
@@ -92,47 +91,59 @@ public class ClassroomController {
     }
 
     @PostMapping(params = "btnInsert")
-    public String insert(ModelMap model, Lop lop, BindingResult bindingResult, RedirectAttributes redirectAttributes,
-            HttpSession httpSession) {
-        lopValidator.validate(lop, bindingResult);
+    public String insert(ModelMap model, @Valid @ModelAttribute("lop") ClassroomDTO classroomDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "Lỗi nhập liệu lớp học!");
-            model.addAttribute("lop", lop);
+            model.addAttribute("error",
+                    "Lỗi nhập liệu lớp học: " + bindingResult.getFieldErrors().stream()
+                            .map(org.springframework.validation.FieldError::getDefaultMessage)
+                            .collect(Collectors.joining("<br>")));
+            model.addAttribute("lop", classroomDto);
             model.addAttribute("mode", "add");
-            return index(model, lop.getMaKhoa(), httpSession);
+            return index(model, classroomDto.getMaKhoa(), httpSession);
         }
         try {
+            Lop lop = new Lop();
+            lop.setMaLop(classroomDto.getMaLop());
+            lop.setTenLop(classroomDto.getTenLop());
+            lop.setMaKhoa(classroomDto.getMaKhoa());
             classroomService.saveClass(lop, "add");
             redirectAttributes.addFlashAttribute("message", "Thêm lớp [" + lop.getMaLop() + "] thành công!");
         } catch (Exception e) {
             model.addAttribute("error", "Lỗi: " + e.getMessage());
-            model.addAttribute("lop", lop);
+            model.addAttribute("lop", classroomDto);
             model.addAttribute("mode", "add");
-            return index(model, lop.getMaKhoa(), httpSession);
+            return index(model, classroomDto.getMaKhoa(), httpSession);
         }
-        return "redirect:/class?maKhoa=" + lop.getMaKhoa();
+        return "redirect:/class?maKhoa=" + classroomDto.getMaKhoa();
     }
 
     @PostMapping(params = "btnUpdate")
-    public String update(ModelMap model, Lop lop, BindingResult bindingResult, RedirectAttributes redirectAttributes,
-            HttpSession httpSession) {
-        lopValidator.validate(lop, bindingResult);
+    public String update(ModelMap model, @Valid @ModelAttribute("lop") ClassroomDTO classroomDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "Lỗi nhập liệu lớp học!");
-            model.addAttribute("lop", lop);
+            model.addAttribute("error",
+                    "Lỗi nhập liệu lớp học: " + bindingResult.getFieldErrors().stream()
+                            .map(org.springframework.validation.FieldError::getDefaultMessage)
+                            .collect(Collectors.joining("<br>")));
+            model.addAttribute("lop", classroomDto);
             model.addAttribute("mode", "edit");
-            return index(model, lop.getMaKhoa(), httpSession);
+            return index(model, classroomDto.getMaKhoa(), httpSession);
         }
         try {
+            Lop lop = new Lop();
+            lop.setMaLop(classroomDto.getMaLop());
+            lop.setTenLop(classroomDto.getTenLop());
+            lop.setMaKhoa(classroomDto.getMaKhoa());
             classroomService.saveClass(lop, "edit");
             redirectAttributes.addFlashAttribute("message", "Cập nhật lớp [" + lop.getMaLop() + "] thành công!");
         } catch (Exception e) {
             model.addAttribute("error", "Lỗi: " + e.getMessage());
-            model.addAttribute("lop", lop);
+            model.addAttribute("lop", classroomDto);
             model.addAttribute("mode", "edit");
-            return index(model, lop.getMaKhoa(), httpSession);
+            return index(model, classroomDto.getMaKhoa(), httpSession);
         }
-        return "redirect:/class?maKhoa=" + lop.getMaKhoa();
+        return "redirect:/class?maKhoa=" + classroomDto.getMaKhoa();
     }
 
     @PostMapping(params = "btnDelete")

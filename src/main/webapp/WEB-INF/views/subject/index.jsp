@@ -160,6 +160,20 @@
                                 <h3 class="mb-0 fw-bold text-dark"><s:message code="subject.management"/></h3>
                             </div>
 
+                            <!-- FLASH MESSAGES -->
+                            <c:if test="${not empty message}">
+                                <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                    <i class="bi bi-check-circle-fill me-2"></i> ${message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </c:if>
+                            <c:if test="${not empty error}">
+                                <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </c:if>
+
                             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                                 <div
                                     class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">

@@ -50,4 +50,21 @@ public final class SecurityUtil {
         }
         return null;
     }
+
+    /**
+     * Sinh mật khẩu ngẫu nhiên có độ dài mong muốn.
+     *
+     * @param length
+     *            Độ dài mật khẩu sinh ra
+     * @return Chuỗi mật khẩu ngẫu nhiên
+     */
+    public static String generateRandomPassword(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
 }

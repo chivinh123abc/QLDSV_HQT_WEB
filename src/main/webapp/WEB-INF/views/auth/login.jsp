@@ -136,10 +136,7 @@
             <button type="submit" class="login-btn"><s:message code="global.btn.login"/></button>
         </form>
 
-        <div class="mt-4 text-center d-flex flex-column gap-2">
-            <div>
-                <a href="${pageContext.request.contextPath}/register" class="text-decoration-none small fw-semibold text-primary"><s:message code="auth.login.no.account"/></a>
-            </div>
+        <div class="mt-4 text-center">
             <span class="text-muted small"><s:message code="auth.login.forgot.password"/></span>
         </div>
     </div>

@@ -132,4 +132,22 @@ public class RedisService {
             jedis.del(key);
         }
     }
+
+    /**
+     * Đẩy một phần tử vào đầu danh sách (Queue Producer).
+     */
+    public void lpush(String key, String value) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.lpush(key, value);
+        }
+    }
+
+    /**
+     * Lấy và xóa một phần tử ở cuối danh sách (Queue Consumer).
+     */
+    public String rpop(String key) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.rpop(key);
+        }
+    }
 }

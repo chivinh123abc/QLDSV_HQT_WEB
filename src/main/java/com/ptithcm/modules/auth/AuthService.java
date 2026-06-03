@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ptithcm.entities.GiangVien;
 import com.ptithcm.entities.SinhVien;
+import com.ptithcm.entities.TaiKhoan;
 import com.ptithcm.shared.dtos.UserSession;
 
 @Service
@@ -16,6 +17,19 @@ public class AuthService {
 
     @Autowired
     private AuthDAO authDAO;
+
+    public TaiKhoan getTaiKhoanByUsername(String username) {
+        return authDAO.findTaiKhoanByUsername(username);
+    }
+
+    public void activateAccount(String username, String newPassword) {
+        TaiKhoan tk = authDAO.findTaiKhoanByUsername(username);
+        if (tk != null) {
+            tk.setMatKhau(org.mindrot.jbcrypt.BCrypt.hashpw(newPassword, org.mindrot.jbcrypt.BCrypt.gensalt(12)));
+            tk.setTrangThai(com.ptithcm.shared.enums.TrangThaiTaiKhoan.DA_KICH_HOAT);
+            authDAO.getSession().merge(tk);
+        }
+    }
 
     public UserSession login(String username, String password) {
         return authDAO.findUserByUsernameAndPassword(username, password);

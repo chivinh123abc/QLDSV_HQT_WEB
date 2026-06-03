@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><s:message code="auth.verify.page.title"/></title>
+    <title><s:message code="auth.activate.title"/></title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -28,22 +28,21 @@
             align-items: center;
             justify-content: center;
             margin: 0;
-            padding: 20px;
         }
-        .verify-card {
+        .login-card {
             width: 100%;
-            max-width: 440px;
+            max-width: 420px;
             background: #fff;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             padding: 40px;
             border: 1px solid rgba(0,0,0,0.05);
         }
-        .verify-header {
+        .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
-        .verify-header h2 {
+        .login-header h2 {
             font-weight: 700;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
@@ -51,40 +50,29 @@
             background-clip: text;
             margin-bottom: 10px;
         }
-        .verify-header p {
+        .login-header p {
             color: #6c757d;
             font-size: 0.9rem;
-            line-height: 1.5;
         }
         .form-label {
             font-weight: 600;
             font-size: 0.85rem;
             color: #495057;
             margin-bottom: 8px;
-            text-align: center;
-            display: block;
         }
-        .otp-input {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 12px;
-            text-align: center;
+        .form-control {
             border-radius: 12px;
             padding: 12px 15px;
             border: 1px solid #e2e8f0;
             background-color: #f8fafc;
             transition: all 0.2s;
-            max-width: 240px;
-            margin: 0 auto;
-            display: block;
         }
-        .otp-input:focus {
+        .form-control:focus {
             background-color: #fff;
             border-color: #4361ee;
             box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
-            outline: none;
         }
-        .verify-btn {
+        .login-btn {
             background: var(--primary-gradient);
             border: none;
             padding: 12px;
@@ -92,14 +80,15 @@
             font-weight: 600;
             color: #fff;
             width: 100%;
-            margin-top: 25px;
+            margin-top: 15px;
             box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
             transition: all 0.3s;
         }
-        .verify-btn:hover {
+        .login-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
         }
+
         .alert-custom {
             border-radius: 12px;
             padding: 12px;
@@ -110,13 +99,13 @@
     </style>
 </head>
 <body>
-    <div class="verify-card animate__animated animate__fadeInUp">
-        <div class="verify-header">
+    <div class="login-card animate__animated animate__zoomIn">
+        <div class="login-header">
             <div class="mb-3">
-                <i class="bi bi-shield-fill-check fs-1 text-primary"></i>
+                <i class="bi bi-shield-check fs-1 text-primary"></i>
             </div>
-            <h2><s:message code="auth.verify.title"/></h2>
-            <p><s:message code="auth.verify.otp.sent"/> <strong>${username}</strong>.</p>
+            <h2><s:message code="auth.activate.title"/></h2>
+            <p><s:message code="auth.activate.desc"/></p>
         </div>
 
         <c:if test="${not empty error}">
@@ -125,26 +114,27 @@
             </div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/verify" method="post">
+        <form action="${pageContext.request.contextPath}/activate" method="post">
             <input type="hidden" name="csrf_token" value="${csrfToken}" />
-            <input type="hidden" name="username" value="${username}" />
 
             <div class="mb-3">
-                <label class="form-label"><s:message code="auth.verify.enter.otp"/></label>
-                <input type="text" name="otp" class="form-control otp-input" maxlength="6" placeholder="******" required autocomplete="off" pattern="\d{6}" title="<s:message code="auth.verify.otp.6digits"/>">
+                <label class="form-label"><s:message code="auth.activate.newPassword"/></label>
+                <input type="password" name="newPassword" class="form-control" placeholder="<s:message code="auth.activate.newPassword.placeholder"/>" required>
             </div>
 
-            <button type="submit" class="verify-btn"><s:message code="auth.verify.btn.activate"/></button>
+            <div class="mb-4">
+                <label class="form-label"><s:message code="auth.activate.confirmPassword"/></label>
+                <input type="password" name="confirmPassword" class="form-control" placeholder="<s:message code="auth.activate.confirmPassword.placeholder"/>" required>
+            </div>
+
+            <button type="submit" class="login-btn"><s:message code="auth.activate.btn.submit"/></button>
         </form>
 
-        <div class="mt-4 text-center d-flex flex-column gap-2">
-            <div>
-                <span class="text-muted small"><s:message code="auth.verify.not.received"/> </span>
-                <a href="${pageContext.request.contextPath}/register" class="text-decoration-none small fw-semibold text-primary"><s:message code="auth.verify.request.resend"/></a>
-            </div>
-            <span class="text-muted small"><s:message code="auth.verify.otp.expiry"/></span>
+        <div class="mt-4 text-center">
+            <a href="${pageContext.request.contextPath}/logout" class="text-decoration-none small fw-semibold text-primary">
+                <i class="bi bi-arrow-left me-1"></i><s:message code="global.btn.logout"/>
+            </a>
         </div>
     </div>
 </body>
 </html>
-

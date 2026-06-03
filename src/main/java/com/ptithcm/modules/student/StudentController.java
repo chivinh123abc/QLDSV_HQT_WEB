@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,9 +21,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.ptithcm.entities.Khoa;
 import com.ptithcm.entities.Lop;
 import com.ptithcm.entities.SinhVien;
+import com.ptithcm.modules.student.dtos.StudentDTO;
 import com.ptithcm.shared.constants.SessionConstant;
 import com.ptithcm.shared.enums.RoleEnum;
-import com.ptithcm.shared.validators.StudentValidator;
 
 @Controller
 @RequestMapping("/student")
@@ -29,9 +31,6 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
-
-    @Autowired
-    private StudentValidator sinhVienValidator;
 
     @GetMapping
     public String index(ModelMap model, @RequestParam(value = "maLop", required = false) String maLop,
@@ -91,42 +90,81 @@ public class StudentController {
     }
 
     @PostMapping(params = "btnInsert")
-    public String insert(ModelMap model, SinhVien sinhVien, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes, HttpSession httpSession) {
-        sinhVienValidator.validate(sinhVien, bindingResult);
+    public String insert(ModelMap model, @Valid @ModelAttribute("sinhVien") StudentDTO studentDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "Lỗi nhập liệu sinh viên!");
-            model.addAttribute("sinhVien", sinhVien);
+            model.addAttribute("error",
+                    "Lỗi nhập liệu sinh viên: " + bindingResult.getFieldErrors().stream()
+                            .map(org.springframework.validation.FieldError::getDefaultMessage)
+                            .collect(Collectors.joining("<br>")));
+            model.addAttribute("sinhVien", studentDto);
             model.addAttribute("mode", "add");
-            return index(model, sinhVien.getMaLop(), null, httpSession);
+            return index(model, studentDto.getMaLop(), null, httpSession);
         }
         try {
+            SinhVien sinhVien = new SinhVien();
+            sinhVien.setMaSV(studentDto.getMaSV());
+            sinhVien.setHo(studentDto.getHo());
+            sinhVien.setTen(studentDto.getTen());
+            sinhVien.setPhai(studentDto.getPhai());
+            sinhVien.setDiaChi(studentDto.getDiaChi());
+            sinhVien.setNgaySinh(studentDto.getNgaySinh());
+            sinhVien.setMaLop(studentDto.getMaLop());
+            sinhVien.setDaNghiHoc(studentDto.isDaNghiHoc());
             studentService.insertStudent(sinhVien);
             redirectAttributes.addFlashAttribute("message", "Thêm sinh viên [" + sinhVien.getMaSV() + "] thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Lỗi khi thêm sinh viên: " + e.getMessage());
         }
-        return "redirect:/student?maLop=" + sinhVien.getMaLop();
+        return "redirect:/student?maLop=" + studentDto.getMaLop();
     }
 
     @PostMapping(params = "btnUpdate")
-    public String update(ModelMap model, SinhVien sinhVien, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes, HttpSession httpSession) {
-        sinhVienValidator.validate(sinhVien, bindingResult);
+    public String update(ModelMap model, @Valid @ModelAttribute("sinhVien") StudentDTO studentDto,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "Lỗi nhập liệu sinh viên!");
-            model.addAttribute("sinhVien", sinhVien);
+            model.addAttribute("error",
+                    "Lỗi nhập liệu sinh viên: " + bindingResult.getFieldErrors().stream()
+                            .map(org.springframework.validation.FieldError::getDefaultMessage)
+                            .collect(Collectors.joining("<br>")));
+            model.addAttribute("sinhVien", studentDto);
             model.addAttribute("mode", "edit");
-            return index(model, sinhVien.getMaLop(), null, httpSession);
+            return index(model, studentDto.getMaLop(), null, httpSession);
         }
         try {
+            SinhVien sinhVien = new SinhVien();
+            sinhVien.setMaSV(studentDto.getMaSV());
+            sinhVien.setHo(studentDto.getHo());
+            sinhVien.setTen(studentDto.getTen());
+            sinhVien.setPhai(studentDto.getPhai());
+            sinhVien.setDiaChi(studentDto.getDiaChi());
+            sinhVien.setNgaySinh(studentDto.getNgaySinh());
+            sinhVien.setMaLop(studentDto.getMaLop());
+            sinhVien.setDaNghiHoc(studentDto.isDaNghiHoc());
+            sinhVien.setVersion(studentDto.getVersion());
             studentService.updateStudent(sinhVien);
             redirectAttributes.addFlashAttribute("message",
                     "Cập nhật sinh viên [" + sinhVien.getMaSV() + "] thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi khi cập nhật sinh viên: " + e.getMessage());
+            Throwable t = e;
+            boolean isOptimisticLock = false;
+            while (t != null) {
+                if (t instanceof jakarta.persistence.OptimisticLockException
+                        || t.getClass().getName().contains("StaleObjectStateException")
+                        || t.getClass().getName().contains("ObjectOptimisticLockingFailureException")) {
+                    isOptimisticLock = true;
+                    break;
+                }
+                t = t.getCause();
+            }
+            if (isOptimisticLock) {
+                redirectAttributes.addFlashAttribute("error",
+                        "Dữ liệu sinh viên đã bị chỉnh sửa bởi một quản trị viên khác. Vui lòng tải lại trang và thực hiện lại!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Lỗi khi cập nhật sinh viên: " + e.getMessage());
+            }
         }
-        return "redirect:/student?maLop=" + sinhVien.getMaLop();
+        return "redirect:/student?maLop=" + studentDto.getMaLop();
     }
 
     @PostMapping(params = "btnDelete")
