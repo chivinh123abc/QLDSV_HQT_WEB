@@ -1,7 +1,6 @@
 package com.ptithcm.modules.payment;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -73,37 +72,16 @@ public class PaymentService {
     // Thống kê thanh toán của lớp theo học kỳ
     public List<Object[]> getPaymentStatsByClass(String maLop, String nienKhoa, int hocKy) {
         Session session = sessionFactory.getCurrentSession();
-        // Lấy danh sách SV của lớp
-        String svHql = "FROM SinhVien sv WHERE sv.lop.maLop = :maLop";
-        List<com.ptithcm.entities.SinhVien> svList = session.createQuery(svHql, com.ptithcm.entities.SinhVien.class)
-                .setParameter("maLop", maLop).getResultList();
+        String hql = "SELECT sv.maSV, CONCAT(sv.ho, ' ', sv.ten), "
+                + "CAST(SUM(CASE WHEN dk.trangThaiDangKy = com.ptithcm.shared.enums.TrangThaiDangKy.HIEU_LUC THEN (mh.soTietLT / 15) + (mh.soTietTH / 30) ELSE 0 END) AS int), "
+                + "CAST(SUM(CASE WHEN dk.trangThaiDangKy = com.ptithcm.shared.enums.TrangThaiDangKy.HIEU_LUC THEN ((mh.soTietLT / 15) + (mh.soTietTH / 30)) * 1000000L ELSE 0L END) AS long), "
+                + "CASE WHEN SUM(CASE WHEN dk.trangThaiDangKy = com.ptithcm.shared.enums.TrangThaiDangKy.HIEU_LUC AND dk.daThanhToan = false THEN 1 ELSE 0 END) = 0 THEN true ELSE false END "
+                + "FROM DangKy dk " + "JOIN dk.sinhVien sv " + "JOIN dk.lopTinChi ltc " + "JOIN ltc.monHoc mh "
+                + "WHERE sv.lop.maLop = :maLop AND ltc.nienKhoa = :nienKhoa AND ltc.hocKy = :hocKy "
+                + "GROUP BY sv.maSV, sv.ho, sv.ten "
+                + "HAVING SUM(CASE WHEN dk.trangThaiDangKy = com.ptithcm.shared.enums.TrangThaiDangKy.HIEU_LUC THEN (mh.soTietLT / 15) + (mh.soTietTH / 30) ELSE 0 END) > 0";
 
-        List<Object[]> stats = new ArrayList<>();
-
-        for (com.ptithcm.entities.SinhVien sv : svList) {
-            List<DangKy> dks = getRegistrations(sv.getMaSV(), nienKhoa, hocKy);
-            if (dks.isEmpty())
-                continue; // Bỏ qua SV không đăng ký học kỳ này
-
-            int tongTinChi = 0;
-            boolean daThanhToanHet = true;
-
-            for (DangKy dk : dks) {
-                if (dk.getTrangThaiDangKy().name().equals("HIEU_LUC")) {
-                    tongTinChi += dk.getLopTinChi().getMonHoc().getSoTinChi();
-                    if (!dk.isDaThanhToan()) {
-                        daThanhToanHet = false;
-                    }
-                }
-            }
-
-            if (tongTinChi > 0) {
-                long tongTien = tongTinChi * 1_000_000L;
-                stats.add(new Object[]{sv.getMaSV(), sv.getHo() + " " + sv.getTen(), tongTinChi, tongTien,
-                        daThanhToanHet});
-            }
-        }
-
-        return stats;
+        return session.createQuery(hql, Object[].class).setParameter("maLop", maLop).setParameter("nienKhoa", nienKhoa)
+                .setParameter("hocKy", hocKy).getResultList();
     }
 }

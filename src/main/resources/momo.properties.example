@@ -1,0 +1,7 @@
+# Cấu hình Momo mẫu (Thay đổi thông tin thật trong momo.properties)
+
+momo.partnerCode=
+momo.accessKey=
+momo.secretKey=
+momo.endpoint=
+momo.requestType=

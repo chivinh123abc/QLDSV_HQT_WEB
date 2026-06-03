@@ -1,23 +1,31 @@
 package com.ptithcm.modules.payment;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.DangKy;
 import com.ptithcm.entities.Lop;
 import com.ptithcm.modules.classroom.ClassroomService;
+import com.ptithcm.modules.payment.providers.PaymentProvider;
 import com.ptithcm.shared.constants.SessionConstant;
 import com.ptithcm.shared.enums.RoleEnum;
 
@@ -25,14 +33,16 @@ import com.ptithcm.shared.enums.RoleEnum;
 @RequestMapping("/payment")
 public class PaymentController {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
+
     @Autowired
     private PaymentService paymentService;
 
     @Autowired
-    private MoMoService moMoService;
-
-    @Autowired
     private ClassroomService classroomService;
+
+    @jakarta.annotation.Resource(name = "paymentProviderRegistry")
+    private Map<String, PaymentProvider> paymentProviderRegistry;
 
     // ==========================================
     // MÀN HÌNH SINH VIÊN (SV) - THANH TOÁN
@@ -90,7 +100,9 @@ public class PaymentController {
 
     @PostMapping("/checkout")
     public String checkout(HttpSession session, HttpServletRequest request, @RequestParam("nienKhoa") String nienKhoa,
-            @RequestParam("hocKy") int hocKy, RedirectAttributes redirectAttributes) {
+            @RequestParam("hocKy") int hocKy, @RequestParam(value = "method", defaultValue = "momo") String method,
+            RedirectAttributes redirectAttributes) {
+
         com.ptithcm.shared.dtos.UserSession userSession = (com.ptithcm.shared.dtos.UserSession) session
                 .getAttribute(SessionConstant.USER);
         String maSV = userSession.getUsername();
@@ -106,53 +118,67 @@ public class PaymentController {
             return "redirect:/payment";
         }
 
+        PaymentProvider provider = paymentProviderRegistry.get(method);
+        if (provider == null) {
+            log.warn("[PAYMENT] Yêu cầu cổng thanh toán không được hỗ trợ: {}", method);
+            redirectAttributes.addFlashAttribute("error", "Cổng thanh toán không hỗ trợ!");
+            return "redirect:/payment";
+        }
+
         long amount = tongTinChi * 1_000_000L;
         String orderId = maSV + "_" + nienKhoa + "_" + hocKy + "_" + System.currentTimeMillis();
-        String orderInfo = "Thanh toan hoc phi HK" + hocKy + " " + nienKhoa + " - " + maSV;
 
         String baseUrl = String.format("%s://%s:%d%s", request.getScheme(), request.getServerName(),
                 request.getServerPort(), request.getContextPath());
         String returnUrl = baseUrl + "/payment/momo-return";
-        String ipnUrl = baseUrl + "/payment/momo-ipn";
 
         String mockSuccessUrl = returnUrl + "?resultCode=0&orderId=" + orderId;
-        System.out.println("=================================================");
-        System.out.println("[MOMO HACK] Click vao link sau de GIA LAP THANH TOAN THANH CONG (Khong can quet QR):");
-        System.out.println(mockSuccessUrl);
-        System.out.println("=================================================");
+        log.info("=================================================");
+        log.info("[MOMO HACK] Click vao link sau de GIA LAP THANH TOAN THANH CONG (Khong can quet QR):");
+        log.info(mockSuccessUrl);
+        log.info("=================================================");
 
-        String payUrl = moMoService.createPayment(orderId, orderInfo, amount, returnUrl, ipnUrl);
-        if (payUrl == null) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Không thể kết nối đến cổng thanh toán MoMo. Vui lòng thử lại sau.");
+        try {
+            String payUrl = provider.generatePaymentUrl(orderId, amount, baseUrl);
+            if (payUrl == null) {
+                redirectAttributes.addFlashAttribute("error",
+                        "Không thể kết nối đến cổng thanh toán " + method.toUpperCase() + ". Vui lòng thử lại sau.");
+                return "redirect:/payment";
+            }
+            return "redirect:" + payUrl;
+        } catch (Exception e) {
+            log.error("[PAYMENT] Exception generating payment url via {}", method, e);
+            redirectAttributes.addFlashAttribute("error", "Lỗi xử lý kết nối cổng thanh toán!");
             return "redirect:/payment";
         }
-        return "redirect:" + payUrl;
     }
 
     @GetMapping("/momo-return")
     public String momoReturn(@RequestParam Map<String, String> params, HttpSession session,
             RedirectAttributes redirectAttributes) {
-        // Kiểm tra kết quả
+
+        PaymentProvider provider = paymentProviderRegistry.get("momo");
+        if (provider == null || !provider.verifySignature(params)) {
+            log.warn("[PAYMENT] Cảnh báo bảo mật: Chữ ký thanh toán không hợp lệ!");
+            redirectAttributes.addFlashAttribute("error", "Thông tin xác thực thanh toán không hợp lệ!");
+            return "redirect:/payment";
+        }
+
         String resultCode = params.get("resultCode");
         String orderId = params.get("orderId");
 
         if ("0".equals(resultCode)) {
-            // Thanh toán thành công -> update DB
-            String[] parts = orderId.split("_");
-            if (parts.length >= 3) {
-                String maSV = parts[0];
-                String nienKhoa = parts[1];
-                int hocKy = Integer.parseInt(parts[2]);
-                paymentService.markAsPaid(maSV, nienKhoa, hocKy);
-
-                System.out.println("=================================================");
-                System.out.println("[PAYMENT] Sinh vien " + maSV + " da THANH TOAN THANH CONG hoc phi HK" + hocKy + " ("
-                        + nienKhoa + ")");
-                System.out.println("=================================================");
-
+            try {
+                provider.processIpn(params); // Tận dụng method processIpn của MoMoPaymentProvider để cập nhật DB
+                log.info("[PAYMENT] Sinh vien da THANH TOAN THANH CONG qua MoMo cho order {}", orderId);
                 redirectAttributes.addFlashAttribute("message", "Thanh toán thành công!");
-                return "redirect:/payment?nienKhoa=" + nienKhoa + "&hocKy=" + hocKy;
+                String[] parts = orderId.split("_");
+                if (parts.length >= 3) {
+                    return "redirect:/payment?nienKhoa=" + parts[1] + "&hocKy=" + parts[2];
+                }
+            } catch (Exception e) {
+                log.error("[PAYMENT] Error processing checkout redirect success for order {}", orderId, e);
+                redirectAttributes.addFlashAttribute("error", "Lỗi ghi nhận thanh toán vào hệ thống!");
             }
         } else {
             redirectAttributes.addFlashAttribute("error",
@@ -165,6 +191,37 @@ public class PaymentController {
         }
 
         return "redirect:/payment";
+    }
+
+    @PostMapping("/momo-ipn")
+    @ResponseBody
+    public ResponseEntity<Void> momoIpn(@RequestBody(required = false) Map<String, String> jsonParams,
+            @RequestParam(required = false) Map<String, String> queryParams) {
+
+        Map<String, String> params = new HashMap<>();
+        if (queryParams != null) {
+            params.putAll(queryParams);
+        }
+        if (jsonParams != null) {
+            params.putAll(jsonParams);
+        }
+
+        log.info("[MOMO IPN] Received IPN request: {}", params);
+
+        PaymentProvider provider = paymentProviderRegistry.get("momo");
+        if (provider == null || !provider.verifySignature(params)) {
+            log.warn("[MOMO IPN] Invalid signature for IPN!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        try {
+            provider.processIpn(params);
+        } catch (Exception e) {
+            log.error("[MOMO IPN] Error processing IPN database update", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return ResponseEntity.noContent().build(); // Trả về HTTP 204 No Content
     }
 
     // ==========================================
