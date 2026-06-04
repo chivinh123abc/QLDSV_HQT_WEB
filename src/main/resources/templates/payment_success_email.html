@@ -1,0 +1,27 @@
+<div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+    <h2 style="color: #2ec4b6; text-align: center; text-transform: uppercase;">XÁC NHẬN THANH TOÁN HỌC PHÍ THÀNH CÔNG</h2>
+    <p>Chào bạn <b>{{studentName}}</b> (MSSV: {{studentId}}),</p>
+    <p>Hệ thống Quản lý Điểm Sinh Viên đã ghi nhận giao dịch thanh toán học phí thành công của bạn. Thông tin chi tiết như sau:</p>
+    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+            <td style="padding: 8px 0; color: #555; border-bottom: 1px solid #eee;">Học kỳ:</td>
+            <td style="padding: 8px 0; font-weight: bold; text-align: right; border-bottom: 1px solid #eee;">Học kỳ {{hocKy}} - Niên khóa {{nienKhoa}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #555; border-bottom: 1px solid #eee;">Số tiền thanh toán:</td>
+            <td style="padding: 8px 0; font-weight: bold; color: #2ec4b6; text-align: right; border-bottom: 1px solid #eee;">{{amount}} VNĐ</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #555; border-bottom: 1px solid #eee;">Thời gian giao dịch:</td>
+            <td style="padding: 8px 0; text-align: right; border-bottom: 1px solid #eee;">{{paymentDate}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #555; border-bottom: 1px solid #eee;">Mã hóa đơn:</td>
+            <td style="padding: 8px 0; font-family: monospace; text-align: right; border-bottom: 1px solid #eee;">{{invoiceNumber}}</td>
+        </tr>
+    </table>
+    <p>Hóa đơn học phí điện tử (dạng PDF) đã được đính kèm cùng email này để bạn tiện lưu trữ hoặc xuất trình khi cần thiết.</p>
+    <p>Cảm ơn bạn đã sử dụng dịch vụ thanh toán trực tuyến.</p>
+    <hr style="border: none; border-top: 1px solid #eee; margin: 25px 0;">
+    <p style="font-size: 11px; color: #888; text-align: center;">Hệ thống Quản lý Điểm Sinh Viên PTITHCM.<br>Đây là email tự động từ hệ thống, vui lòng không trả lời thư này.</p>
+</div>

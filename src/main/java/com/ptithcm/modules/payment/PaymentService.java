@@ -18,6 +18,12 @@ public class PaymentService {
     @Autowired
     private SessionFactory sessionFactory;
 
+    @Autowired
+    private com.ptithcm.shared.services.MailerService mailerService;
+
+    @Autowired
+    private com.ptithcm.shared.services.InvoicePdfService invoicePdfService;
+
     // Lấy học kỳ mới nhất mà SV có đăng ký
     public String[] getLatestSemesterOfStudent(String maSV) {
         Session session = sessionFactory.getCurrentSession();
@@ -55,10 +61,58 @@ public class PaymentService {
     public void markAsPaid(String maSV, String nienKhoa, int hocKy) {
         Session session = sessionFactory.getCurrentSession();
         List<DangKy> unpaids = getUnpaidRegistrations(maSV, nienKhoa, hocKy);
+        if (unpaids.isEmpty()) {
+            return;
+        }
+
+        // Calculate total amount and credits
+        int totalCredits = 0;
+        for (DangKy dk : unpaids) {
+            totalCredits += dk.getLopTinChi().getMonHoc().getSoTinChi();
+        }
+        long totalAmount = totalCredits * 1_000_000L;
+
+        // Perform updates
         for (DangKy dk : unpaids) {
             dk.setDaThanhToan(true);
             dk.setNgayThanhToan(OffsetDateTime.now());
             session.merge(dk);
+        }
+
+        // Fetch Student and Account for Email/PDF
+        try {
+            com.ptithcm.entities.SinhVien sv = session.get(com.ptithcm.entities.SinhVien.class, maSV);
+            com.ptithcm.entities.TaiKhoan tk = session.get(com.ptithcm.entities.TaiKhoan.class, maSV);
+
+            if (sv != null && tk != null && tk.getEmail() != null && !tk.getEmail().trim().isEmpty()) {
+                String invoiceNumber = "HD-" + maSV + "-" + nienKhoa.replace("-", "") + "-" + hocKy + "-"
+                        + (System.currentTimeMillis() % 100000);
+
+                // Generate PDF
+                byte[] pdfBytes = invoicePdfService.generateInvoicePdf(sv, unpaids, invoiceNumber, nienKhoa, hocKy);
+
+                // Send email
+                java.util.Map<String, String> vars = new java.util.HashMap<>();
+                vars.put("studentName", sv.getHo() + " " + sv.getTen());
+                vars.put("studentId", maSV);
+                vars.put("hocKy", String.valueOf(hocKy));
+                vars.put("nienKhoa", nienKhoa);
+                vars.put("amount", String.format("%,d", totalAmount));
+                vars.put("paymentDate", java.time.LocalDateTime.now()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+                vars.put("invoiceNumber", invoiceNumber);
+
+                com.ptithcm.shared.dtos.MailInfoDTO mailInfo = new com.ptithcm.shared.dtos.MailInfoDTO(
+                        tk.getEmail().trim(), "[QLDSV] Xác nhận thanh toán học phí thành công - Học kỳ " + hocKy
+                                + " (Niên khóa " + nienKhoa + ")",
+                        "templates/payment_success_email.html", vars);
+
+                mailerService.sendMail(mailInfo, pdfBytes,
+                        "HoaDon_HocPhi_" + maSV + "_" + nienKhoa.replace("-", "_") + "_HK" + hocKy + ".pdf");
+            }
+        } catch (Exception e) {
+            System.err.println("[PaymentService] Error sending payment success email/PDF: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

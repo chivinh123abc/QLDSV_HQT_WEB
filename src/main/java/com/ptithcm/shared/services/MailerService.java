@@ -22,6 +22,10 @@ public class MailerService {
     private JavaMailSender mailSender;
 
     public void sendMail(MailInfoDTO mailInfo) throws Exception {
+        sendMail(mailInfo, null, null);
+    }
+
+    public void sendMail(MailInfoDTO mailInfo, byte[] attachmentBytes, String attachmentName) throws Exception {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -34,6 +38,13 @@ public class MailerService {
         String htmlContent = loadAndParseTemplate(mailInfo.getTemplatePath(), mailInfo.getVariables());
 
         helper.setText(htmlContent, true);
+
+        if (attachmentBytes != null && attachmentName != null) {
+            org.springframework.core.io.ByteArrayResource byteArrayResource = new org.springframework.core.io.ByteArrayResource(
+                    attachmentBytes);
+            helper.addAttachment(attachmentName, byteArrayResource);
+        }
+
         mailSender.send(message);
     }
 
