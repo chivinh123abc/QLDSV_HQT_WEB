@@ -8,41 +8,54 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><s:message code="payment.title"/> | QLDSV_HTC</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css" />
+    <style>
+        .badge-soft-primary { background-color: #e0f2fe; color: #0369a1; border-radius: 20px; font-weight: 600; padding: 6px 12px; }
+        .badge-soft-success { background-color: #dcfce7; color: #166534; border-radius: 20px; font-weight: 600; padding: 6px 12px; }
+        .badge-soft-danger { background-color: #fee2e2; color: #991b1b; border-radius: 20px; font-weight: 600; padding: 6px 12px; }
+        .table-custom th { font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
+        .table-custom td { vertical-align: middle; padding: 1rem 0.75rem; border-bottom: 1px solid #f1f5f9; }
+        .registration-card { transition: all 0.3s; border: 1px solid #e2e8f0; }
+        .registration-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; border-color: #4361ee; }
+    </style>
 </head>
-<body class="app-body">
-    <!-- Navbar -->
-    <jsp:include page="/WEB-INF/views/shared/header.jsp" />
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-white shadow-sm">
-                <jsp:include page="/WEB-INF/views/shared/sidebar.jsp" />
-            </div>
+<body>
+    <div class="app-layout">
+        <!-- SIDEBAR -->
+        <jsp:include page="/WEB-INF/views/shared/sidebar.jsp" />
 
-            <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 content-wrapper">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-                    <h1 class="h2 text-primary fw-bold">
-                        <i class="bi bi-credit-card me-2"></i><s:message code="payment.title"/>
-                    </h1>
-                </div>
+        <div class="app-main">
+            <!-- HEADER -->
+            <jsp:include page="/WEB-INF/views/shared/header.jsp" />
 
-                <c:if test="${not empty message}">
-                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i>${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <!-- MAIN CONTENT -->
+            <main id="main-content" class="app-content p-4 bg-light">
+                <div class="container-fluid max-w-7xl mx-auto">
+                    
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                        <h1 class="h2 text-primary fw-bold">
+                            <i class="bi bi-credit-card me-2"></i><s:message code="payment.title"/>
+                        </h1>
                     </div>
-                </c:if>
-                <c:if test="${not empty error}">
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>${error}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </c:if>
+
+                    <c:if test="${not empty message}">
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 rounded-3 mb-4" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 rounded-3 mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>${error}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </c:if>
 
                 <!-- Filter -->
                 <div class="card shadow-sm mb-4 border-0 rounded-4">
@@ -153,6 +166,7 @@
                         </div>
                     </div>
                 </c:if>
+                </div>
             </main>
         </div>
     </div>

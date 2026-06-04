@@ -110,27 +110,43 @@
                     <div class="announcements-list">
                         <c:choose>
                             <c:when test="${not empty announcements}">
-                                <c:forEach var="tb" items="${announcements}">
-                                    <div class="card announcement-card">
-                                        <div class="announcement-header d-flex justify-content-between align-items-start gap-3">
-                                            <div>
-                                                <h3 class="announcement-title text-primary">${tb.tieuDe}</h3>
-                                                <div class="d-flex flex-wrap align-items-center gap-3">
-                                                    <span class="meta-item">
-                                                        <i class="bi bi-person"></i> <s:message code="announcement.postedBy"/> <strong>${tb.nguoiTao.tenDangNhap}</strong>
-                                                    </span>
-                                                    <span class="meta-item">
-                                                        <i class="bi bi-calendar3"></i> <s:message code="announcement.postedAt"/> <strong>${tb.ngayTaoFormatted}</strong>
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <div class="announcement-body">
-                                            ${tb.noiDung}
-                                        </div>
-                                    </div>
-                                </c:forEach>
+                                 <c:forEach var="tb" items="${announcements}">
+                                     <c:set var="isRead" value="${not empty readMap && readMap[tb.id] == true}" />
+                                     <c:set var="cardClass" value="${isRead ? 'card announcement-card border-start border-secondary border-3' : 'card announcement-card border-start border-primary border-4'}" />
+                                     <div class="${cardClass}">
+                                         <div class="announcement-header d-flex justify-content-between align-items-start gap-3">
+                                             <div>
+                                                 <c:set var="titleLinkClass" value="${isRead ? 'text-decoration-none fw-normal text-muted' : 'text-decoration-none fw-bold text-dark'}" />
+                                                 <h3 class="announcement-title d-flex align-items-center gap-2 mb-2">
+                                                     <a href="${pageContext.request.contextPath}/announcements/detail/${tb.id}" class="${titleLinkClass}">
+                                                         ${tb.tieuDe}
+                                                     </a>
+                                                     <c:if test="${!isRead}">
+                                                         <span class="badge bg-primary text-white rounded-pill px-2 py-1" style="font-size: 0.65rem; font-weight: 700;">
+                                                             MỚI
+                                                         </span>
+                                                     </c:if>
+                                                 </h3>
+                                                 <div class="d-flex flex-wrap align-items-center gap-3">
+                                                     <span class="meta-item">
+                                                         <i class="bi bi-person"></i> <s:message code="announcement.postedBy"/> <strong>${tb.nguoiTao.tenDangNhap}</strong>
+                                                     </span>
+                                                     <span class="meta-item">
+                                                         <i class="bi bi-calendar3"></i> <s:message code="announcement.postedAt"/> <strong>${tb.ngayTaoFormatted}</strong>
+                                                     </span>
+                                                     <c:if test="${isRead}">
+                                                         <span class="meta-item text-success">
+                                                             <i class="bi bi-check2-all"></i> <span style="font-size: 0.8rem; font-weight: 600;">Đã đọc</span>
+                                                         </span>
+                                                     </c:if>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                         <div class="announcement-body">
+                                             ${tb.noiDung}
+                                         </div>
+                                     </div>
+                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-state">

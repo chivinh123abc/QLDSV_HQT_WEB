@@ -32,4 +32,8 @@
         <property name="suffix" value=".jsp" />
     </bean>
 
+    <!-- Environment-Aware Static Resources Mapping for Avatars -->
+    <mvc:resources mapping="/resources/uploads/avatars/**"
+                   location="/resources/uploads/avatars/, file:/usr/local/tomcat/external/avatars/" />
+
 </beans>

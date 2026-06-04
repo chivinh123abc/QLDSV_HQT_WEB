@@ -83,4 +83,8 @@ public class AnnouncementService {
     public int countUnread(String tenDangNhap) {
         return thongBaoDAO.countUnread(tenDangNhap);
     }
+
+    public Map<String, Boolean> getReadStatusMap(String tenDangNhap) {
+        return thongBaoDAO.getReadStatusMap(tenDangNhap);
+    }
 }
