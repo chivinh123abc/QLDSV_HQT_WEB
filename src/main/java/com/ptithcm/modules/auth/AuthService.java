@@ -31,6 +31,14 @@ public class AuthService {
         }
     }
 
+    public void activateAccount(String username) {
+        TaiKhoan tk = authDAO.findTaiKhoanByUsername(username);
+        if (tk != null) {
+            tk.setTrangThai(com.ptithcm.shared.enums.TrangThaiTaiKhoan.DA_KICH_HOAT);
+            authDAO.getSession().merge(tk);
+        }
+    }
+
     public UserSession login(String username, String password) {
         return authDAO.findUserByUsernameAndPassword(username, password);
     }

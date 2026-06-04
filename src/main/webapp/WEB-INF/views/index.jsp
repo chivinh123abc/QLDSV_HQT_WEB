@@ -216,7 +216,7 @@
                                 <h1 class="display-5 fw-bold mb-2"><s:message code="dashboard.welcome.admin"/></h1>
                                 <p class="lead opacity-75 mb-4"><s:message code="dashboard.system.desc"/></p>
                                 <div class="d-flex gap-3">
-                                    <a href="${pageContext.request.contextPath}/student" class="btn btn-primary px-4 py-2 rounded-pill fw-bold">
+                                    <a href="${pageContext.request.contextPath}/admin/student" class="btn btn-primary px-4 py-2 rounded-pill fw-bold">
                                         <i class="bi bi-people-fill me-2"></i> <s:message code="student.management"/>
                                     </a>
                                     <a href="${pageContext.request.contextPath}/credit-class" class="btn btn-light px-4 py-2 rounded-pill fw-bold">
@@ -305,7 +305,7 @@
                                             <h5 class="fw-bold mb-4"><s:message code="dashboard.quick.access"/></h5>
                                             <div class="row g-3">
                                                 <div class="col-sm-4">
-                                                    <a href="${pageContext.request.contextPath}/student" class="quick-action-card d-block shadow-sm h-100">
+                                                    <a href="${pageContext.request.contextPath}/admin/student" class="quick-action-card d-block shadow-sm h-100">
                                                         <div class="quick-action-icon"><i class="bi bi-person-plus"></i></div>
                                                         <h6 class="fw-bold mb-1"><s:message code="dashboard.add.student"/></h6>
                                                         <p class="text-muted small mb-0"><s:message code="dashboard.manage.records"/></p>

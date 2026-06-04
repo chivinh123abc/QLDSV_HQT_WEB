@@ -101,28 +101,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         // 1. Luồng kích hoạt tài khoản
         if (uri.contains("/activate")) {
-            if (session.getAttribute("temp_username") != null) {
-                return true;
-            }
-            UserSession currUser = SessionUtil.getUser(session);
-            if (currUser != null) {
-                // Nếu đã đăng nhập chính thức, kiểm tra xem có thực sự CHUA_KICH_HOAT không
-                boolean isUnactivated = false;
-                Session hSession = factory.openSession();
-                try {
-                    TaiKhoan tk = hSession.get(TaiKhoan.class, currUser.getUsername());
-                    if (tk != null && tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
-                        isUnactivated = true;
-                    }
-                } finally {
-                    hSession.close();
-                }
-                if (isUnactivated) {
-                    return true;
-                }
-            }
-            response.sendRedirect(request.getContextPath() + "/login");
-            return false;
+            return true;
         }
 
         // 2. Chặn truy cập nếu tài khoản đang chờ kích hoạt
@@ -130,28 +109,39 @@ public class AuthInterceptor implements HandlerInterceptor {
             if (uri.contains("/login") || uri.contains("/logout") || uri.contains("/resources/")) {
                 return true;
             }
-            response.sendRedirect(request.getContextPath() + "/activate");
+            response.sendRedirect(request.getContextPath() + "/auth/activate");
             return false;
         }
 
-        // 3. Phòng hờ: nếu user có session chính thức nhưng DB báo CHUA_KICH_HOAT
+        // 3. Phòng hờ: nếu user có session chính thức nhưng DB báo CHUA_KICH_HOAT hoặc
+        // KHOA
         UserSession currUser = SessionUtil.getUser(session);
         if (currUser != null) {
             boolean isUnactivated = false;
+            boolean isLocked = false;
             Session hSession = factory.openSession();
             try {
                 TaiKhoan tk = hSession.get(TaiKhoan.class, currUser.getUsername());
-                if (tk != null && tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
-                    isUnactivated = true;
+                if (tk != null) {
+                    if (tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
+                        isUnactivated = true;
+                    } else if (tk.getTrangThai() == TrangThaiTaiKhoan.KHOA) {
+                        isLocked = true;
+                    }
                 }
             } finally {
                 hSession.close();
+            }
+            if (isLocked) {
+                SessionUtil.invalidate(session);
+                response.sendRedirect(request.getContextPath() + "/login?error=locked");
+                return false;
             }
             if (isUnactivated) {
                 if (uri.contains("/login") || uri.contains("/logout") || uri.contains("/resources/")) {
                     return true;
                 }
-                response.sendRedirect(request.getContextPath() + "/activate");
+                response.sendRedirect(request.getContextPath() + "/auth/activate");
                 return false;
             }
         }

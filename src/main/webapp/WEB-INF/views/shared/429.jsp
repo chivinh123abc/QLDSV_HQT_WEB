@@ -88,10 +88,10 @@
             <div class="icon-box">
                 <i class="bi bi-shield-slash-fill"></i>
             </div>
-            <h1>Yêu cầu quá nhanh!</h1>
-            <p>Hệ thống đã ghi nhận quá nhiều thao tác ghi từ bạn trong thời gian ngắn để phòng chống spam. Vui lòng dừng lại và chờ một chút trước khi thử lại.</p>
+            <h1><s:message code="error.429.title"/></h1>
+            <p><s:message code="error.429.desc"/></p>
             <a href="${pageContext.request.contextPath}/" class="btn-retry">
-                <i class="bi bi-house-door-fill"></i> Quay lại trang chủ
+                <i class="bi bi-house-door-fill"></i> <s:message code="shared.error.back.home"/>
             </a>
         </div>
     </div>

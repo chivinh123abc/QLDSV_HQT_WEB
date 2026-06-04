@@ -89,11 +89,7 @@
                             <h2 class="fw-bold text-dark mb-1">📢 <s:message code="announcement.title"/></h2>
                             <p class="text-muted mb-0"><s:message code="announcement.desc"/></p>
                         </div>
-                        <c:if test="${role == 'PGV' || role == 'KHOA'}">
-                            <a href="${pageContext.request.contextPath}/announcements/create" class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm">
-                                <i class="bi bi-plus-lg me-2"></i> <s:message code="announcement.create"/>
-                            </a>
-                        </c:if>
+
                     </div>
 
                     <!-- Flash messages -->
@@ -128,20 +124,7 @@
                                                     </span>
                                                 </div>
                                             </div>
-                                            <c:if test="${role == 'PGV' || role == 'KHOA'}">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <a href="${pageContext.request.contextPath}/announcements/edit?id=${tb.id}" class="btn btn-outline-primary action-btn">
-                                                        <i class="bi bi-pencil"></i> <s:message code="announcement.edit"/>
-                                                    </a>
-                                                    <form action="${pageContext.request.contextPath}/announcements/delete" method="POST" onsubmit="return confirm('<s:message code="announcement.confirmDelete"/>');" class="m-0">
-                                                        <input type="hidden" name="id" value="${tb.id}" />
-                                                        <input type="hidden" name="csrf_token" value="${csrfToken}" />
-                                                        <button type="submit" class="btn btn-outline-danger action-btn">
-                                                            <i class="bi bi-trash"></i> <s:message code="announcement.delete"/>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </c:if>
+
                                         </div>
                                         <div class="announcement-body">
                                             ${tb.noiDung}
