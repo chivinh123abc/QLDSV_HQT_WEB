@@ -5,7 +5,8 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
-    <!-- Kích hoạt các annotation lập lịch biểu (@Scheduled) -->
-    <task:annotation-driven />
+    <!-- Kích hoạt các annotation lập lịch biểu (@Scheduled) với scheduler cụ thể -->
+    <task:annotation-driven scheduler="myScheduler" />
+    <task:scheduler id="myScheduler" pool-size="5" />
 
 </beans>

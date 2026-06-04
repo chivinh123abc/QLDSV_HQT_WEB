@@ -4,25 +4,27 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.GiangVien;
 import com.ptithcm.entities.SinhVien;
 import com.ptithcm.entities.TaiKhoan;
-import com.ptithcm.modules.auth.dtos.ActivateAccountDTO;
 import com.ptithcm.modules.auth.dtos.LoginDTO;
 import com.ptithcm.shared.constants.MessageConstant;
 import com.ptithcm.shared.dtos.UserSession;
 import com.ptithcm.shared.enums.RoleEnum;
 import com.ptithcm.shared.enums.TrangThaiTaiKhoan;
+import com.ptithcm.shared.services.EmailOTPService;
 import com.ptithcm.shared.utils.SecurityUtil;
 import com.ptithcm.shared.utils.SessionUtil;
 
@@ -32,10 +34,18 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private EmailOTPService emailOTPService;
+
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(HttpSession session, @RequestParam(value = "activated", required = false) String activated,
-            ModelMap model) {
+            @RequestParam(value = "error", required = false) String error, ModelMap model) {
         if (SessionUtil.getUser(session) != null) {
+            UserSession currUser = SessionUtil.getUser(session);
+            TaiKhoan tk = authService.getTaiKhoanByUsername(currUser.getUsername());
+            if (tk != null && tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
+                return "redirect:/auth/activate";
+            }
             String role = SessionUtil.getRole(session);
             if (RoleEnum.SINHVIEN.getCode().equals(role)) {
                 return "redirect:/registration";
@@ -45,12 +55,15 @@ public class AuthController {
         if ("true".equals(activated)) {
             model.addAttribute("success", "Kích hoạt tài khoản thành công! Vui lòng đăng nhập.");
         }
+        if ("locked".equals(error)) {
+            model.addAttribute("error", "Tài khoản của bạn đã bị khóa!");
+        }
         return "auth/login";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String handleLogin(@Valid @ModelAttribute("loginDto") LoginDTO loginDto, BindingResult bindingResult,
-            HttpSession session, HttpServletResponse response, ModelMap model) {
+            HttpSession session, HttpServletResponse response, ModelMap model, RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("error", bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -68,11 +81,10 @@ public class AuthController {
                 model.addAttribute("username", username);
                 return "auth/login";
             }
-            if (BCrypt.checkpw(password, tk.getMatKhau())) {
-                if (tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
-                    session.setAttribute("temp_username", tk.getTenDangNhap());
-                    return "redirect:/activate";
-                }
+            if (tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
+                redirectAttributes.addFlashAttribute("errorMsg",
+                        "Tài khoản chưa được kích hoạt, vui lòng kích hoạt lần đầu!");
+                return "redirect:/auth/activate";
             }
         }
 
@@ -138,36 +150,128 @@ public class AuthController {
         return "redirect:/login";
     }
 
-    @RequestMapping(value = "/activate", method = RequestMethod.GET)
-    public String activate(HttpSession session, ModelMap model) {
-        if (session.getAttribute("temp_username") == null) {
-            return "redirect:/login";
+    @GetMapping("/auth/activate")
+    public String activatePage(HttpSession session, ModelMap model) {
+        String activatingUser = (String) session.getAttribute("ACTIVATING_USER");
+        String activatingEmail = (String) session.getAttribute("ACTIVATING_EMAIL");
+
+        if (activatingUser != null && activatingEmail != null) {
+            model.addAttribute("username", activatingUser);
+            model.addAttribute("email", activatingEmail);
+
+            // Mask email for privacy
+            String maskedEmail = activatingEmail;
+            int atIndex = activatingEmail.indexOf("@");
+            if (atIndex > 3) {
+                maskedEmail = activatingEmail.substring(0, 3) + "***" + activatingEmail.substring(atIndex);
+            }
+            model.addAttribute("maskedEmail", maskedEmail);
+            model.addAttribute("STEP_OTP_SENT", true);
         }
         return "auth/activate";
     }
 
-    @RequestMapping(value = "/activate", method = RequestMethod.POST)
-    public String handleActivate(@Valid @ModelAttribute("activateDto") ActivateAccountDTO activateDto,
-            BindingResult bindingResult, HttpSession session, ModelMap model) {
-        String tempUsername = (String) session.getAttribute("temp_username");
-        if (tempUsername == null) {
-            return "redirect:/login";
+    @PostMapping("/auth/activate/request-otp")
+    public String requestOtp(@RequestParam("maSV") String maSV, @RequestParam("email") String email,
+            HttpSession session, RedirectAttributes redirectAttributes) {
+        if (maSV == null || maSV.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Mã sinh viên và email không được để trống!");
+            return "redirect:/auth/activate";
         }
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("error", bindingResult.getAllErrors().get(0).getDefaultMessage());
-            return "auth/activate";
+        maSV = maSV.trim();
+        email = email.trim();
+
+        TaiKhoan tk = authService.getTaiKhoanByUsername(maSV);
+        if (tk == null) {
+            redirectAttributes.addFlashAttribute("error", "Tài khoản sinh viên không tồn tại trong hệ thống!");
+            return "redirect:/auth/activate";
         }
 
-        String newPassword = activateDto.getNewPassword();
+        if (tk.getTrangThai() == TrangThaiTaiKhoan.DA_KICH_HOAT) {
+            redirectAttributes.addFlashAttribute("error", "Tài khoản này đã được kích hoạt trước đó!");
+            return "redirect:/auth/activate";
+        }
+
+        if (tk.getTrangThai() == TrangThaiTaiKhoan.KHOA) {
+            redirectAttributes.addFlashAttribute("error", "Tài khoản đã bị khóa, không thể kích hoạt!");
+            return "redirect:/auth/activate";
+        }
+
+        // BẮT BUỘC query DB kiểm tra Email user nhập vào từ Form PHẢI TRÙNG KHỚP 100%
+        // với Email đã lưu trong DB
+        if (!tk.getEmail().equals(email)) {
+            redirectAttributes.addFlashAttribute("error", "Email không chính xác với thông tin tài khoản đã đăng ký!");
+            return "redirect:/auth/activate";
+        }
 
         try {
-            authService.activateAccount(tempUsername, newPassword);
-            session.removeAttribute("temp_username");
-            return "redirect:/login?activated=true";
+            emailOTPService.sendActivationOTP(email);
+            session.setAttribute("ACTIVATING_USER", maSV);
+            session.setAttribute("ACTIVATING_EMAIL", email);
+            redirectAttributes.addFlashAttribute("message", "Mã OTP đã được gửi thành công đến email " + email);
         } catch (Exception e) {
-            model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-            return "auth/activate";
+            redirectAttributes.addFlashAttribute("error", "Không thể gửi OTP kích hoạt: " + e.getMessage());
         }
+
+        return "redirect:/auth/activate";
+    }
+
+    @PostMapping("/auth/activate/confirm")
+    public String confirmActivation(@RequestParam("otpCode") String otpCode,
+            @RequestParam("newPassword") String newPassword, @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session, RedirectAttributes redirectAttributes) {
+
+        String username = (String) session.getAttribute("ACTIVATING_USER");
+        String email = (String) session.getAttribute("ACTIVATING_EMAIL");
+
+        if (username == null || email == null) {
+            redirectAttributes.addFlashAttribute("error", "Yêu cầu kích hoạt không hợp lệ hoặc đã hết hạn!");
+            return "redirect:/auth/activate";
+        }
+
+        if (otpCode == null || otpCode.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Mã OTP không được để trống!");
+            return "redirect:/auth/activate";
+        }
+
+        if (newPassword == null || newPassword.trim().isEmpty() || confirmPassword == null
+                || confirmPassword.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Mật khẩu mới không được để trống!");
+            return "redirect:/auth/activate";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Xác nhận mật khẩu không trùng khớp!");
+            return "redirect:/auth/activate";
+        }
+
+        if (!emailOTPService.verifyOTP(email, otpCode.trim())) {
+            redirectAttributes.addFlashAttribute("error", "Mã OTP không chính xác hoặc đã hết hạn!");
+            return "redirect:/auth/activate";
+        }
+
+        try {
+            // Kích hoạt tài khoản và cập nhật mật khẩu mới
+            authService.activateAccount(username, newPassword);
+
+            // Xóa OTP và session
+            emailOTPService.deleteOTP(email);
+            session.removeAttribute("ACTIVATING_USER");
+            session.removeAttribute("ACTIVATING_EMAIL");
+
+            redirectAttributes.addFlashAttribute("success", "Kích hoạt tài khoản thành công! Vui lòng đăng nhập.");
+            return "redirect:/login";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi kích hoạt tài khoản: " + e.getMessage());
+            return "redirect:/auth/activate";
+        }
+    }
+
+    @GetMapping("/auth/activate/reset")
+    public String resetActivation(HttpSession session) {
+        session.removeAttribute("ACTIVATING_USER");
+        session.removeAttribute("ACTIVATING_EMAIL");
+        return "redirect:/auth/activate";
     }
 }

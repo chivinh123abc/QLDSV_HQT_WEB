@@ -2,6 +2,9 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<s:message code="global.lang.vi" var="lblLangVi"/>
+<s:message code="global.lang.en" var="lblLangEn"/>
+<s:message code="announcement.bellTitle" var="lblBellTitle"/>
 <script>
     (function () {
         const currentTheme = localStorage.getItem("theme") || "light";
@@ -19,11 +22,11 @@
     <div class="d-flex align-items-center gap-3">
         <!-- Khối chuyển đổi ngôn ngữ -->
         <div class="d-flex align-items-center gap-2 me-2">
-            <a href="javascript:void(0);" onclick="changeLanguage('vi')" title="<s:message code="global.lang.vi"/>" class="text-decoration-none text-dark fw-semibold px-2 py-1 rounded hover-bg-light" style="font-size: 0.9rem;">
+            <a href="javascript:void(0);" onclick="changeLanguage('vi')" title="${lblLangVi}" class="text-decoration-none text-dark fw-semibold px-2 py-1 rounded hover-bg-light" style="font-size: 0.9rem;">
                 VN
             </a>
             <span class="text-muted" style="opacity: 0.5;">|</span>
-            <a href="javascript:void(0);" onclick="changeLanguage('en')" title="<s:message code="global.lang.en"/>" class="text-decoration-none text-dark fw-semibold px-2 py-1 rounded hover-bg-light" style="font-size: 0.9rem;">
+            <a href="javascript:void(0);" onclick="changeLanguage('en')" title="${lblLangEn}" class="text-decoration-none text-dark fw-semibold px-2 py-1 rounded hover-bg-light" style="font-size: 0.9rem;">
                 EN
             </a>
         </div>
@@ -34,7 +37,7 @@
         </button>
 
         <!-- Notification Bell -->
-        <div class="position-relative d-inline-flex me-2 text-secondary p-2 rounded-circle hover-bg-light" style="cursor: pointer; width: 40px; height: 40px; align-items: center; justify-content: center;" onclick="window.location.href='${pageContext.request.contextPath}/announcements'" title="<s:message code="announcement.bellTitle"/>">
+        <div class="position-relative d-inline-flex me-2 text-secondary p-2 rounded-circle hover-bg-light" style="cursor: pointer; width: 40px; height: 40px; align-items: center; justify-content: center;" onclick="window.location.href='${pageContext.request.contextPath}/announcements'" title="${lblBellTitle}">
             <i class="bi bi-bell-fill fs-5"></i>
             <span id="unreadBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
                   style="${unreadCount > 0 ? '' : 'display: none;'} font-size: 0.65rem; padding: 0.25em 0.5em;">
@@ -94,7 +97,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2" id="myAvatarMenu" style="position: absolute; right: 0; top: 100%; display: none;">
                 <li>
-                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="${pageContext.request.contextPath}/profile">
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="${pageContext.request.contextPath}${sessionScope.role == 'SINHVIEN' ? '/student/profile' : '/profile'}">
                         <i class="bi bi-person-circle text-primary fs-5"></i>
                         <span><s:message code="profile.title"/></span>
                     </a>

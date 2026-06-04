@@ -13,13 +13,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>ckfinder-repository</id>
-      <name>CKFinder Repository</name>
-      <url>https://maven.cksource.com/</url>
-    </repository>
-  </repositories>
+
 
   <dependencies>
     <!-- Spring MVC & Core -->
@@ -237,11 +231,7 @@
             <artifactId>opencsv</artifactId>
             <version>5.8</version>
         </dependency>
-        <dependency>
-            <groupId>com.cksource</groupId>
-            <artifactId>ckfinder3</artifactId>
-            <version>3.5.2</version>
-        </dependency>
+
 
   </dependencies>
 

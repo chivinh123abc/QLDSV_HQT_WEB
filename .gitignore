@@ -58,3 +58,5 @@ momo.properties
 *.dbdiagram
 
 *.env
+
+src/main/webapp/resources/uploads/*
