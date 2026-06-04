@@ -51,7 +51,7 @@ public class AdminMarkController {
         }
         model.addAttribute("khoaList", khoaList);
 
-        // Dependent dropdowns & student lists loaded in SSR
+        // Dependent dropdowns
         if (nienKhoa != null && !nienKhoa.isEmpty() && !"all".equals(nienKhoa) && hocKy != null && !hocKy.isEmpty()
                 && !"all".equals(hocKy)) {
             List<Object[]> subjectList = markService.getSubjects(nienKhoa, hocKy, maKhoa);
@@ -60,17 +60,13 @@ public class AdminMarkController {
             if (maMH != null && !maMH.isEmpty()) {
                 List<Integer> groupList = markService.getGroups(nienKhoa, hocKy, maMH, maKhoa);
                 model.addAttribute("groupList", groupList);
-
-                if (nhom != null || (searchMaSV != null && !searchMaSV.trim().isEmpty())) {
-                    List<Object[]> studentList = markService.loadStudents(nienKhoa, hocKy, maMH, nhom, searchMaSV,
-                            maKhoa);
-                    model.addAttribute("studentMarkList", studentList);
-                }
             }
-        } else if (searchMaSV != null && !searchMaSV.trim().isEmpty()) {
-            List<Object[]> studentList = markService.loadStudents(null, null, null, null, searchMaSV, maKhoa);
-            model.addAttribute("studentMarkList", studentList);
         }
+
+        // Always load student marks matching whatever filters are active (or all if no
+        // filters selected)
+        List<Object[]> studentList = markService.loadStudents(nienKhoa, hocKy, maMH, nhom, searchMaSV, maKhoa);
+        model.addAttribute("studentMarkList", studentList);
 
         model.addAttribute("maKhoa", maKhoa);
         model.addAttribute("nienKhoa", nienKhoa);

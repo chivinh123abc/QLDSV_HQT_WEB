@@ -178,7 +178,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </c:if>
-                            <c:if test="${not empty error}">
+                            <c:if test="${not empty error && empty mode}">
                                 <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
                                     <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -335,6 +335,12 @@
                         <form:form action="${pageContext.request.contextPath}/admin/classroom" method="POST" modelAttribute="lop">
                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                             <div class="modal-body p-4">
+                                <c:if test="${not empty error}">
+                                    <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-3" role="alert">
+                                        <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                </c:if>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.classCode"/> <span class="text-danger">*</span></label>
@@ -356,7 +362,7 @@
                                             </button>
                                             <form:input path="khoaHoc" cssClass="form-control rounded-pill text-center fw-bold bg-white"
                                                 style="padding-left: 40px; padding-right: 40px; height: 42px; border-color: #e2e8f0;"
-                                                id="inp_khoaHoc" placeholder="2025-2026"/>
+                                                id="inp_khoaHoc"/>
                                             <button id="btn_year_up" class="btn btn-sm btn-light rounded-circle border shadow-sm p-0 position-absolute end-0 me-2 d-flex align-items-center justify-content-center" style="z-index: 5; width: 28px; height: 28px;" type="button" onclick="adjustYear(1)">
                                                 <i class="bi bi-plus"></i>
                                             </button>

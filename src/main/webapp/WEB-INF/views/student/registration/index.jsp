@@ -142,6 +142,7 @@
                                                     <th class="px-3"><s:message code="credit-class.lbl.classId"/></th>
                                                     <th>Môn Học & Nhóm</th>
                                                     <th>Niên Khóa & Học Kỳ</th>
+                                                    <th class="text-center">Sĩ Số</th>
                                                     <th class="text-center"><s:message code="global.lbl.actions"/></th>
                                                 </tr>
                                             </thead>
@@ -164,6 +165,8 @@
                                                         </c:forEach>
                                                     </c:if>
                                                     
+                                                    <c:set var="regCount" value="${classRegistrationCounts[item.maLTC] != null ? classRegistrationCounts[item.maLTC] : 0}" />
+                                                    
                                                     <tr>
                                                         <td class="px-3"><span class="badge-soft-primary">${item.maLTC}</span></td>
                                                         <td>
@@ -173,6 +176,11 @@
                                                         <td>
                                                             <div class="fw-bold text-dark">${item.nienKhoa}</div>
                                                             <div class="small text-muted"><s:message code="registration.semester" arguments="${item.hocKy}"/></div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge ${regCount >= item.soSVToiDa ? 'bg-danger text-danger' : 'bg-success text-success'} bg-opacity-10 rounded-pill fw-semibold">
+                                                                ${regCount} / ${item.soSVToiDa}
+                                                            </span>
                                                         </td>
                                                         <td class="text-center">
                                                             <c:choose>
@@ -190,6 +198,11 @@
                                                                         <i class="bi bi-dash-circle me-1"></i> Đã Đăng Ký
                                                                     </button>
                                                                 </c:when>
+                                                                <c:when test="${regCount >= item.soSVToiDa}">
+                                                                    <button class="btn btn-sm btn-secondary rounded-3 px-3" disabled title="Lớp đã đầy (đạt giới hạn sĩ số tối đa)">
+                                                                        <i class="bi bi-exclamation-octagon me-1"></i> Lớp Đầy
+                                                                    </button>
+                                                                </c:when>
                                                                 <c:otherwise>
                                                                     <form action="${pageContext.request.contextPath}/student/registration" method="POST">
                                                                         <input type="hidden" name="csrf_token" value="${csrfToken}" />
@@ -205,7 +218,7 @@
                                                 </c:forEach>
                                                 <c:if test="${empty availableClasses}">
                                                     <tr>
-                                                        <td colspan="4" class="text-center py-4 text-muted">Không có lớp tín chỉ khả dụng</td>
+                                                        <td colspan="5" class="text-center py-4 text-muted">Không có lớp tín chỉ khả dụng</td>
                                                     </tr>
                                                 </c:if>
                                             </tbody>

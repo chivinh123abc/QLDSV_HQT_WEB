@@ -1651,4 +1651,10 @@ tr[onclick], tr[onclick] * { cursor: pointer !important; user-select: none; }
   color: var(--color-foreground) !important;
 }
 
+/* Hide native Edge/Chrome password reveal/clear buttons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none !important;
+}
+
 

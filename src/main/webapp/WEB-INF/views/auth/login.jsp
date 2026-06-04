@@ -107,6 +107,11 @@
             border-color: #e2e8f0;
             background-color: #f8fafc;
         }
+        /* Hide native Edge/Chrome password reveal/clear buttons */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none !important;
+        }
     </style>
 </head>
 <body>

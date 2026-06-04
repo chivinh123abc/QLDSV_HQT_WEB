@@ -209,7 +209,6 @@ public class AuthController {
             emailOTPService.sendActivationOTP(email);
             session.setAttribute("ACTIVATING_USER", maSV);
             session.setAttribute("ACTIVATING_EMAIL", email);
-            redirectAttributes.addFlashAttribute("message", "Mã OTP đã được gửi thành công đến email " + email);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Không thể gửi OTP kích hoạt: " + e.getMessage());
         }

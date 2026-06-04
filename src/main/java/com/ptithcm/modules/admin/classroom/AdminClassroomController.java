@@ -37,6 +37,7 @@ public class AdminClassroomController {
         if (maKhoa != null && !maKhoa.equals("all")) {
             lop.setMaKhoa(maKhoa);
         }
+        lop.setKhoaHoc("2025-2026");
         return lop;
     }
 
@@ -100,6 +101,16 @@ public class AdminClassroomController {
     @PostMapping(params = "btnInsert")
     public String insert(ModelMap model, @Valid @ModelAttribute("lop") ClassroomDTO classroomDto,
             BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+        String khoaHoc = classroomDto.getKhoaHoc();
+        if (khoaHoc != null && khoaHoc.matches("^\\d{4}-\\d{4}$")) {
+            String[] years = khoaHoc.split("-");
+            int startYear = Integer.parseInt(years[0]);
+            int endYear = Integer.parseInt(years[1]);
+            if (endYear != startYear + 1) {
+                bindingResult.rejectValue("khoaHoc", "error.khoaHoc",
+                        "Khóa học phải gồm 2 năm liên tiếp (Ví dụ: 2025-2026)!");
+            }
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("error",
                     "Lỗi nhập liệu lớp học: " + bindingResult.getFieldErrors().stream()
@@ -129,6 +140,16 @@ public class AdminClassroomController {
     @PostMapping(params = "btnUpdate")
     public String update(ModelMap model, @Valid @ModelAttribute("lop") ClassroomDTO classroomDto,
             BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+        String khoaHoc = classroomDto.getKhoaHoc();
+        if (khoaHoc != null && khoaHoc.matches("^\\d{4}-\\d{4}$")) {
+            String[] years = khoaHoc.split("-");
+            int startYear = Integer.parseInt(years[0]);
+            int endYear = Integer.parseInt(years[1]);
+            if (endYear != startYear + 1) {
+                bindingResult.rejectValue("khoaHoc", "error.khoaHoc",
+                        "Khóa học phải gồm 2 năm liên tiếp (Ví dụ: 2025-2026)!");
+            }
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("error",
                     "Lỗi nhập liệu lớp học: " + bindingResult.getFieldErrors().stream()

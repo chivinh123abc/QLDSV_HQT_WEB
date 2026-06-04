@@ -1,6 +1,7 @@
 package com.ptithcm.modules.student.registration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
@@ -63,6 +64,11 @@ public class StudentRegistrationController {
 
         List<LopTinChi> availableClasses = registrationService.getAvailableClasses();
         model.addAttribute("availableClasses", availableClasses);
+
+        List<DangKy> allRegistrations = registrationService.listRegistration();
+        Map<String, Long> classRegistrationCounts = allRegistrations.stream().filter(r -> !r.isHuyDangKy())
+                .collect(Collectors.groupingBy(r -> r.getLopTinChi().getMaLTC(), Collectors.counting()));
+        model.addAttribute("classRegistrationCounts", classRegistrationCounts);
 
         return "student/registration/index";
     }

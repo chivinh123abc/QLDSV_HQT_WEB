@@ -109,6 +109,7 @@
                                             </c:if>
 
                                             <%-- Reports: PGV and KHOA --%>
+                                            <%--
                                                 <c:if
                                                     test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                                     <li>
@@ -124,6 +125,7 @@
                                                         </a>
                                                     </li>
                                                 </c:if>
+                                            --%>
 
                                                 <%-- Role Management: PGV only --%>
                                                     <c:if test="${sessionScope.role == 'PGV'}">

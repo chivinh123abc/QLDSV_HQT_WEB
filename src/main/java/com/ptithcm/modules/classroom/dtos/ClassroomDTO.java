@@ -1,6 +1,7 @@
 package com.ptithcm.modules.classroom.dtos;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class ClassroomDTO {
@@ -15,6 +16,8 @@ public class ClassroomDTO {
     @NotBlank(message = "Mã khoa không được để trống!")
     private String maKhoa;
 
+    @NotBlank(message = "Khóa học không được để trống!")
+    @Pattern(regexp = "^\\d{4}-\\d{4}$", message = "Khóa học phải đúng định dạng YYYY-YYYY (Ví dụ: 2025-2026)!")
     private String khoaHoc;
 
     public String getMaLop() {
