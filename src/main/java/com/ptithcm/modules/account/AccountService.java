@@ -14,7 +14,6 @@ import com.ptithcm.entities.GiangVien;
 import com.ptithcm.entities.SinhVien;
 import com.ptithcm.entities.TaiKhoan;
 import com.ptithcm.shared.enums.TrangThaiTaiKhoan;
-import com.ptithcm.shared.utils.SecurityUtil;
 
 @Service
 @Transactional
@@ -23,30 +22,29 @@ public class AccountService {
     @Autowired
     private AccountDAO accountDAO;
 
-    public List<String[]> provisionStudentAccounts(List<String> mssvList) {
+    public List<String[]> provisionStudentAccounts(List<String[]> importData) {
         List<String[]> results = new ArrayList<>();
 
-        for (String mssv : mssvList) {
-            String rawPassword = SecurityUtil.generateRandomPassword(8);
-            String email = mssv + "@student.ptit.edu.vn";
+        for (String[] data : importData) {
+            String mssv = data[0];
+            String csvEmail = data[1];
 
             TaiKhoan tk = accountDAO.getAccountByUsername(mssv);
             if (tk == null) {
+                String email = (csvEmail != null && !csvEmail.trim().isEmpty())
+                        ? csvEmail.trim()
+                        : (mssv + "@student.ptit.edu.vn");
+
                 tk = new TaiKhoan();
                 tk.setTenDangNhap(mssv);
-                tk.setMatKhau(BCrypt.hashpw(rawPassword, BCrypt.gensalt(12)));
+                tk.setMatKhau(BCrypt.hashpw("", BCrypt.gensalt(12)));
                 tk.setEmail(email);
                 tk.setPhanQuyen("SINHVIEN");
                 tk.setTrangThai(TrangThaiTaiKhoan.CHUA_KICH_HOAT);
                 accountDAO.saveAccount(tk);
-            } else {
-                tk.setMatKhau(BCrypt.hashpw(rawPassword, BCrypt.gensalt(12)));
-                tk.setEmail(email);
-                tk.setTrangThai(TrangThaiTaiKhoan.CHUA_KICH_HOAT);
-                accountDAO.updateAccount(tk);
-            }
 
-            results.add(new String[]{mssv, rawPassword, email});
+                results.add(new String[]{mssv, email});
+            }
         }
         return results;
     }

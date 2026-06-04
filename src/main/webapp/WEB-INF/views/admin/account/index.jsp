@@ -111,13 +111,10 @@
                                             </p>
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <form action="${pageContext.request.contextPath}/admin/account/import" method="POST" enctype="multipart/form-data" class="d-inline-flex gap-1 align-items-center mb-0">
-                                                <input type="hidden" name="csrf_token" value="${csrfToken}" />
-                                                <input type="file" name="file" accept=".csv" required class="form-control form-control-sm rounded-3" style="max-width: 200px;" />
-                                                <button type="submit" class="btn btn-outline-success btn-sm rounded-3 fw-bold shadow-sm">
-                                                    <i class="bi bi-file-earmark-arrow-up-fill me-1"></i> <s:message code="account.import.csv" />
-                                                </button>
-                                            </form>
+                                            <!-- Import Button -->
+                                            <button type="button" class="btn btn-info btn-sm text-white rounded-3 px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#importCsvModal">
+                                                <i class="bi bi-file-earmark-arrow-up-fill me-1"></i> <s:message code="account.import.csv" />
+                                            </button>
                                             <a href="${pageContext.request.contextPath}/admin/account?lnkAdd=true"
                                                 class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm d-inline-flex align-items-center">
                                                 <i class="bi bi-plus-circle-fill me-1"></i>
@@ -269,6 +266,92 @@
                          </main>
                      </div>
                  </div>
+
+                  <!-- IMPORT CSV MODAL -->
+                  <div class="modal fade" id="importCsvModal" tabindex="-1" aria-labelledby="importCsvModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content border-0 shadow-lg rounded-4">
+                              <div class="modal-header bg-info text-white border-0 py-3 px-4 rounded-top-4">
+                                  <h5 class="modal-title fw-bold d-flex align-items-center gap-2"
+                                      id="importCsvModalLabel">
+                                      <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                                      <s:message code="account.import.modal.title" />
+                                  </h5>
+                                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                      aria-label="Close"></button>
+                              </div>
+                              <form action="${pageContext.request.contextPath}/admin/account/import" method="POST"
+                                  enctype="multipart/form-data">
+                                  <input type="hidden" name="csrf_token" value="${csrfToken}" />
+                                  <div class="modal-body p-4">
+                                      <!-- Hướng dẫn cấu trúc file -->
+                                      <div class="alert alert-info border-0 rounded-3 mb-3 small">
+                                          <h6 class="fw-bold mb-2"><i class="bi bi-info-circle-fill me-1"></i>
+                                              <s:message code="account.import.guide.title" />
+                                          </h6>
+                                          <ul class="ps-3 mb-2" style="list-style-type: disc;">
+                                              <li>
+                                                  <s:message code="account.import.guide.headers" /> <strong>Mã SV, Họ Tên, Email, Phái, Ngày Sinh, Địa Chỉ, Trạng Thái</strong>
+                                              </li>
+                                              <li>
+                                                  <s:message code="account.import.guide.separator" />
+                                                  <strong>,</strong>
+                                              </li>
+                                              <li>
+                                                  <s:message code="account.import.guide.encoding" />
+                                              </li>
+                                              <li>
+                                                  <s:message code="account.import.guide.fields" />
+                                              </li>
+                                          </ul>
+                                          <div class="text-muted small border-top pt-2 mt-2">
+                                              <strong>
+                                                  <s:message code="account.import.guide.example" />
+                                              </strong><br>
+                                              <code>Mã SV,Họ Tên,Email,Phái,Ngày Sinh,Địa Chỉ,Trạng Thái</code><br>
+                                              <code>N21DCCN001,Nguyễn Văn A,n21dccn001@student.ptit.edu.vn,Nam,2003-05-15,Hà Nội,Đang học</code>
+                                          </div>
+                                      </div>
+
+                                      <s:message code="student.import.file.noFile" var="noFileMsg" />
+                                      <!-- Chọn tệp dịch chuyển label -->
+                                      <div class="mb-3">
+                                          <label class="form-label small fw-bold text-muted">
+                                              <s:message code="account.import.file.select" />
+                                          </label>
+                                          <div class="input-group">
+                                              <input type="file" name="file" accept=".csv" required
+                                                  class="form-control d-none" id="csvFileInput"
+                                                  onchange="updateFileName(this)">
+                                              <label for="csvFileInput"
+                                                  class="btn btn-outline-secondary rounded-start-3 mb-0"
+                                                  style="border-top-left-radius: 12px; border-bottom-left-radius: 12px;">
+                                                  <s:message code="account.import.file.selectBtn" />
+                                              </label>
+                                              <span class="form-control text-muted bg-light" id="csvFileName"
+                                                  data-no-file-text="${noFileMsg}"
+                                                  style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; font-size: 0.9rem; line-height: 24px; display: flex; align-items: center;">${noFileMsg}</span>
+                                          </div>
+                                          <div class="form-text text-muted small mt-1">
+                                              <s:message code="account.import.file.hint" />
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="modal-footer border-0 px-4 pb-4">
+                                      <button type="button" class="btn btn-light rounded-3 fw-bold"
+                                          data-bs-dismiss="modal">
+                                          <s:message code="global.btn.cancel" />
+                                      </button>
+                                      <button type="submit"
+                                          class="btn btn-info text-white rounded-3 fw-bold px-4">
+                                          <s:message code="account.import.btn.submit" />
+                                      </button>
+                                  </div>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
 
                  <!-- ACCOUNT MODAL (SSR) -->
                  <c:if test="${not empty mode || not empty param.lnkAdd}">
@@ -442,6 +525,17 @@
                  <!-- Bootstrap JS -->
                  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
                  <script>
+                      function updateFileName(input) {
+                          const nameSpan = document.getElementById('csvFileName');
+                          if (input.files && input.files.length > 0) {
+                              nameSpan.textContent = input.files[0].name;
+                              nameSpan.classList.remove('text-muted');
+                          } else {
+                              nameSpan.textContent = nameSpan.getAttribute('data-no-file-text');
+                              nameSpan.classList.add('text-muted');
+                          }
+                      }
+
                      function normalizeVN(str) {
                          return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd').replace(/\u0110/g, 'D').toLowerCase();
                      }

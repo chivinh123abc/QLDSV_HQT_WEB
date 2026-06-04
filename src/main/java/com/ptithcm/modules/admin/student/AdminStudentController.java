@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,6 @@ import com.ptithcm.modules.student.StudentService;
 import com.ptithcm.modules.student.dtos.StudentDTO;
 import com.ptithcm.shared.constants.SessionConstant;
 import com.ptithcm.shared.enums.RoleEnum;
-import com.ptithcm.shared.enums.TrangThaiTaiKhoan;
 
 @Controller
 @RequestMapping("/admin/student")
@@ -290,7 +290,9 @@ public class AdminStudentController {
     }
 
     @GetMapping("/export-credentials")
-    public void exportCredentialsToCsv(HttpServletResponse response, HttpSession httpSession) {
+    @Transactional
+    public void exportCredentialsToCsv(@RequestParam(value = "maLop", required = false) String maLop,
+            HttpServletResponse response, HttpSession httpSession) {
         String sessionRole = (String) httpSession.getAttribute(SessionConstant.ROLE);
         if (!RoleEnum.PGV.getCode().equals(sessionRole) && !RoleEnum.KHOA.getCode().equals(sessionRole)) {
             try {
@@ -304,7 +306,7 @@ public class AdminStudentController {
             // 1. Set Encoding BẮT BUỘC phải nằm TRƯỚC khi gọi getWriter()
             response.setContentType("text/csv");
             response.setCharacterEncoding("UTF-8");
-            response.setHeader("Content-Disposition", "attachment; filename=\"DanhSach_TaiKhoan_SinhVien.csv\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"DanhSach_SinhVien.csv\"");
 
             // 2. Lấy luồng ghi Text chuẩn của Spring/Tomcat
             PrintWriter writer = response.getWriter();
@@ -313,30 +315,35 @@ public class AdminStudentController {
             writer.write('\ufeff');
 
             // 4. Ghi tiêu đề Header
-            writer.println("Mã SV,Họ Tên,Email Đăng Nhập,Phân Quyền,Trạng Thái");
+            writer.println("Mã SV,Họ Tên,Email,Phái,Ngày Sinh,Địa Chỉ,Trạng Thái");
 
-            // 5. Lọc danh sách (Chỉ sinh viên CÓ tài khoản)
-            List<SinhVien> danhSach = studentService.getStudentsWithAccount();
+            // 5. Lọc danh sách (Nếu có maLop thì lấy tất cả sinh viên lớp đó, nếu không lấy
+            // tất cả có tài khoản)
+            List<SinhVien> danhSach;
+            if (maLop != null && !maLop.trim().isEmpty()) {
+                danhSach = studentService.listStudentsByClass(maLop);
+            } else {
+                danhSach = studentService.getStudentsWithAccount();
+            }
+
             List<TaiKhoan> accounts = accountDAO.getAllAccounts();
             Map<String, TaiKhoan> accountMap = accounts.stream()
                     .collect(Collectors.toMap(TaiKhoan::getTenDangNhap, a -> a, (a1, a2) -> a1));
 
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+
             // 6. Ghi dữ liệu
             for (SinhVien sv : danhSach) {
                 TaiKhoan tk = accountMap.get(sv.getMaSV());
-                if (tk != null) {
-                    // Biến đổi trạng thái số thành text để Giáo vụ dễ đọc
-                    String txtTrangThai = "Chưa kích hoạt";
-                    if (tk.getTrangThai() == TrangThaiTaiKhoan.DA_KICH_HOAT) {
-                        txtTrangThai = "Đang hoạt động";
-                    } else if (tk.getTrangThai() == TrangThaiTaiKhoan.KHOA) {
-                        txtTrangThai = "Bị khóa";
-                    }
+                String email = tk != null ? tk.getEmail() : "";
 
-                    // Ghi từng dòng (bọc ngoặc kép để chống lỗi nếu tên có dấu phẩy)
-                    writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", sv.getMaSV(), sv.getHo() + " " + sv.getTen(),
-                            tk.getEmail(), "SINH_VIEN", txtTrangThai);
-                }
+                String ngaySinhStr = sv.getNgaySinh() != null ? sdf.format(sv.getNgaySinh()) : "";
+                String trangThaiStr = sv.isDaNghiHoc() ? "Nghỉ học" : "Đang học";
+
+                // Ghi từng dòng (bọc ngoặc kép để chống lỗi nếu tên hoặc địa chỉ có dấu phẩy)
+                writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", sv.getMaSV(),
+                        sv.getHo() + " " + sv.getTen(), email, sv.getPhai() != null ? sv.getPhai() : "", ngaySinhStr,
+                        sv.getDiaChi() != null ? sv.getDiaChi() : "", trangThaiStr);
             }
 
             writer.flush();

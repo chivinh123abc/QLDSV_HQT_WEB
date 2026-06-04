@@ -148,8 +148,8 @@ public class AdminAccountController {
                 throw new IllegalArgumentException("Tệp tin tải lên không đúng định dạng. Vui lòng chọn tệp CSV!");
             }
 
-            List<String> mssvList = csvService.extractMssvFromCsv(file);
-            List<String[]> credentials = accountService.provisionStudentAccounts(mssvList);
+            List<String[]> importData = csvService.extractAccountImportFromCsv(file);
+            List<String[]> credentials = accountService.provisionStudentAccounts(importData);
             csvService.exportCredentialsToCsv(credentials, response);
         } catch (IllegalArgumentException e) {
             try {
