@@ -340,7 +340,7 @@
                                                                             <th
                                                                                 class="border-0 small fw-bold text-muted">
                                                                                 <s:message
-                                                                                    code="student.lbl.lastName" /> V├Ç
+                                                                                    code="student.lbl.lastName" /> &
                                                                                 <s:message
                                                                                     code="lecturer.lbl.firstName.required" />
                                                                             </th>
