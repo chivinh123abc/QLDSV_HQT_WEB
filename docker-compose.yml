@@ -55,7 +55,7 @@ services:
       - ./src/main/resources/database.properties:/usr/local/tomcat/lib/database.properties
       - ./src/main/resources/gmail.properties:/usr/local/tomcat/lib/gmail.properties
       # - ./src/main/resources/chatbot.properties:/usr/local/tomcat/lib/chatbot.properties
-      - ./uploads/avatars:/usr/local/tomcat/webapps/ROOT/resources/uploads/avatars
+      - ./uploads/avatars:/usr/local/tomcat/external/avatars
     networks:
       - app-network
     depends_on:
