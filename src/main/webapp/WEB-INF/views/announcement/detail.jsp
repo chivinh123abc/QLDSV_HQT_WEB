@@ -99,7 +99,7 @@
                         </div>
                         
                         <div class="detail-body">
-                            ${announcement.noiDung}
+                            <c:out value="${announcement.noiDung}" escapeXml="false" />
                         </div>
                     </div>
                 </div>

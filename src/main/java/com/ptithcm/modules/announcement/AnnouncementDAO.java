@@ -1,5 +1,9 @@
 package com.ptithcm.modules.announcement;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Repository;
 
 import com.ptithcm.entities.ThongBao;
@@ -26,5 +30,16 @@ public class AnnouncementDAO extends BaseDAO<ThongBao, String> {
         Long count = getSession().createNativeQuery(sql, Long.class).setParameter("tenDangNhap", tenDangNhap)
                 .getSingleResult();
         return count != null ? count.intValue() : 0;
+    }
+
+    public Map<String, Boolean> getReadStatusMap(String tenDangNhap) {
+        String sql = "SELECT id_thong_bao FROM thong_bao_da_doc WHERE ten_dang_nhap = :tenDangNhap";
+        List<String> list = getSession().createNativeQuery(sql, String.class).setParameter("tenDangNhap", tenDangNhap)
+                .getResultList();
+        Map<String, Boolean> map = new HashMap<>();
+        for (String id : list) {
+            map.put(id, true);
+        }
+        return map;
     }
 }
