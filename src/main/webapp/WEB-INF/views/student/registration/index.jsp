@@ -130,7 +130,8 @@
                                     <h6 class="fw-bold text-dark mb-0"><s:message code="registration.available.classes"/></h6>
                                     <div class="input-group" style="max-width: 200px;">
                                         <span class="input-group-text bg-light border-0"><i class="bi bi-funnel"></i></span>
-                                        <input type="text" id="ltc-search" class="form-control bg-light border-0 small" placeholder="<s:message code="registration.filter"/>" onkeyup="filterLTC()">
+                                        <s:message code="registration.filter" var="lblRegistrationFilter"/>
+                                        <input type="text" id="ltc-search" class="form-control bg-light border-0 small" placeholder="${lblRegistrationFilter}" onkeyup="filterLTC()">
                                     </div>
                                 </div>
                                 <div class="card-body p-4">

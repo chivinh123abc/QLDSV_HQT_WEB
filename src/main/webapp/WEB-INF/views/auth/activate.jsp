@@ -158,7 +158,8 @@
                         <label class="form-label"><s:message code="auth.activate.username"/></label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-person text-muted"></i></span>
-                            <input type="text" name="maSV" class="form-control" placeholder="<s:message code="auth.activate.username.placeholder"/>" required>
+                            <s:message code="auth.activate.username.placeholder" var="lblAuthActivateUsernamePlaceholder"/>
+                            <input type="text" name="maSV" class="form-control" placeholder="${lblAuthActivateUsernamePlaceholder}" required>
                         </div>
                     </div>
 
@@ -166,7 +167,8 @@
                         <label class="form-label"><s:message code="auth.activate.email"/></label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-envelope text-muted"></i></span>
-                            <input type="email" name="email" class="form-control" placeholder="<s:message code="auth.activate.email.placeholder"/>" required>
+                            <s:message code="auth.activate.email.placeholder" var="lblAuthActivateEmailPlaceholder"/>
+                            <input type="email" name="email" class="form-control" placeholder="${lblAuthActivateEmailPlaceholder}" required>
                         </div>
                     </div>
 
@@ -189,7 +191,8 @@
                         <label class="form-label"><s:message code="auth.activate.otp.label"/></label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-key text-muted"></i></span>
-                            <input type="text" name="otpCode" class="form-control text-center fw-bold fs-5" style="letter-spacing: 2px;" placeholder="<s:message code="auth.activate.otp.placeholder"/>" maxlength="6" required autocomplete="off">
+                            <s:message code="auth.activate.otp.placeholder" var="lblAuthActivateOtpPlaceholder"/>
+                            <input type="text" name="otpCode" class="form-control text-center fw-bold fs-5" style="letter-spacing: 2px;" placeholder="${lblAuthActivateOtpPlaceholder}" maxlength="6" required autocomplete="off">
                         </div>
                     </div>
 
@@ -197,7 +200,8 @@
                         <label class="form-label"><s:message code="auth.activate.newPassword"/></label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                            <input type="password" name="newPassword" id="newPassword" class="form-control border-start-0 border-end-0" placeholder="<s:message code="auth.activate.newPassword.placeholder"/>" required>
+                            <s:message code="auth.activate.newPassword.placeholder" var="lblAuthActivateNewPasswordPlaceholder"/>
+                            <input type="password" name="newPassword" id="newPassword" class="form-control border-start-0 border-end-0" placeholder="${lblAuthActivateNewPasswordPlaceholder}" required>
                             <button class="btn btn-outline-secondary toggle-btn border-start-0" type="button" id="toggleNewPasswordBtn">
                                 <i class="bi bi-eye-slash text-muted" id="toggleNewPasswordIcon"></i>
                             </button>
@@ -208,7 +212,8 @@
                         <label class="form-label"><s:message code="auth.activate.confirmPassword"/></label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock-check text-muted"></i></span>
-                            <input type="password" name="confirmPassword" id="confirmPassword" class="form-control border-start-0 border-end-0" placeholder="<s:message code="auth.activate.confirmPassword.placeholder"/>" required>
+                            <s:message code="auth.activate.confirmPassword.placeholder" var="lblAuthActivateConfirmPasswordPlaceholder"/>
+                            <input type="password" name="confirmPassword" id="confirmPassword" class="form-control border-start-0 border-end-0" placeholder="${lblAuthActivateConfirmPasswordPlaceholder}" required>
                             <button class="btn btn-outline-secondary toggle-btn border-start-0" type="button" id="toggleConfirmPasswordBtn">
                                 <i class="bi bi-eye-slash text-muted" id="toggleConfirmPasswordIcon"></i>
                             </button>

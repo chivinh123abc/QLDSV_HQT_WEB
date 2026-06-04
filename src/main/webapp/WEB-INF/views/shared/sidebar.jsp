@@ -16,11 +16,13 @@
                             <i class="bi bi-house-door"></i> <s:message code="global.menu.home"/>
                         </a>
                     </li>
-                    <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/announcements">
-                            <i class="bi bi-bell"></i> <s:message code="announcement.menu"/>
-                        </a>
-                    </li>
+                    <c:if test="${sessionScope.role != 'PGV' && sessionScope.role != 'KHOA'}">
+                        <li>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/announcements">
+                                <i class="bi bi-bell"></i> <s:message code="announcement.menu"/>
+                            </a>
+                        </li>
+                    </c:if>
 
                     <%-- Student Marks: Students only --%>
                     <c:if test="${sessionScope.role == 'SINHVIEN'}">
@@ -65,7 +67,7 @@
                                 </li>
                                 <li>
                                     <a class="nav-link" href="${pageContext.request.contextPath}/admin/announcement">
-                                        <i class="bi bi-megaphone"></i> <s:message code="announcement.menu"/> (Admin)
+                                        <i class="bi bi-megaphone"></i> <s:message code="announcement.menu"/>
                                     </a>
                                 </li>
                             </c:if>

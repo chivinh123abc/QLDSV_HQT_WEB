@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><s:message code="mark.page.title"/></title>
+    <title><s:message code="mark.page.title" text="Tuition and Grades Management"/></title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -155,8 +155,8 @@
 
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                         <div>
-                            <h2 class="page-title"><i class="bi bi-grid-3x3-gap-fill me-2"></i><s:message code="mark.lbl.title"/></h2>
-                            <p class="text-muted small mb-0"><s:message code="mark.system.desc"/></p>
+                            <h2 class="page-title"><i class="bi bi-grid-3x3-gap-fill me-2"></i><s:message code="mark.lbl.title" text="Tuition and Grades Management"/></h2>
+                            <p class="text-muted small mb-0"><s:message code="mark.system.desc" text="Enter and manage student grades."/></p>
                         </div>
                         <c:if test="${not empty studentMarkList}">
                             <div class="d-flex gap-2 align-items-center">
@@ -176,7 +176,7 @@
                                     <div class="col-lg-3 col-md-6">
                                         <label class="form-label text-secondary fw-semibold small">KHOA</label>
                                         <select class="form-select border-0 bg-light rounded-3" name="maKhoa" onchange="this.form.submit()">
-                                            <option value="all"><s:message code="mark.all.faculties"/></option>
+                                            <option value="all"><s:message code="mark.all.faculties" text="All Faculties"/></option>
                                             <c:forEach var="k" items="${khoaList}">
                                                 <option value="${k.maKhoa}" ${maKhoa == k.maKhoa ? 'selected' : ''}>${k.tenKhoa}</option>
                                             </c:forEach>
@@ -191,7 +191,7 @@
                             <div class="col-lg-2 col-md-6">
                                 <label class="form-label text-secondary fw-semibold small"><s:message code="global.lbl.academicYear.upper"/></label>
                                 <select class="form-select border-0 bg-light rounded-3" name="nienKhoa" onchange="this.form.submit()">
-                                    <option value=""><s:message code="mark.select.academic.year"/></option>
+                                    <option value=""><s:message code="mark.select.academic.year" text="Select Academic Year"/></option>
                                     <c:forEach var="nk" items="${nienKhoaList}">
                                         <option value="${nk}" ${nienKhoa == nk ? 'selected' : ''}>${nk}</option>
                                     </c:forEach>
@@ -201,7 +201,7 @@
                             <div class="col-lg-2 col-md-6">
                                 <label class="form-label text-secondary fw-semibold small">HỌC KỲ</label>
                                 <select class="form-select border-0 bg-light rounded-3" name="hocKy" onchange="this.form.submit()">
-                                    <option value=""><s:message code="mark.select.semester"/></option>
+                                    <option value=""><s:message code="mark.select.semester" text="Select Semester"/></option>
                                     <option value="1" ${hocKy == '1' ? 'selected' : ''}>1</option>
                                     <option value="2" ${hocKy == '2' ? 'selected' : ''}>2</option>
                                     <option value="3" ${hocKy == '3' ? 'selected' : ''}>3</option>
@@ -212,7 +212,7 @@
                             <div class="col-lg-3 col-md-12">
                                 <label class="form-label text-secondary fw-semibold small"><s:message code="credit-class.lbl.subject"/></label>
                                 <select class="form-select border-0 bg-light rounded-3" name="maMH" onchange="this.form.submit()" ${empty subjectList ? 'disabled' : ''}>
-                                    <option value=""><s:message code="mark.select.subject"/></option>
+                                    <option value=""><s:message code="mark.select.subject" text="Select Subject"/></option>
                                     <c:forEach var="sb" items="${subjectList}">
                                         <option value="${sb[0]}" ${maMH == sb[0] ? 'selected' : ''}>[${sb[0]}] ${sb[1]}</option>
                                     </c:forEach>
@@ -222,7 +222,7 @@
                             <div class="col-lg-1 col-md-6">
                                 <label class="form-label text-secondary fw-semibold small"><s:message code="credit-class.lbl.group"/></label>
                                 <select class="form-select border-0 bg-light rounded-3" name="nhom" onchange="this.form.submit()" ${empty groupList ? 'disabled' : ''}>
-                                    <option value=""><s:message code="mark.group"/></option>
+                                    <option value=""><s:message code="mark.group" text="Select Group"/></option>
                                     <c:forEach var="g" items="${groupList}">
                                         <option value="${g}" ${nhom == g ? 'selected' : ''}>${g}</option>
                                     </c:forEach>
@@ -231,7 +231,8 @@
 
                             <div class="col-lg-2 col-md-6">
                                 <label class="form-label text-secondary fw-semibold small"><s:message code="mark.lbl.searchStudentId"/></label>
-                                <input type="text" class="form-control border-0 bg-light rounded-3 shadow-none" name="searchMaSV" value="${searchMaSV}" placeholder="<s:message code="mark.enter.student.id"/>">
+                                <s:message code="mark.enter.student.id" var="lblMarkEnterStudentId"/>
+                                <input type="text" class="form-control border-0 bg-light rounded-3 shadow-none" name="searchMaSV" value="${searchMaSV}" placeholder="${lblMarkEnterStudentId}">
                             </div>
 
                             <div class="col-lg-1 col-md-12 d-flex align-items-end">
@@ -261,7 +262,7 @@
                                                 <th class="ps-4">STT</th>
                                                 <th><s:message code="global.lbl.studentId"/></th>
                                                 <th><s:message code="global.lbl.fullName"/></th>
-                                                <th><s:message code="mark.subject.group"/></th>
+                                                <th><s:message code="mark.subject.group" text="Subject & Group"/></th>
                                                 <th class="text-center">CC (10%)</th>
                                                 <th class="text-center">GK (30%)</th>
                                                 <th class="text-center">CK (60%)</th>
@@ -307,7 +308,7 @@
                                                 <tr>
                                                     <td colspan="8" class="text-center py-5 text-muted">
                                                         <div class="opacity-50 mb-3"><i class="bi bi-inbox fs-1"></i></div>
-                                                        <s:message code="mark.please.select.info"/>
+                                                        <s:message code="mark.please.select.info" text="Please select academic year, semester, subject, and group to query data."/>
                                                     </td>
                                                 </tr>
                                             </c:if>

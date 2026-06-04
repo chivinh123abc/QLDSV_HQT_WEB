@@ -75,7 +75,8 @@
                                     <form action="${pageContext.request.contextPath}/admin/registration" method="GET" class="mb-3">
                                         <div class="input-group shadow-sm rounded-3 overflow-hidden">
                                             <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge"></i></span>
-                                            <input type="text" name="maSV" class="form-control border-start-0 ps-0" placeholder="<s:message code="registration.enter.student.id"/>" value="${selectedStudent != null ? selectedStudent.maSV : ''}" required>
+                                            <s:message code="registration.enter.student.id" var="lblRegistrationEnterStudentId"/>
+                                            <input type="text" name="maSV" class="form-control border-start-0 ps-0" placeholder="${lblRegistrationEnterStudentId}" value="${selectedStudent != null ? selectedStudent.maSV : ''}" required>
                                             <button class="btn btn-primary fw-bold" type="submit"><s:message code="registration.btn.search"/></button>
                                         </div>
                                     </form>
@@ -152,7 +153,8 @@
                                     <h6 class="fw-bold text-dark mb-0"><s:message code="registration.available.classes"/></h6>
                                     <div class="input-group" style="max-width: 200px;">
                                         <span class="input-group-text bg-light border-0"><i class="bi bi-funnel"></i></span>
-                                        <input type="text" id="ltc-search" class="form-control bg-light border-0 small" placeholder="<s:message code="registration.filter"/>" onkeyup="filterLTC()">
+                                        <s:message code="registration.filter" var="lblRegistrationFilter"/>
+                                        <input type="text" id="ltc-search" class="form-control bg-light border-0 small" placeholder="${lblRegistrationFilter}" onkeyup="filterLTC()">
                                     </div>
                                 </div>
                                 <div class="card-body p-4">
@@ -207,7 +209,8 @@
                                                                     </form>
                                                                 </c:when>
                                                                 <c:when test="${isSameSubjectRegistered}">
-                                                                    <button class="btn btn-sm btn-secondary rounded-3 px-3" disabled title="<s:message code="registration.already.registered"/>">
+                                                                    <s:message code="registration.already.registered" var="lblAlreadyRegistered"/>
+                                                                    <button class="btn btn-sm btn-secondary rounded-3 px-3" disabled title="${lblAlreadyRegistered}">
                                                                         <i class="bi bi-dash-circle me-1"></i> <s:message code="registration.already.registered.label"/>
                                                                     </button>
                                                                 </c:when>
@@ -215,7 +218,8 @@
                                                                     <form action="${pageContext.request.contextPath}/admin/registration" method="POST">
                                                                         <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                         <input type="hidden" name="maLTC" value="${item.maLTC}">
-                                                                        <button type="submit" name="btnInsert" class="btn btn-sm btn-primary rounded-3 px-3" <c:if test="${empty selectedStudent}">disabled title="<s:message code="registration.disabled.search.first"/>"</c:if>>
+                                                                        <s:message code="registration.disabled.search.first" var="disabledSearchFirstMsg" />
+                                                                        <button type="submit" name="btnInsert" class="btn btn-sm btn-primary rounded-3 px-3" ${empty selectedStudent ? 'disabled' : ''} title="${empty selectedStudent ? disabledSearchFirstMsg : ''}">
                                                                             <i class="bi bi-plus-circle me-1"></i> <s:message code="registration.btn.register"/>
                                                                         </button>
                                                                     </form>

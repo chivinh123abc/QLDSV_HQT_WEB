@@ -208,9 +208,10 @@
                                         <div class="input-group" style="max-width: 300px;">
                                             <span class="input-group-text bg-light border-0"><i
                                                     class="bi bi-search text-muted"></i></span>
+                                            <s:message code="classroom.search" var="lblClassroomSearch"/>
                                             <input type="text" id="search-input"
                                                 class="form-control bg-light border-0 small"
-                                                placeholder="<s:message code="classroom.search"/>" onkeyup="filterLocal()">
+                                                placeholder="${lblClassroomSearch}" onkeyup="filterLocal()">
                                         </div>
                                         <div class="d-flex gap-3 align-items-center">
                                             <label class="fw-bold small text-muted text-uppercase mb-0"><s:message code="global.btn.filter"/>
@@ -284,9 +285,10 @@
                                                                         <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                         <input type="hidden" name="maLop" value="${item.maLop}">
                                                                         <input type="hidden" name="maKhoa" value="${maKhoa}">
-                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!item.canDelete}">disabled title="<s:message code='classroom.cannot.delete'/>"</c:if>>
-                                                                            <i class="bi bi-trash3"></i>
-                                                                        </button>
+                                                                         <s:message code="classroom.cannot.delete" var="cannotDeleteMsg" />
+                                                                         <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled' : ''} title="${!item.canDelete ? cannotDeleteMsg : ''}">
+                                                                             <i class="bi bi-trash3"></i>
+                                                                         </button>
                                                                     </form>
                                                                 </div>
                                                             </td>
@@ -342,8 +344,9 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.className"/> <span class="text-danger">*</span></label>
+                                        <s:message code="classroom.example.desc" var="lblClassroomExampleDesc"/>
                                         <form:input path="tenLop" cssClass="form-control rounded-3"
-                                            placeholder="<s:message code="classroom.example.desc"/>"/>
+                                            placeholder="${lblClassroomExampleDesc}"/>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label small fw-bold text-muted"><s:message code="classroom.lbl.academicTerm"/> <span class="text-danger">*</span></label>

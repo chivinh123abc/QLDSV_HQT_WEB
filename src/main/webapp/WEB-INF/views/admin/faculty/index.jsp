@@ -169,7 +169,8 @@
                                     <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                                         <div class="input-group" style="max-width: 300px;">
                                             <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                            <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="<s:message code="faculty.search"/>" onkeyup="filterLocal()">
+                                            <s:message code="faculty.search" var="lblFacultySearch"/>
+                                            <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="${lblFacultySearch}" onkeyup="filterLocal()">
                                         </div>
                                     </div>
 
@@ -202,7 +203,8 @@
                                                                 <form action="${pageContext.request.contextPath}/admin/faculty" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khoa này không? Thao tác này không thể hoàn tác.');" class="d-inline">
                                                                     <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                     <input type="hidden" name="maKhoa" value="${item.maKhoa}">
-                                                                    <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!item.canDelete}">disabled title="<s:message code='faculty.cannot.delete'/>"</c:if>>
+                                                                    <s:message code="faculty.cannot.delete" var="cannotDeleteMsg" />
+                                                                    <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled' : ''} title="${!item.canDelete ? cannotDeleteMsg : ''}">
                                                                         <i class="bi bi-trash3"></i>
                                                                     </button>
                                                                 </form>
@@ -253,7 +255,8 @@
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label small fw-bold text-muted"><s:message code="faculty.lbl.name"/> <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control rounded-3" name="tenKhoa" value="${khoa.tenKhoa}" placeholder="<s:message code="faculty.example.name"/>" required>
+                                            <s:message code="faculty.example.name" var="lblFacultyExampleName"/>
+                                            <input type="text" class="form-control rounded-3" name="tenKhoa" value="${khoa.tenKhoa}" placeholder="${lblFacultyExampleName}" required>
                                         </div>
                                     </div>
                                 </div>

@@ -158,7 +158,8 @@
                 <label class="form-label"><s:message code="auth.login.username"/></label>
                 <div class="input-group">
                     <span class="input-group-text bg-light"><i class="bi bi-person text-muted"></i></span>
-                    <input type="text" name="username" class="form-control" placeholder="<s:message code="auth.login.enter.id"/>" value="${username}" required autofocus>
+                    <s:message code="auth.login.enter.id" var="lblAuthLoginEnterId"/>
+                    <input type="text" name="username" class="form-control" placeholder="${lblAuthLoginEnterId}" value="${username}" required autofocus>
                 </div>
             </div>
 
@@ -166,7 +167,8 @@
                 <label class="form-label"><s:message code="auth.login.password"/></label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                    <input type="password" name="password" id="password" class="form-control border-start-0 border-end-0" placeholder="<s:message code="auth.login.enter.password"/>" required>
+                    <s:message code="auth.login.enter.password" var="lblAuthLoginEnterPassword"/>
+                    <input type="password" name="password" id="password" class="form-control border-start-0 border-end-0" placeholder="${lblAuthLoginEnterPassword}" required>
                     <button class="btn btn-outline-secondary toggle-btn border-start-0" type="button" id="togglePasswordBtn">
                         <i class="bi bi-eye-slash text-muted" id="togglePasswordIcon"></i>
                     </button>

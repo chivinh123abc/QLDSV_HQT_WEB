@@ -87,7 +87,8 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div class="input-group" style="max-width: 300px;">
                                     <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                    <input type="text" id="class-search" class="form-control bg-light border-0 small" placeholder="<s:message code="student.search.class"/>" onkeyup="filterLocalClasses()">
+                                    <s:message code="student.search.class" var="lblStudentSearchClass"/>
+                                    <input type="text" id="class-search" class="form-control bg-light border-0 small" placeholder="${lblStudentSearchClass}" onkeyup="filterLocalClasses()">
                                 </div>
                                 <div class="d-flex gap-2">
                                     <c:choose>
@@ -189,7 +190,8 @@
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="input-group" style="max-width: 300px;">
                                                 <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                                <input type="text" id="student-search" class="form-control bg-light border-0 small" placeholder="<s:message code="student.search.student"/>" onkeyup="filterLocalStudents()">
+                                                <s:message code="student.search.student" var="lblStudentSearchStudent"/>
+                                                <input type="text" id="student-search" class="form-control bg-light border-0 small" placeholder="${lblStudentSearchStudent}" onkeyup="filterLocalStudents()">
                                             </div>
                                         </div>
 
@@ -247,7 +249,8 @@
                                                                             <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                             <input type="hidden" name="maSV" value="${sv.maSV}">
                                                                             <input type="hidden" name="maLop" value="${maLop}">
-                                                                            <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!sv.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!sv.canDelete}">disabled title="<s:message code='student.cannot.delete'/>"</c:if>>
+                                                                            <s:message code="student.cannot.delete" var="cannotDeleteMsg" />
+                                                                            <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!sv.canDelete ? 'disabled opacity-25' : ''}" ${!sv.canDelete ? 'disabled' : ''} title="${!sv.canDelete ? cannotDeleteMsg : ''}">
                                                                                 <i class="bi bi-trash3"></i>
                                                                             </button>
                                                                         </form>
@@ -311,19 +314,22 @@
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.studentId.form"/></label>
                                     <%-- form:input tự động điền lại giá trị khi form lỗi (giữ dữ liệu đã nhập) --%>
+                                    <s:message code="student.example.id" var="lblStudentExampleId"/>
                                     <form:input path="maSV" cssClass="form-control rounded-3"
-                                        id="inp_maSV" placeholder="<s:message code="student.example.id"/>"
+                                        id="inp_maSV" placeholder="${lblStudentExampleId}"
                                         readonly="${mode == 'edit'}"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.lastName"/></label>
+                                    <s:message code="student.example.name" var="lblStudentExampleName"/>
                                     <form:input path="ho" cssClass="form-control rounded-3"
-                                        id="inp_ho" placeholder="<s:message code="student.example.name"/>"/>
+                                        id="inp_ho" placeholder="${lblStudentExampleName}"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.firstName.required"/></label>
+                                    <s:message code="student.example.firstName" var="lblStudentExampleFirstName"/>
                                     <form:input path="ten" cssClass="form-control rounded-3"
-                                        id="inp_ten" placeholder="<s:message code="student.example.firstName"/>"/>
+                                        id="inp_ten" placeholder="${lblStudentExampleFirstName}"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.lbl.gender.upper"/></label>
@@ -348,8 +354,9 @@
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label small fw-bold text-muted"><s:message code="student.address"/></label>
+                                    <s:message code="student.example.address" var="lblStudentExampleAddress"/>
                                     <form:input path="diaChi" cssClass="form-control rounded-3"
-                                        id="inp_diaChi" placeholder="<s:message code="student.example.address"/>"/>
+                                        id="inp_diaChi" placeholder="${lblStudentExampleAddress}"/>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-check form-switch p-0 d-flex align-items-center gap-2">

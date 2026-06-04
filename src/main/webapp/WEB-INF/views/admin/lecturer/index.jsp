@@ -176,8 +176,8 @@
                                 <div class="card-body px-4 pb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                                         <div class="input-group" style="max-width: 300px;">
-                                            <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                            <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="<s:message code="lecturer.search"/>" onkeyup="filterLocal()">
+                                            <s:message code="lecturer.search" var="lblLecturerSearch"/>
+                                            <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="${lblLecturerSearch}" onkeyup="filterLocal()">
                                         </div>
                                         <div class="d-flex gap-3 align-items-center">
                                             <label class="fw-bold small text-muted text-uppercase mb-0"><s:message code="lecturer.filter.by.faculty"/></label>
@@ -259,7 +259,8 @@
                                                                         <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                         <input type="hidden" name="maGV" value="${item.maGV}">
                                                                         <input type="hidden" name="maKhoa" value="${maKhoa}">
-                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!item.canDelete}">disabled title="<s:message code='lecturer.cannot.delete'/>"</c:if>>
+                                                                        <s:message code="lecturer.cannot.delete" var="cannotDeleteMsg" />
+                                                                        <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled' : ''} title="${!item.canDelete ? cannotDeleteMsg : ''}">
                                                                             <i class="bi bi-trash3"></i>
                                                                         </button>
                                                                     </form>
@@ -323,31 +324,36 @@
                                                 <form:options items="${khoaList}" itemValue="maKhoa" itemLabel="tenKhoa"/>
                                             </form:select>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.lastName.required"/> <span class="text-danger">*</span></label>
-                                            <form:input path="ho" cssClass="form-control rounded-3"
-                                                placeholder="<s:message code="lecturer.example.name"/>"/>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.firstName.required"/> <span class="text-danger">*</span></label>
-                                            <form:input path="ten" cssClass="form-control rounded-3"
-                                                placeholder="<s:message code="lecturer.example.firstName"/>"/>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.academicDegree"/></label>
-                                            <form:input path="hocVi" cssClass="form-control rounded-3"
-                                                placeholder="<s:message code="lecturer.placeholder.degree"/>"/>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.academicRank"/></label>
-                                            <form:input path="hocHam" cssClass="form-control rounded-3"
-                                                placeholder="<s:message code="lecturer.placeholder.rank"/>"/>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.specialization"/></label>
-                                            <form:input path="chuyenMon" cssClass="form-control rounded-3"
-                                                placeholder="<s:message code="lecturer.placeholder.specialty"/>"/>
-                                        </div>
+                                                                        <s:message code="lecturer.example.name" var="lblExampleName" />
+                                                                        <s:message code="lecturer.example.firstName" var="lblExampleFirstName" />
+                                                                        <s:message code="lecturer.placeholder.degree" var="lblPlaceholderDegree" />
+                                                                        <s:message code="lecturer.placeholder.rank" var="lblPlaceholderRank" />
+                                                                        <s:message code="lecturer.placeholder.specialty" var="lblPlaceholderSpecialty" />
+                                                                        <div class="col-md-6">
+                                                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.lastName.required"/> <span class="text-danger">*</span></label>
+                                                                            <form:input path="ho" cssClass="form-control rounded-3"
+                                                                                placeholder="${lblExampleName}"/>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.firstName.required"/> <span class="text-danger">*</span></label>
+                                                                            <form:input path="ten" cssClass="form-control rounded-3"
+                                                                                placeholder="${lblExampleFirstName}"/>
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.academicDegree"/></label>
+                                                                            <form:input path="hocVi" cssClass="form-control rounded-3"
+                                                                                placeholder="${lblPlaceholderDegree}"/>
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.academicRank"/></label>
+                                                                            <form:input path="hocHam" cssClass="form-control rounded-3"
+                                                                                placeholder="${lblPlaceholderRank}"/>
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <label class="form-label small fw-bold text-muted"><s:message code="lecturer.lbl.specialization"/></label>
+                                                                            <form:input path="chuyenMon" cssClass="form-control rounded-3"
+                                                                                placeholder="${lblPlaceholderSpecialty}"/>
+                                                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0 px-4 pb-4">

@@ -132,9 +132,10 @@
                                             <div class="input-group" style="max-width: 300px;">
                                                 <span class="input-group-text bg-light border-0"><i
                                                         class="bi bi-search text-muted"></i></span>
+                                                <s:message code="account.search.username" var="lblAccountSearchUsername"/>
                                                 <input type="text" id="search-input"
                                                     class="form-control bg-light border-0 small"
-                                                    placeholder="<s:message code="account.search.username" />"
+                                                    placeholder="${lblAccountSearchUsername}"
                                                 onkeyup="filterLocal()">
                                             </div>
                                             <div class="d-flex gap-3 align-items-center">
@@ -239,12 +240,11 @@
                                                                              value="${csrfToken}" />
                                                                          <input type="hidden" name="userId"
                                                                              value="${item.userId}">
+                                                                         <s:message code="account.cannot.delete" var="cannotDeleteMsg" />
                                                                          <button type="submit"
                                                                              class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}"
-                                                                             <c:if test="${!item.canDelete}">disabled
-                                                                             title="
-                                                                             <s:message code='account.cannot.delete' />"
-                                                                             </c:if>>
+                                                                             ${!item.canDelete ? 'disabled' : ''}
+                                                                             title="${!item.canDelete ? cannotDeleteMsg : ''}">
                                                                              <i class="bi bi-trash3"></i>
                                                                          </button>
                                                                      </form>
@@ -364,10 +364,11 @@
                                                      <s:message code="account.username.label" /> <span
                                                          class="text-danger">*</span>
                                                  </label>
-                                                 <input type="text" class="form-control rounded-3 bg-light"
-                                                     name="username" id="inp_username" value="${account.tenDangNhap}"
-                                                     placeholder="<s:message code="account.username.label" />" required
-                                                 readonly>
+                                                  <s:message code="account.username.label" var="lblAccountUsernameLabel"/>
+                                                  <input type="text" class="form-control rounded-3 bg-light"
+                                                      name="username" id="inp_username" value="${account.tenDangNhap}"
+                                                      placeholder="${lblAccountUsernameLabel}" required
+                                                  readonly>
                                              </div>
                                              <div class="col-12">
                                                  <label class="form-label small fw-bold text-muted">
@@ -376,8 +377,9 @@
                                                              class="text-danger">*</span></c:if>
                                                  </label>
                                                  <div class="input-group">
-                                                     <input type="password" class="form-control rounded-start-3"
-                                                         name="password" id="inp_password" placeholder="<s:message code="account.enter.password" />" ${mode == 'edit' ? '' : 'required'}>
+                                                      <s:message code="account.enter.password" var="lblAccountEnterPassword"/>
+                                                      <input type="password" class="form-control rounded-start-3"
+                                                          name="password" id="inp_password" placeholder="${lblAccountEnterPassword}" ${mode == 'edit' ? '' : 'required'}>
                                                      <button class="btn btn-outline-secondary rounded-end-3"
                                                          type="button" id="btnTogglePass" onclick="togglePassword()">
                                                          <i class="bi bi-eye"></i>
@@ -392,9 +394,10 @@
                                              <div class="col-12">
                                                  <label class="form-label small fw-bold text-muted">EMAIL <span
                                                          class="text-danger">*</span></label>
-                                                 <input type="email" class="form-control rounded-3" name="email"
-                                                     id="inp_email" value="${account.email}"
-                                                     placeholder="<s:message code="account.enter.email" />" required>
+                                                  <s:message code="account.enter.email" var="lblAccountEnterEmail"/>
+                                                  <input type="email" class="form-control rounded-3" name="email"
+                                                      id="inp_email" value="${account.email}"
+                                                      placeholder="${lblAccountEnterEmail}" required>
                                              </div>
                                              <c:if test="${mode == 'edit'}">
                                                  <div class="col-12">

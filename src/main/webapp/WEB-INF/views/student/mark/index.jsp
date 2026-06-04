@@ -167,7 +167,8 @@
                         <div class="card-body p-3 d-flex flex-wrap gap-3 align-items-center justify-content-between">
                             <div class="input-group" style="max-width: 300px;">
                                 <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-                                <input type="text" id="subject-search" class="form-control bg-light border-0" placeholder="<s:message code="mark.student.search.subject"/>" onkeyup="filterGrades()">
+                                <s:message code="mark.student.search.subject" var="lblMarkStudentSearchSubject"/>
+                                <input type="text" id="subject-search" class="form-control bg-light border-0" placeholder="${lblMarkStudentSearchSubject}" onkeyup="filterGrades()">
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <label for="semester-filter" class="text-muted small fw-bold mb-0 text-nowrap"><s:message code="mark.student.display.semester"/></label>
@@ -201,6 +202,9 @@
                                         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
                                             <div class="card-body p-0">
                                                 <div class="table-responsive">
+                                                    <s:message code="mark.student.accumulated.success" var="lblMarkAccumulatedSuccess"/>
+                                                    <s:message code="mark.student.failed.retake" var="lblMarkFailedRetake"/>
+                                                    <s:message code="mark.student.incomplete.grade" var="lblMarkIncompleteGrade"/>
                                                     <table class="table table-custom align-middle mb-0">
                                                         <thead class="table-light">
                                                             <tr>
@@ -328,13 +332,13 @@
                                                                     <td class="text-center">
                                                                         <c:choose>
                                                                             <c:when test="${isPassed == 'true'}">
-                                                                                <span class="text-success fs-5" title="<s:message code="mark.student.accumulated.success"/>"><i class="bi bi-check-circle-fill"></i></span>
+                                                                                <span class="text-success fs-5" title="${lblMarkAccumulatedSuccess}"><i class="bi bi-check-circle-fill"></i></span>
                                                                             </c:when>
                                                                             <c:when test="${row[5] != null && row[6] != null && row[7] != null}">
-                                                                                <span class="text-danger fs-5" title="<s:message code="mark.student.failed.retake"/>"><i class="bi bi-x-circle-fill"></i></span>
+                                                                                <span class="text-danger fs-5" title="${lblMarkFailedRetake}"><i class="bi bi-x-circle-fill"></i></span>
                                                                             </c:when>
                                                                             <c:otherwise>
-                                                                                <span class="text-muted small" title="<s:message code="mark.student.incomplete.grade"/>"><i class="bi bi-dash-circle"></i></span>
+                                                                                <span class="text-muted small" title="${lblMarkIncompleteGrade}"><i class="bi bi-dash-circle"></i></span>
                                                                             </c:otherwise>
                                                                         </c:choose>
                                                                     </td>

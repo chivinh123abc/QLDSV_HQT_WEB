@@ -131,7 +131,8 @@
                             <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                                 <div class="input-group" style="max-width: 300px;">
                                     <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
-                                    <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="<s:message code="subject.search"/>" onkeyup="filterLocal()">
+                                    <s:message code="subject.search" var="lblSubjectSearch"/>
+                                    <input type="text" id="search-input" class="form-control bg-light border-0 small" placeholder="${lblSubjectSearch}" onkeyup="filterLocal()">
                                 </div>
                                 <div class="text-muted small">
                                     <i class="bi bi-info-circle me-1"></i> <s:message code="subject.total"/> <strong id="subject-count">${monHocList.size()}</strong> <s:message code="subject.count.suffix"/>
@@ -179,7 +180,8 @@
                                                             <form action="${pageContext.request.contextPath}/admin/subject" method="POST" onsubmit="return confirm('<s:message code="subject.js.confirmDelete"/>');" class="d-inline">
                                                                 <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                                                 <input type="hidden" name="maMH" value="${item.maMH}">
-                                                                <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" <c:if test="${!item.canDelete}">disabled title="<s:message code='subject.cannot.delete'/>"</c:if>>
+                                                                <s:message code="subject.cannot.delete" var="cannotDeleteMsg" />
+                                                                <button type="submit" name="btnDelete" class="btn btn-sm btn-outline-danger border-0 rounded-3 ${!item.canDelete ? 'disabled opacity-25' : ''}" ${!item.canDelete ? 'disabled' : ''} title="${!item.canDelete ? cannotDeleteMsg : ''}">
                                                                     <i class="bi bi-trash3"></i>
                                                                 </button>
                                                             </form>

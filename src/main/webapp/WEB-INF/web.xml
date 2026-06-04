@@ -46,7 +46,7 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- Khai báo CKFinder Connector Servlet -->
+	<!-- Khai báo CKFinder Connector Servlet
 	<servlet>
 		<servlet-name>CKFinderConnector</servlet-name>
 		<servlet-class>com.cksource.ckfinder.servlet.CKFinderServlet</servlet-class>
@@ -61,6 +61,7 @@
 		<servlet-name>CKFinderConnector</servlet-name>
 		<url-pattern>/ckfinder/connector</url-pattern>
 	</servlet-mapping>
+	-->
 
 	<error-page>
 		<error-code>404</error-code>
