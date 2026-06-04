@@ -248,6 +248,14 @@ VALUES (N'SV04', N'Nguyễn Thị', N'Mai', N'Nữ', N'Hải Phòng', CAST(N'200
 INSERT INTO [dbo].[sinh_vien] ([id], [ho], [ten], [phai], [dia_chi], [ngay_sinh], [lop_id], [trang_thai_hoc]) 
 VALUES (N'SV05', N'Trần Thu', N'Hà', N'Nữ', N'Cần Thơ', CAST(N'2004-07-22' AS Date), N'D22CQAT01', N'DANG_HOC');
 
+-- Student N23DCCN003: Demo student (CNTT, Unactivated Account)
+INSERT INTO [dbo].[sinh_vien] ([id], [ho], [ten], [phai], [dia_chi], [ngay_sinh], [lop_id], [trang_thai_hoc]) 
+VALUES (N'N23DCCN003', N'Phan Tuấn Quốc', N'Anh', N'Nam', N'HCM', CAST(N'2005-01-01' AS Date), N'D22CQCN01', N'DANG_HOC');
+
+-- Student N23DCCN067: Demo student (CNTT, Unactivated Account)
+INSERT INTO [dbo].[sinh_vien] ([id], [ho], [ten], [phai], [dia_chi], [ngay_sinh], [lop_id], [trang_thai_hoc]) 
+VALUES (N'N23DCCN067', N'Lương Chí', N'Vinh', N'Nam', N'An Giang', CAST(N'2005-01-01' AS Date), N'D22CQCN01', N'DANG_HOC');
+
 
 -- --------------------------------------------------
 -- Transactional Data: Class Registrations, Marks, & Payments
@@ -342,6 +350,12 @@ VALUES (N'SV04', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja'
 
 INSERT INTO [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) 
 VALUES (N'SV05', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'sv05@ptithcm.edu.vn', N'SINHVIEN', N'DA_KICH_HOAT');
+
+INSERT INTO [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) 
+VALUES (N'N23DCCN003', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'n23dccn003@student.ptithcm.edu.vn', N'SINHVIEN', N'CHUA_KICH_HOAT');
+
+INSERT INTO [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) 
+VALUES (N'N23DCCN067', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'n23dccn067@student.ptithcm.edu.vn', N'SINHVIEN', N'CHUA_KICH_HOAT');
 
 
 -- --------------------------------------------------
