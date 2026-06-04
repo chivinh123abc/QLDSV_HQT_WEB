@@ -48,7 +48,7 @@ public class AuthController {
             }
             String role = SessionUtil.getRole(session);
             if (RoleEnum.SINHVIEN.getCode().equals(role)) {
-                return "redirect:/registration";
+                return "redirect:/index";
             }
             return "redirect:/index";
         }
@@ -128,7 +128,7 @@ public class AuthController {
                     SessionUtil.setStudentProfile(session, svProfile);
                 }
 
-                return "redirect:/registration";
+                return "redirect:/index";
             }
         }
 

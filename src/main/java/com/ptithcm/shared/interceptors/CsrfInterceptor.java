@@ -32,24 +32,25 @@ public class CsrfInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         String method = request.getMethod();
 
-        // 1. Nếu là GET: Sinh Token đưa xuống View
+        // Đảm bảo luôn có CSRF Token trong Session và đưa vào Request Attribute
+        // (để phục vụ việc render JSP ngay cả khi Forward từ một yêu cầu POST thất bại)
+        String csrfToken = (String) session.getAttribute(CSRF_TOKEN_SESSION_ATTR);
+        if (csrfToken == null) {
+            csrfToken = UUID.randomUUID().toString();
+            session.setAttribute(CSRF_TOKEN_SESSION_ATTR, csrfToken);
+        }
+        request.setAttribute("csrfToken", csrfToken);
+
+        // 1. Nếu là GET: Cho phép đi tiếp (token đã được đưa vào request ở trên)
         if ("GET".equalsIgnoreCase(method)) {
-            String csrfToken = (String) session.getAttribute(CSRF_TOKEN_SESSION_ATTR);
-            if (csrfToken == null) {
-                csrfToken = UUID.randomUUID().toString();
-                session.setAttribute(CSRF_TOKEN_SESSION_ATTR, csrfToken);
-            }
-            // Đưa vào request để JSP có thể đọc được bằng ${csrfToken}
-            request.setAttribute("csrfToken", csrfToken);
             return true;
         }
 
         // 2. Nếu là POST, PUT, DELETE: Bắt buộc kiểm tra Token
         if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method)) {
-            String sessionToken = (String) session.getAttribute(CSRF_TOKEN_SESSION_ATTR);
             String requestToken = request.getParameter(CSRF_TOKEN_REQ_PARAM);
 
-            if (sessionToken != null && sessionToken.equals(requestToken)) {
+            if (csrfToken.equals(requestToken)) {
                 return true; // Token hợp lệ, cho phép đi tiếp vào Controller
             }
 
