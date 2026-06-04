@@ -38,4 +38,11 @@ public class StudentDAO extends BaseDAO<SinhVien, String> {
         return getSession().createQuery("SELECT COUNT(*) FROM DangKy WHERE sinhVien.maSV = :maSV", Long.class)
                 .setParameter("maSV", maSV).uniqueResult();
     }
+
+    public List<SinhVien> getStudentsWithAccount() {
+        return getSession()
+                .createQuery("SELECT s FROM SinhVien s WHERE s.maSV IN (SELECT t.tenDangNhap FROM TaiKhoan t)",
+                        SinhVien.class)
+                .list();
+    }
 }

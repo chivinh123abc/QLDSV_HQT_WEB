@@ -17,7 +17,7 @@ public class HomeController {
     @Autowired
     private HomeService homeService;
 
-    @RequestMapping({"/", "/index"})
+    @RequestMapping({"/", "/index", "/home"})
     public String index(ModelMap model, HttpSession httpSession) {
         String role = SessionUtil.getRole(httpSession);
         if (RoleEnum.SINHVIEN.getCode().equals(role)) {

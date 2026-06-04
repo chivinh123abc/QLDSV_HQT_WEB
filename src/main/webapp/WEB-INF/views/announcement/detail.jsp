@@ -96,21 +96,6 @@
                                 </div>
                             </div>
                             
-                            <c:if test="${role == 'PGV' || role == 'KHOA'}">
-                                <div class="d-flex align-items-center gap-2">
-                                    <a href="${pageContext.request.contextPath}/announcements/edit?id=${announcement.id}" class="btn btn-outline-primary action-btn">
-                                        <i class="bi bi-pencil"></i> <s:message code="announcement.edit.notice"/>
-                                    </a>
-                                    <s:message code="announcement.confirmDelete" var="confirmDeleteMsg" />
-                                    <form action="${pageContext.request.contextPath}/announcements/delete" method="POST" onsubmit="return confirm('${confirmDeleteMsg}');" class="m-0">
-                                        <input type="hidden" name="id" value="${announcement.id}" />
-                                        <input type="hidden" name="csrf_token" value="${csrfToken}" />
-                                        <button type="submit" class="btn btn-outline-danger action-btn">
-                                            <i class="bi bi-trash"></i> <s:message code="announcement.delete"/>
-                                        </button>
-                                    </form>
-                                </div>
-                            </c:if>
                         </div>
                         
                         <div class="detail-body">

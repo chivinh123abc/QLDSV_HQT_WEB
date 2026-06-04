@@ -25,12 +25,12 @@
                     <%-- Student Marks: Students only --%>
                     <c:if test="${sessionScope.role == 'SINHVIEN'}">
                         <li>
-                            <a class="nav-link" href="${pageContext.request.contextPath}/mark/student">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/student/mark">
                                 <i class="bi bi-bookmark-star"></i> <s:message code="sidebar.menu.viewGrades"/>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-link" href="${pageContext.request.contextPath}/payment">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/student/payment">
                                 <i class="bi bi-credit-card"></i> <s:message code="payment.title"/>
                             </a>
                         </li>
@@ -39,37 +39,49 @@
                         <%-- Student Management & Classes: PGV and KHOA --%>
                             <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                 <li>
-                                    <a class="nav-link" href="${pageContext.request.contextPath}/student">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/admin/student">
                                         <i class="bi bi-people"></i> <s:message code="sidebar.menu.students"/>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="nav-link" href="${pageContext.request.contextPath}/class">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/admin/classroom">
                                         <i class="bi bi-building"></i> <s:message code="dashboard.classroom"/>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="nav-link" href="${pageContext.request.contextPath}/subject">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/admin/subject">
                                         <i class="bi bi-book"></i> <s:message code="global.lbl.subject"/>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="nav-link" href="${pageContext.request.contextPath}/credit-class">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/admin/creditclass">
                                         <i class="bi bi-journal-text"></i> <s:message code="sidebar.menu.creditClasses"/>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="nav-link" href="${pageContext.request.contextPath}/lecturer">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/admin/lecturer">
                                         <i class="bi bi-person-badge"></i> <s:message code="sidebar.menu.lecturers"/>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/admin/announcement">
+                                        <i class="bi bi-megaphone"></i> <s:message code="announcement.menu"/> (Admin)
                                     </a>
                                 </li>
                             </c:if>
 
 
                                 <%-- Registration: Students & PGV --%>
-                                    <c:if test="${sessionScope.role == 'SINHVIEN' || sessionScope.role == 'PGV'}">
+                                    <c:if test="${sessionScope.role == 'SINHVIEN'}">
                                         <li>
-                                            <a class="nav-link" href="${pageContext.request.contextPath}/registration">
+                                            <a class="nav-link" href="${pageContext.request.contextPath}/student/registration">
+                                                 <i class="bi bi-pencil-square"></i> <s:message code="sidebar.menu.registration"/>
+                                             </a>
+                                         </li>
+                                    </c:if>
+                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                        <li>
+                                            <a class="nav-link" href="${pageContext.request.contextPath}/admin/registration">
                                                  <i class="bi bi-pencil-square"></i> <s:message code="sidebar.menu.registration"/>
                                              </a>
                                          </li>
@@ -78,7 +90,7 @@
                                     <%-- Mark Entry: KHOA and PGV (Full access) --%>
                                         <c:if test="${sessionScope.role == 'KHOA' || sessionScope.role == 'PGV'}">
                                             <li>
-                                                <a class="nav-link" href="${pageContext.request.contextPath}/mark">
+                                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/mark">
                                                     <i class="bi bi-check2-square"></i> <s:message code="sidebar.menu.enterGrades"/>
                                                 </a>
                                             </li>
@@ -88,7 +100,7 @@
                                             <c:if test="${sessionScope.role == 'PGV'}">
                                                 <li>
                                                     <a class="nav-link"
-                                                        href="${pageContext.request.contextPath}/faculty">
+                                                        href="${pageContext.request.contextPath}/admin/faculty">
                                                         <i class="bi bi-diagram-3"></i> <s:message code="sidebar.menu.faculty"/>
                                                     </a>
                                                 </li>
@@ -99,13 +111,13 @@
                                                     test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                                     <li>
                                                         <a class="nav-link"
-                                                            href="${pageContext.request.contextPath}/report">
+                                                            href="${pageContext.request.contextPath}/admin/report">
                                                             <i class="bi bi-file-earmark-text"></i> <s:message code="sidebar.menu.reports"/>
                                                         </a>
                                                     </li>
                                                     <li>
                                                         <a class="nav-link"
-                                                            href="${pageContext.request.contextPath}/payment/stats">
+                                                            href="${pageContext.request.contextPath}/admin/payment">
                                                             <i class="bi bi-pie-chart"></i> <s:message code="payment.stats.title"/>
                                                         </a>
                                                     </li>
@@ -115,7 +127,7 @@
                                                     <c:if test="${sessionScope.role == 'PGV'}">
                                                          <li>
                                                              <a class="nav-link"
-                                                                 href="${pageContext.request.contextPath}/accounts">
+                                                                 href="${pageContext.request.contextPath}/admin/account">
                                                                  <i class="bi bi-person-lines-fill"></i> <s:message code="sidebar.menu.accountRoles"/>
                                                              </a>
                                                          </li>
@@ -149,9 +161,18 @@
                 const currentPath = window.location.pathname;
                 document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
                     const href = link.getAttribute('href');
-                    const linkPath = new URL(href, window.location.origin).pathname;
-                    if (currentPath === linkPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
-                        link.classList.add('active');
+                    if (href) {
+                        try {
+                            const linkPath = new URL(href, window.location.origin).pathname;
+                            if (currentPath === linkPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+                                link.classList.add('active');
+                            }
+                        } catch (e) {
+                            // Fallback
+                            if (currentPath.includes(href)) {
+                                link.classList.add('active');
+                            }
+                        }
                     }
                 });
             })();

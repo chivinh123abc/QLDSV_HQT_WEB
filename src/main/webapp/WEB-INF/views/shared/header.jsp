@@ -94,7 +94,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2" id="myAvatarMenu" style="position: absolute; right: 0; top: 100%; display: none;">
                 <li>
-                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="${pageContext.request.contextPath}/profile">
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="${pageContext.request.contextPath}${sessionScope.role == 'SINHVIEN' ? '/student/profile' : '/profile'}">
                         <i class="bi bi-person-circle text-primary fs-5"></i>
                         <span><s:message code="profile.title"/></span>
                     </a>

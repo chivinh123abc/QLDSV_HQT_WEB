@@ -13,8 +13,6 @@ help:
 
 dev:
 	git config core.hooksPath .githooks
-	@echo "Starting Auto-Reload system (Server + Watcher)..."
-	cmd /c start "Maven File Watcher" cmd /c "mvn fizzed-watcher:run"
 	mvn clean spotless:apply package cargo:run
 
 build:

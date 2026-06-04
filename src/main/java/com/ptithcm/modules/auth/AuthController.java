@@ -4,27 +4,27 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.GiangVien;
 import com.ptithcm.entities.SinhVien;
 import com.ptithcm.entities.TaiKhoan;
 import com.ptithcm.modules.auth.dtos.LoginDTO;
-import com.ptithcm.shared.constants.CacheConstant;
 import com.ptithcm.shared.constants.MessageConstant;
 import com.ptithcm.shared.dtos.UserSession;
 import com.ptithcm.shared.enums.RoleEnum;
 import com.ptithcm.shared.enums.TrangThaiTaiKhoan;
 import com.ptithcm.shared.services.EmailOTPService;
-import com.ptithcm.shared.services.RedisService;
 import com.ptithcm.shared.utils.SecurityUtil;
 import com.ptithcm.shared.utils.SessionUtil;
 
@@ -37,9 +37,6 @@ public class AuthController {
     @Autowired
     private EmailOTPService emailOTPService;
 
-    @Autowired
-    private RedisService redisService;
-
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(HttpSession session, @RequestParam(value = "activated", required = false) String activated,
             @RequestParam(value = "error", required = false) String error, ModelMap model) {
@@ -47,7 +44,7 @@ public class AuthController {
             UserSession currUser = SessionUtil.getUser(session);
             TaiKhoan tk = authService.getTaiKhoanByUsername(currUser.getUsername());
             if (tk != null && tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
-                return "redirect:/activate";
+                return "redirect:/auth/activate";
             }
             String role = SessionUtil.getRole(session);
             if (RoleEnum.SINHVIEN.getCode().equals(role)) {
@@ -66,7 +63,7 @@ public class AuthController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String handleLogin(@Valid @ModelAttribute("loginDto") LoginDTO loginDto, BindingResult bindingResult,
-            HttpSession session, HttpServletResponse response, ModelMap model) {
+            HttpSession session, HttpServletResponse response, ModelMap model, RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("error", bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -84,11 +81,10 @@ public class AuthController {
                 model.addAttribute("username", username);
                 return "auth/login";
             }
-            if (BCrypt.checkpw(password, tk.getMatKhau())) {
-                if (tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
-                    session.setAttribute("temp_username", tk.getTenDangNhap());
-                    return "redirect:/activate";
-                }
+            if (tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
+                redirectAttributes.addFlashAttribute("errorMsg",
+                        "Tài khoản chưa được kích hoạt, vui lòng kích hoạt lần đầu!");
+                return "redirect:/auth/activate";
             }
         }
 
@@ -154,171 +150,128 @@ public class AuthController {
         return "redirect:/login";
     }
 
-    @RequestMapping(value = "/activate", method = RequestMethod.GET)
-    public String activate(HttpSession session, ModelMap model) {
-        String tempUsername = (String) session.getAttribute("temp_username");
-        if (tempUsername == null) {
-            UserSession currUser = SessionUtil.getUser(session);
-            if (currUser != null) {
-                tempUsername = currUser.getUsername();
+    @GetMapping("/auth/activate")
+    public String activatePage(HttpSession session, ModelMap model) {
+        String activatingUser = (String) session.getAttribute("ACTIVATING_USER");
+        String activatingEmail = (String) session.getAttribute("ACTIVATING_EMAIL");
+
+        if (activatingUser != null && activatingEmail != null) {
+            model.addAttribute("username", activatingUser);
+            model.addAttribute("email", activatingEmail);
+
+            // Mask email for privacy
+            String maskedEmail = activatingEmail;
+            int atIndex = activatingEmail.indexOf("@");
+            if (atIndex > 3) {
+                maskedEmail = activatingEmail.substring(0, 3) + "***" + activatingEmail.substring(atIndex);
             }
+            model.addAttribute("maskedEmail", maskedEmail);
+            model.addAttribute("STEP_OTP_SENT", true);
         }
-        if (tempUsername == null) {
-            return "redirect:/login";
-        }
-
-        TaiKhoan tk = authService.getTaiKhoanByUsername(tempUsername);
-        if (tk == null) {
-            return "redirect:/login";
-        }
-
-        if (tk.getTrangThai() == TrangThaiTaiKhoan.DA_KICH_HOAT) {
-            session.removeAttribute("temp_username");
-            if (SessionUtil.getUser(session) != null) {
-                String role = SessionUtil.getRole(session);
-                if (RoleEnum.SINHVIEN.getCode().equals(role)) {
-                    return "redirect:/registration";
-                }
-                return "redirect:/index";
-            }
-            return "redirect:/login?activated=true";
-        }
-
-        String email = tk.getEmail();
-        model.addAttribute("email", email);
-
-        // Mask email for privacy (e.g. sv***@student.ptit.edu.vn)
-        String maskedEmail = email;
-        int atIndex = email.indexOf("@");
-        if (atIndex > 3) {
-            maskedEmail = email.substring(0, 3) + "***" + email.substring(atIndex);
-        }
-        model.addAttribute("maskedEmail", maskedEmail);
-
-        try {
-            // Check if OTP already exists in Redis
-            String key = CacheConstant.getOtpResetPwKey(email);
-            if (redisService.get(key) == null) {
-                emailOTPService.sendActivationOTP(email);
-                model.addAttribute("info", "Chúng tôi đã gửi mã OTP kích hoạt đến email của bạn.");
-            } else {
-                model.addAttribute("info", "Mã OTP đã được gửi trước đó và vẫn còn hiệu lực.");
-            }
-        } catch (Exception e) {
-            model.addAttribute("error", "Không thể gửi email OTP: " + e.getMessage());
-        }
-
         return "auth/activate";
     }
 
-    @RequestMapping(value = "/activate", method = RequestMethod.POST)
-    public String handleActivate(@RequestParam("otpCode") String otpCode, HttpSession session, ModelMap model) {
-        String tempUsername = (String) session.getAttribute("temp_username");
-        if (tempUsername == null) {
-            UserSession currUser = SessionUtil.getUser(session);
-            if (currUser != null) {
-                tempUsername = currUser.getUsername();
-            }
-        }
-        if (tempUsername == null) {
-            return "redirect:/login";
+    @PostMapping("/auth/activate/request-otp")
+    public String requestOtp(@RequestParam("maSV") String maSV, @RequestParam("email") String email,
+            HttpSession session, RedirectAttributes redirectAttributes) {
+        if (maSV == null || maSV.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Mã sinh viên và email không được để trống!");
+            return "redirect:/auth/activate";
         }
 
-        TaiKhoan tk = authService.getTaiKhoanByUsername(tempUsername);
+        maSV = maSV.trim();
+        email = email.trim();
+
+        TaiKhoan tk = authService.getTaiKhoanByUsername(maSV);
         if (tk == null) {
-            return "redirect:/login";
+            redirectAttributes.addFlashAttribute("error", "Tài khoản sinh viên không tồn tại trong hệ thống!");
+            return "redirect:/auth/activate";
         }
 
-        String email = tk.getEmail();
-        model.addAttribute("email", email);
-        String maskedEmail = email;
-        int atIndex = email.indexOf("@");
-        if (atIndex > 3) {
-            maskedEmail = email.substring(0, 3) + "***" + email.substring(atIndex);
-        }
-        model.addAttribute("maskedEmail", maskedEmail);
-
-        if (otpCode == null || otpCode.trim().isEmpty()) {
-            model.addAttribute("error", "Mã OTP không được để trống.");
-            return "auth/activate";
+        if (tk.getTrangThai() == TrangThaiTaiKhoan.DA_KICH_HOAT) {
+            redirectAttributes.addFlashAttribute("error", "Tài khoản này đã được kích hoạt trước đó!");
+            return "redirect:/auth/activate";
         }
 
-        if (emailOTPService.verifyOTP(email, otpCode)) {
-            try {
-                // Kích hoạt tài khoản
-                authService.activateAccount(tempUsername);
-
-                // Xóa OTP
-                emailOTPService.deleteOTP(email);
-
-                // Tự động đăng nhập
-                if (RoleEnum.SINHVIEN.getCode().equals(tk.getPhanQuyen())) {
-                    SinhVien sv = authService.getSinhVienProfile(tempUsername);
-                    if (sv != null) {
-                        UserSession user = new UserSession(sv.getMaSV(), "SINHVIEN", null,
-                                sv.getHo() + " " + sv.getTen(), tk.getAvatar());
-                        SessionUtil.setUser(session, user);
-                        SessionUtil.setRole(session, RoleEnum.SINHVIEN.getCode());
-                        SessionUtil.setStudentProfile(session, sv);
-                    }
-                    session.removeAttribute("temp_username");
-                    return "redirect:/registration";
-                } else {
-                    GiangVien gv = authService.getGiangVienProfile(tempUsername);
-                    if (gv != null) {
-                        UserSession user = new UserSession(gv.getMaGV(), tk.getPhanQuyen(), gv.getMaKhoa(),
-                                gv.getHo() + " " + gv.getTen(), tk.getAvatar());
-                        SessionUtil.setUser(session, user);
-                        SessionUtil.setRole(session, user.getRole());
-                        if (RoleEnum.KHOA.getCode().equals(user.getRole())) {
-                            SessionUtil.setMaKhoa(session, gv.getMaKhoa());
-                        }
-                    } else {
-                        // Fallback if it's PGV or has no lecturer profile
-                        UserSession user = new UserSession(tk.getTenDangNhap(), tk.getPhanQuyen(), null, "Hệ thống",
-                                tk.getAvatar());
-                        SessionUtil.setUser(session, user);
-                        SessionUtil.setRole(session, user.getRole());
-                    }
-                    session.removeAttribute("temp_username");
-                    return "redirect:/index";
-                }
-            } catch (Exception e) {
-                model.addAttribute("error", "Kích hoạt thất bại: " + e.getMessage());
-                return "auth/activate";
-            }
-        } else {
-            model.addAttribute("error", "Mã OTP không chính xác hoặc đã hết hạn.");
-            return "auth/activate";
-        }
-    }
-
-    @RequestMapping(value = "/activate/resend", method = RequestMethod.GET)
-    public String resendActivateOTP(HttpSession session, ModelMap model,
-            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        String tempUsername = (String) session.getAttribute("temp_username");
-        if (tempUsername == null) {
-            UserSession currUser = SessionUtil.getUser(session);
-            if (currUser != null) {
-                tempUsername = currUser.getUsername();
-            }
-        }
-        if (tempUsername == null) {
-            return "redirect:/login";
+        if (tk.getTrangThai() == TrangThaiTaiKhoan.KHOA) {
+            redirectAttributes.addFlashAttribute("error", "Tài khoản đã bị khóa, không thể kích hoạt!");
+            return "redirect:/auth/activate";
         }
 
-        TaiKhoan tk = authService.getTaiKhoanByUsername(tempUsername);
-        if (tk == null) {
-            return "redirect:/login";
+        // BẮT BUỘC query DB kiểm tra Email user nhập vào từ Form PHẢI TRÙNG KHỚP 100%
+        // với Email đã lưu trong DB
+        if (!tk.getEmail().equals(email)) {
+            redirectAttributes.addFlashAttribute("error", "Email không chính xác với thông tin tài khoản đã đăng ký!");
+            return "redirect:/auth/activate";
         }
 
         try {
-            emailOTPService.sendActivationOTP(tk.getEmail());
-            redirectAttributes.addFlashAttribute("message", "Đã gửi lại mã OTP mới thành công!");
+            emailOTPService.sendActivationOTP(email);
+            session.setAttribute("ACTIVATING_USER", maSV);
+            session.setAttribute("ACTIVATING_EMAIL", email);
+            redirectAttributes.addFlashAttribute("message", "Mã OTP đã được gửi thành công đến email " + email);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Gửi lại OTP thất bại: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Không thể gửi OTP kích hoạt: " + e.getMessage());
         }
 
-        return "redirect:/activate";
+        return "redirect:/auth/activate";
+    }
+
+    @PostMapping("/auth/activate/confirm")
+    public String confirmActivation(@RequestParam("otpCode") String otpCode,
+            @RequestParam("newPassword") String newPassword, @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session, RedirectAttributes redirectAttributes) {
+
+        String username = (String) session.getAttribute("ACTIVATING_USER");
+        String email = (String) session.getAttribute("ACTIVATING_EMAIL");
+
+        if (username == null || email == null) {
+            redirectAttributes.addFlashAttribute("error", "Yêu cầu kích hoạt không hợp lệ hoặc đã hết hạn!");
+            return "redirect:/auth/activate";
+        }
+
+        if (otpCode == null || otpCode.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Mã OTP không được để trống!");
+            return "redirect:/auth/activate";
+        }
+
+        if (newPassword == null || newPassword.trim().isEmpty() || confirmPassword == null
+                || confirmPassword.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Mật khẩu mới không được để trống!");
+            return "redirect:/auth/activate";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Xác nhận mật khẩu không trùng khớp!");
+            return "redirect:/auth/activate";
+        }
+
+        if (!emailOTPService.verifyOTP(email, otpCode.trim())) {
+            redirectAttributes.addFlashAttribute("error", "Mã OTP không chính xác hoặc đã hết hạn!");
+            return "redirect:/auth/activate";
+        }
+
+        try {
+            // Kích hoạt tài khoản và cập nhật mật khẩu mới
+            authService.activateAccount(username, newPassword);
+
+            // Xóa OTP và session
+            emailOTPService.deleteOTP(email);
+            session.removeAttribute("ACTIVATING_USER");
+            session.removeAttribute("ACTIVATING_EMAIL");
+
+            redirectAttributes.addFlashAttribute("success", "Kích hoạt tài khoản thành công! Vui lòng đăng nhập.");
+            return "redirect:/login";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi kích hoạt tài khoản: " + e.getMessage());
+            return "redirect:/auth/activate";
+        }
+    }
+
+    @GetMapping("/auth/activate/reset")
+    public String resetActivation(HttpSession session) {
+        session.removeAttribute("ACTIVATING_USER");
+        session.removeAttribute("ACTIVATING_EMAIL");
+        return "redirect:/auth/activate";
     }
 }

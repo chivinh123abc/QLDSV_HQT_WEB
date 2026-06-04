@@ -101,28 +101,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         // 1. Luồng kích hoạt tài khoản
         if (uri.contains("/activate")) {
-            if (session.getAttribute("temp_username") != null) {
-                return true;
-            }
-            UserSession currUser = SessionUtil.getUser(session);
-            if (currUser != null) {
-                // Nếu đã đăng nhập chính thức, kiểm tra xem có thực sự CHUA_KICH_HOAT không
-                boolean isUnactivated = false;
-                Session hSession = factory.openSession();
-                try {
-                    TaiKhoan tk = hSession.get(TaiKhoan.class, currUser.getUsername());
-                    if (tk != null && tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
-                        isUnactivated = true;
-                    }
-                } finally {
-                    hSession.close();
-                }
-                if (isUnactivated) {
-                    return true;
-                }
-            }
-            response.sendRedirect(request.getContextPath() + "/login");
-            return false;
+            return true;
         }
 
         // 2. Chặn truy cập nếu tài khoản đang chờ kích hoạt
@@ -130,7 +109,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             if (uri.contains("/login") || uri.contains("/logout") || uri.contains("/resources/")) {
                 return true;
             }
-            response.sendRedirect(request.getContextPath() + "/activate");
+            response.sendRedirect(request.getContextPath() + "/auth/activate");
             return false;
         }
 
@@ -162,7 +141,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 if (uri.contains("/login") || uri.contains("/logout") || uri.contains("/resources/")) {
                     return true;
                 }
-                response.sendRedirect(request.getContextPath() + "/activate");
+                response.sendRedirect(request.getContextPath() + "/auth/activate");
                 return false;
             }
         }
