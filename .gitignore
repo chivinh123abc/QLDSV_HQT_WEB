@@ -56,3 +56,5 @@ pusher.properties
 momo.properties
 
 *.dbdiagram
+
+*.env

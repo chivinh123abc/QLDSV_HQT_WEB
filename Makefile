@@ -1,5 +1,8 @@
 .PHONY: dev build clean format lint help
 
+include .env
+export
+
 help:
 	@echo "Available commands:"
 	@echo "  make dev    - Setup Git hooks, start Watcher (Auto-reload) & Tomcat (cargo:run)"
@@ -25,3 +28,12 @@ format:
 
 lint:
 	mvn spotless:check
+
+migrate:
+	docker exec -it qldsv-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$(DB_PASSWORD)" -C -i /docker-entrypoint-initdb.d/Gendb.sql
+
+up:
+	docker-compose --env-file .env up -d
+
+down:
+	docker-compose --env-file .env down

@@ -1,13 +1,13 @@
 # Cấu hình Database mẫu (Thay đổi thông tin thật trong database.properties)
 
 db.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
-db.url=jdbc:sqlserver://localhost:1433;databaseName=QLDSV_HTC_WEB;encrypt=true;trustServerCertificate=true;
+db.url=jdbc:sqlserver://${DB_HOST:localhost}:1433;databaseName=QLDSV_HTC_WEB;encrypt=true;trustServerCertificate=true;
 
 # Điền username của bạn (Mặc định thường là sa)
-db.username=sa
+db.username=${DB_USER:sa}
 
 # Điền mật khẩu SQL Server của máy bạn vào đây
-db.password=your_sql_password_here
+db.password=${DB_PASSWORD:your_sql_password_here}
 
 hibernate.dialect=org.hibernate.dialect.SQLServerDialect
 hibernate.show_sql=true

@@ -1,0 +1,29 @@
+# Build inputs/outputs
+target/
+*.class
+*.war
+*.jar
+
+# Version Control & IDEs
+.git
+.gitignore
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Secrets & Local Configurations (Tuyệt đối không mang vào Image)
+database.properties
+gmail.properties
+redis.properties
+pusher.properties
+momo.properties
+chatbot.properties
+!.properties.example
+.env
+
+# OS rác
+Thumbs.db
+Desktop.ini
