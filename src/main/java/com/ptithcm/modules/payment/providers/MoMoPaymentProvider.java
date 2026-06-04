@@ -106,7 +106,6 @@ public class MoMoPaymentProvider implements PaymentProvider {
 
     @Override
     public boolean verifySignature(Map<String, String> params) {
-        return true;
         // try {
         // String rawSignature = "accessKey=" + moMoProperties.getAccessKey() +
         // "&amount=" + params.get("amount")
@@ -137,6 +136,9 @@ public class MoMoPaymentProvider implements PaymentProvider {
         // log.error("[MOMO PROVIDER] Exception verifying signature", e);
         // return false;
         // }
+        log.info("[MOMO PROVIDER] Bypassing signature verification (Development Mode)");
+        // TODO: REVERT FOR PRODUCTION
+        return true;
     }
 
     @Override

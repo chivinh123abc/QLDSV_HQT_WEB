@@ -57,6 +57,9 @@ public class AuthController {
         }
         if ("locked".equals(error)) {
             model.addAttribute("error", "Tài khoản của bạn đã bị khóa!");
+        } else if ("session_expired".equals(error)) {
+            model.addAttribute("error",
+                    "Phiên làm việc đã hết hạn hoặc mã bảo mật không hợp lệ, vui lòng đăng nhập lại!");
         }
         return "auth/login";
     }

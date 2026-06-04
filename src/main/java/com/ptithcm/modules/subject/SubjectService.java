@@ -44,15 +44,35 @@ public class SubjectService {
     }
 
     public String saveMonHoc(MonHoc monHoc, String mode) throws Exception {
-        MonHoc existing = subjectDAO.findById(monHoc.getMaMH());
+        String maMH = monHoc.getMaMH() != null ? monHoc.getMaMH().trim() : "";
         if ("add".equals(mode)) {
-            if (existing != null) {
-                throw new Exception("Mã môn học [" + monHoc.getMaMH() + "] đã tồn tại!");
+            if (!maMH.isEmpty()) {
+                Number count = (Number) subjectDAO.getSession()
+                        .createNativeQuery("SELECT COUNT(*) FROM mon_hoc WHERE id = :id", Object.class)
+                        .setParameter("id", maMH).uniqueResult();
+                if (count != null && count.intValue() > 0) {
+                    Object ngayXoa = subjectDAO.getSession()
+                            .createNativeQuery("SELECT ngay_xoa FROM mon_hoc WHERE id = :id", Object.class)
+                            .setParameter("id", maMH).uniqueResult();
+                    if (ngayXoa == null) {
+                        throw new Exception("Mã môn học [" + maMH + "] đã tồn tại!");
+                    } else {
+                        try {
+                            subjectDAO.getSession().createNativeMutationQuery("DELETE FROM mon_hoc WHERE id = :id")
+                                    .setParameter("id", maMH).executeUpdate();
+                            subjectDAO.getSession().flush();
+                        } catch (org.springframework.dao.DataIntegrityViolationException
+                                | jakarta.persistence.PersistenceException e) {
+                            throw new Exception("Mã này đã từng tồn tại và có dữ liệu lịch sử, không thể tái sử dụng.");
+                        }
+                    }
+                }
             }
             subjectDAO.save(monHoc);
         } else if ("edit".equals(mode)) {
+            MonHoc existing = subjectDAO.findById(maMH);
             if (existing == null) {
-                throw new Exception("Không tìm thấy môn học [" + monHoc.getMaMH() + "] để chỉnh sửa!");
+                throw new Exception("Không tìm thấy môn học [" + maMH + "] để chỉnh sửa!");
             }
             subjectDAO.update(monHoc);
         }

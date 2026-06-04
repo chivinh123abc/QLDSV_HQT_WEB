@@ -10,6 +10,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -18,6 +20,7 @@ import com.ptithcm.entities.base.LuuVetThoiGian;
 @Entity
 @Table(name = "khoa")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLRestriction("ngay_xoa IS NULL")
 public class Khoa extends LuuVetThoiGian {
     @Id
     @Column(name = "id")

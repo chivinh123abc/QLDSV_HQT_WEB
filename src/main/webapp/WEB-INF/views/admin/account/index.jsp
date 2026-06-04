@@ -98,6 +98,21 @@
                                             aria-label="Close"></button>
                                     </div>
                                 </c:if>
+                                <c:if test="${not empty errorLines}">
+                                    <div class="alert alert-warning alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4"
+                                        role="alert">
+                                        <h6 class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> 
+                                            <s:message code="student.import.errorList" arguments="${errorLines.size()}" />
+                                        </h6>
+                                        <ul class="mb-0 small" style="max-height: 150px; overflow-y: auto; padding-left: 20px;">
+                                            <c:forEach var="errLine" items="${errorLines}">
+                                                <li>${errLine}</li>
+                                            </c:forEach>
+                                        </ul>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                    </div>
+                                </c:if>
 
                                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                                     <div

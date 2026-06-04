@@ -16,11 +16,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.ptithcm.entities.base.LuuVetThoiGian;
 import com.ptithcm.shared.enums.TrangThaiLop;
 
 @Entity
 @Table(name = "lop_tin_chi")
+@SQLRestriction("ngay_xoa IS NULL")
 public class LopTinChi extends LuuVetThoiGian {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

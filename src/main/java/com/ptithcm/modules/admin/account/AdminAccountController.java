@@ -54,6 +54,13 @@ public class AdminAccountController {
         model.addAttribute("unassignedStudents", unassignedStudents);
         model.addAttribute("unassignedLecturers", unassignedLecturers);
 
+        @SuppressWarnings("unchecked")
+        List<String> importErrors = (List<String>) session.getAttribute("importErrors");
+        if (importErrors != null) {
+            model.addAttribute("errorLines", importErrors);
+            session.removeAttribute("importErrors");
+        }
+
         if (userId != null && !userId.trim().isEmpty()) {
             TaiKhoan tk = accountService.getAccountById(userId);
             if (tk != null) {
@@ -138,7 +145,7 @@ public class AdminAccountController {
     }
 
     @RequestMapping(value = "/import", method = RequestMethod.POST)
-    public void importCsv(@RequestParam("file") MultipartFile file, HttpServletResponse response) {
+    public void importCsv(@RequestParam("file") MultipartFile file, HttpSession session, HttpServletResponse response) {
         try {
             if (file == null || file.isEmpty()) {
                 throw new IllegalArgumentException("Tệp tin tải lên rỗng hoặc không tồn tại!");

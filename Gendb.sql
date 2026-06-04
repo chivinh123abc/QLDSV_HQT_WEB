@@ -323,12 +323,9 @@ VALUES (N'LTC05', N'SV04', 9.0, 8.0, NULL, N'HIEU_LUC', 1, TODATETIMEOFFSET('202
 
 -- Admin account (PGV role)
 INSERT INTO [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) 
-VALUES (N'admin', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'admin@ptithcm.edu.vn', N'PGV', N'DA_KICH_HOAT');
+VALUES (N'GV01', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'gv01@ptithcm.edu.vn', N'PGV', N'DA_KICH_HOAT');
 
 -- Lecturer/Staff accounts (KHOA role for different faculties)
-INSERT INTO [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) 
-VALUES (N'GV01', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'gv01@ptithcm.edu.vn', N'KHOA', N'DA_KICH_HOAT');
-
 INSERT INTO [dbo].[tai_khoan] ([ten_dang_nhap], [mat_khau], [email], [phan_quyen], [trang_thai]) 
 VALUES (N'GV02', N'$2a$12$o63QUDMoGbNjRpIpkuRUDuicRWTNcZG0caYDyTQJ4jGbuAUTZbCja', N'gv02@ptithcm.edu.vn', N'KHOA', N'DA_KICH_HOAT');
 

@@ -10,12 +10,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.ptithcm.entities.base.LuuVetThoiGian;
 import com.ptithcm.shared.enums.TrangThaiDangKy;
 
 @Entity
 @Table(name = "dang_ky")
 @IdClass(DangKyId.class)
+@SQLRestriction("ngay_xoa IS NULL")
 public class DangKy extends LuuVetThoiGian {
     @Id
     @ManyToOne

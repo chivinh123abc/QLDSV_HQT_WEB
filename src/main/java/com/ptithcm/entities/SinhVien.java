@@ -17,6 +17,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.ptithcm.entities.base.LuuVetThoiGian;
@@ -24,6 +25,7 @@ import com.ptithcm.shared.enums.TrangThaiHoc;
 
 @Entity
 @Table(name = "sinh_vien")
+@SQLRestriction("ngay_xoa IS NULL")
 public class SinhVien extends LuuVetThoiGian {
     @Id
     @Column(name = "id")

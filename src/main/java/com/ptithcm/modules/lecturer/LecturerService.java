@@ -60,13 +60,36 @@ public class LecturerService {
         if (gv.getMaKhoa() != null) {
             gv.setKhoa(lecturerDAO.getSession().get(Khoa.class, gv.getMaKhoa()));
         }
-        GiangVien existing = lecturerDAO.findById(gv.getMaGV());
+        String maGV = gv.getMaGV() != null ? gv.getMaGV().trim() : "";
         if ("add".equals(mode)) {
-            if (existing != null) {
-                throw new Exception("Mã giảng viên [" + gv.getMaGV() + "] đã tồn tại!");
+            if (!maGV.isEmpty()) {
+                Number count = (Number) lecturerDAO.getSession()
+                        .createNativeQuery("SELECT COUNT(*) FROM giang_vien WHERE id = :id", Object.class)
+                        .setParameter("id", maGV).uniqueResult();
+                if (count != null && count.intValue() > 0) {
+                    Object ngayXoa = lecturerDAO.getSession()
+                            .createNativeQuery("SELECT ngay_xoa FROM giang_vien WHERE id = :id", Object.class)
+                            .setParameter("id", maGV).uniqueResult();
+                    if (ngayXoa == null) {
+                        throw new Exception("Mã giảng viên [" + maGV + "] đã tồn tại!");
+                    } else {
+                        try {
+                            lecturerDAO.getSession()
+                                    .createNativeMutationQuery("DELETE FROM tai_khoan WHERE ten_dang_nhap = :id")
+                                    .setParameter("id", maGV).executeUpdate();
+                            lecturerDAO.getSession().createNativeMutationQuery("DELETE FROM giang_vien WHERE id = :id")
+                                    .setParameter("id", maGV).executeUpdate();
+                            lecturerDAO.getSession().flush();
+                        } catch (org.springframework.dao.DataIntegrityViolationException
+                                | jakarta.persistence.PersistenceException e) {
+                            throw new Exception("Mã này đã từng tồn tại và có dữ liệu lịch sử, không thể tái sử dụng.");
+                        }
+                    }
+                }
             }
             lecturerDAO.save(gv);
         } else if ("edit".equals(mode)) {
+            GiangVien existing = lecturerDAO.findById(maGV);
             if (existing == null) {
                 throw new Exception("Không tìm thấy giảng viên để chỉnh sửa!");
             }

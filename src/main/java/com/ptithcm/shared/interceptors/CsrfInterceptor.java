@@ -54,10 +54,9 @@ public class CsrfInterceptor implements HandlerInterceptor {
                 return true; // Token hợp lệ, cho phép đi tiếp vào Controller
             }
 
-            // Token sai hoặc không có -> Báo lỗi 403 Forbidden
+            // Token sai hoặc không có -> Redirect về trang login với thông báo lỗi
             logger.warn("[SECURITY ALERT] Suspicious CSRF activity detected from IP: {}", request.getRemoteAddr());
-            response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                    "Yêu cầu bị từ chối do thiếu hoặc sai mã bảo mật CSRF.");
+            response.sendRedirect(request.getContextPath() + "/login?error=session_expired");
             return false;
         }
 

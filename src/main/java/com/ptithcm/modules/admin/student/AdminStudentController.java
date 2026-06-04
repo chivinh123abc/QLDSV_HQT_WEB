@@ -118,8 +118,8 @@ public class AdminStudentController {
             BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
 
         String sessionRole = (String) httpSession.getAttribute(SessionConstant.ROLE);
-        if (!RoleEnum.PGV.getCode().equals(sessionRole)) {
-            redirectAttributes.addFlashAttribute("error", "Chỉ Giáo vụ (PGV) mới có quyền thêm sinh viên!");
+        if (!RoleEnum.PGV.getCode().equals(sessionRole) && !RoleEnum.KHOA.getCode().equals(sessionRole)) {
+            redirectAttributes.addFlashAttribute("error", "Chỉ Giáo vụ (PGV) hoặc Khoa mới có quyền thêm sinh viên!");
             return "redirect:/admin/student?maLop=" + studentDto.getMaLop();
         }
 
@@ -155,8 +155,9 @@ public class AdminStudentController {
             BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
 
         String sessionRole = (String) httpSession.getAttribute(SessionConstant.ROLE);
-        if (!RoleEnum.PGV.getCode().equals(sessionRole)) {
-            redirectAttributes.addFlashAttribute("error", "Chỉ Giáo vụ (PGV) mới có quyền cập nhật sinh viên!");
+        if (!RoleEnum.PGV.getCode().equals(sessionRole) && !RoleEnum.KHOA.getCode().equals(sessionRole)) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Chỉ Giáo vụ (PGV) hoặc Khoa mới có quyền cập nhật sinh viên!");
             return "redirect:/admin/student?maLop=" + studentDto.getMaLop();
         }
 
@@ -210,8 +211,8 @@ public class AdminStudentController {
             RedirectAttributes redirectAttributes, HttpSession httpSession) {
 
         String sessionRole = (String) httpSession.getAttribute(SessionConstant.ROLE);
-        if (!RoleEnum.PGV.getCode().equals(sessionRole)) {
-            redirectAttributes.addFlashAttribute("error", "Chỉ Giáo vụ (PGV) mới có quyền xóa sinh viên!");
+        if (!RoleEnum.PGV.getCode().equals(sessionRole) && !RoleEnum.KHOA.getCode().equals(sessionRole)) {
+            redirectAttributes.addFlashAttribute("error", "Chỉ Giáo vụ (PGV) hoặc Khoa mới có quyền xóa sinh viên!");
             return "redirect:/admin/student?maLop=" + maLop;
         }
 
@@ -266,8 +267,9 @@ public class AdminStudentController {
     public String importCsv(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
             HttpSession httpSession) {
         String sessionRole = (String) httpSession.getAttribute(SessionConstant.ROLE);
-        if (!RoleEnum.PGV.getCode().equals(sessionRole)) {
-            redirectAttributes.addFlashAttribute("error", "Chỉ Giáo vụ (PGV) mới có quyền nhập CSV sinh viên!");
+        if (!RoleEnum.PGV.getCode().equals(sessionRole) && !RoleEnum.KHOA.getCode().equals(sessionRole)) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Chỉ Giáo vụ (PGV) hoặc Khoa mới có quyền nhập CSV sinh viên!");
             return "redirect:/admin/student";
         }
 
@@ -327,8 +329,8 @@ public class AdminStudentController {
             }
 
             List<TaiKhoan> accounts = accountDAO.getAllAccounts();
-            Map<String, TaiKhoan> accountMap = accounts.stream()
-                    .collect(Collectors.toMap(TaiKhoan::getTenDangNhap, a -> a, (a1, a2) -> a1));
+            Map<String, TaiKhoan> accountMap = accounts.stream().filter(a -> a.getTenDangNhap() != null)
+                    .collect(Collectors.toMap(a -> a.getTenDangNhap().trim().toUpperCase(), a -> a, (a1, a2) -> a1));
 
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
 

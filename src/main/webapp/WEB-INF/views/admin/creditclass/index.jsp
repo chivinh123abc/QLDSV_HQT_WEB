@@ -201,7 +201,7 @@
                                         <h6 class="fw-bold text-primary text-uppercase small mb-1"><s:message code="credit-class.list.title"/>
                                         </h6>
                                     </div>
-                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                    <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                         <a href="${pageContext.request.contextPath}/admin/creditclass?maKhoa=${maKhoa}&lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
                                             <i class="bi bi-plus-circle-fill me-1"></i> Mở <s:message code="global.lbl.selectClass"/> Mới
                                         </a>
@@ -257,7 +257,7 @@
                                                     <th class="text-center"><s:message code="credit-class.lbl.group"/></th>
                                                     <th><s:message code="credit-class.lbl.lecturer"/></th>
                                                     <th class="text-center"><s:message code="credit-class.lbl.status"/></th>
-                                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                                    <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                                         <th class="text-center"><s:message code="global.lbl.actions"/></th>
                                                     </c:if>
                                                 </tr>
@@ -295,7 +295,7 @@
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </td>
-                                                        <c:if test="${sessionScope.role == 'PGV'}">
+                                                        <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                                             <td class="text-center">
                                                                 <div class="d-flex gap-2 justify-content-center">
                                                                     <a href="${pageContext.request.contextPath}/admin/creditclass?maKhoa=${maKhoa}&maLTC=${item.maLTC}&lnkEdit"
@@ -318,7 +318,7 @@
                                                 </c:forEach>
                                                 <c:if test="${empty ltcList}">
                                                     <tr>
-                                                        <td colspan="${sessionScope.role == 'PGV' ? 7 : 6}" class="text-center py-5 text-muted">
+                                                        <td colspan="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA' ? 7 : 6}" class="text-center py-5 text-muted">
                                                             <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
                                                             <s:message code="credit-class.no.data"/>
                                                         </td>
@@ -335,7 +335,7 @@
             </div>
 
             <!-- MODAL (SSR) -->
-            <c:if test="${sessionScope.role == 'PGV' && (not empty mode || not empty param.lnkAdd)}">
+            <c:if test="${(sessionScope.role == 'PGV' || sessionScope.role == 'KHOA') && (not empty mode || not empty param.lnkAdd)}">
                 <div class="modal fade show d-block" id="ltcModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
                     <div class="modal-dialog modal-lg modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg rounded-4">
@@ -373,7 +373,7 @@
                                             <select class="form-select" name="maMH" required>
                                                 <option value=""><s:message code="credit-class.select.subject"/></option>
                                                 <c:forEach var="mh" items="${monHocList}">
-                                                    <option value="${mh.maMH}" ${ltc.monHoc.maMH == mh.maMH ? 'selected' : ''}>[${mh.maMH}] ${mh.tenMH}</option>
+                                                    <option value="${mh.maMH}" ${ltc.maMH == mh.maMH ? 'selected' : ''}>[${mh.maMH}] ${mh.tenMH}</option>
                                                 </c:forEach>
                                             </select>
                                         </div>
@@ -382,7 +382,7 @@
                                             <select class="form-select" name="maGV" required>
                                                 <option value=""><s:message code="credit-class.select.lecturer"/></option>
                                                 <c:forEach var="gv" items="${giangVienList}">
-                                                    <option value="${gv.maGV}" ${ltc.giangVien.maGV == gv.maGV ? 'selected' : ''}>[${gv.maGV}] ${gv.ho} ${gv.ten}</option>
+                                                    <option value="${gv.maGV}" ${ltc.maGV == gv.maGV ? 'selected' : ''}>[${gv.maGV}] ${gv.ho} ${gv.ten}</option>
                                                 </c:forEach>
                                             </select>
                                         </div>
@@ -390,7 +390,7 @@
                                             <label class="form-label small fw-bold text-muted"><s:message code="credit-class.lbl.faculty.required"/> <span class="text-danger">*</span></label>
                                             <select name="maKhoa" class="form-select">
                                                 <c:forEach var="k" items="${khoaList}">
-                                                    <option value="${k.maKhoa}" ${(not empty ltc.khoa.maKhoa ? ltc.khoa.maKhoa == k.maKhoa : maKhoa == k.maKhoa) ? 'selected' : ''}>${k.tenKhoa}</option>
+                                                    <option value="${k.maKhoa}" ${(not empty ltc.maKhoa ? ltc.maKhoa == k.maKhoa : maKhoa == k.maKhoa) ? 'selected' : ''}>${k.tenKhoa}</option>
                                                 </c:forEach>
                                             </select>
                                         </div>

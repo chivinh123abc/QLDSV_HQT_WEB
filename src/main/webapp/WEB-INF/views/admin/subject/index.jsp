@@ -119,7 +119,7 @@
                                 <h6 class="fw-bold text-primary text-uppercase small mb-1"><s:message code="subject.directory"/></h6>
                                 <p class="text-muted small mb-0"><s:message code="subject.management.desc"/></p>
                             </div>
-                            <c:if test="${sessionScope.role == 'PGV'}">
+                            <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                 <a href="${pageContext.request.contextPath}/admin/subject?lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
                                     <i class="bi bi-plus-circle-fill me-1"></i> <s:message code="subject.btn.add"/>
                                 </a>
@@ -148,7 +148,7 @@
                                             <th><s:message code="subject.lbl.name"/></th>
                                             <th class="text-center"><s:message code="subject.lbl.theoryHours"/></th>
                                             <th class="text-center"><s:message code="subject.lbl.practiceHours"/></th>
-                                            <c:if test="${sessionScope.role == 'PGV'}">
+                                            <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                                 <th class="text-center"><s:message code="global.lbl.actions"/></th>
                                             </c:if>
                                         </tr>
@@ -171,11 +171,11 @@
                                                 <td class="text-center">
                                                     <span class="badge-soft-secondary">${item.soTietTH} <s:message code="global.lbl.hours"/></span>
                                                 </td>
-                                                <c:if test="${sessionScope.role == 'PGV'}">
+                                                <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                                     <td class="text-center">
                                                         <div class="d-flex gap-2 justify-content-center">
                                                             <a href="${pageContext.request.contextPath}/admin/subject?maMH=${item.maMH}&lnkEdit" class="btn btn-sm btn-outline-primary border-0 rounded-3">
-                                                                <i class="bi bi-pencil-square"></i>
+                                                                 <i class="bi bi-pencil-square"></i>
                                                             </a>
                                                             <form action="${pageContext.request.contextPath}/admin/subject" method="POST" onsubmit="return confirm('<s:message code="subject.js.confirmDelete"/>');" class="d-inline">
                                                                 <input type="hidden" name="csrf_token" value="${csrfToken}" />
@@ -209,7 +209,7 @@
     </div>
 
     <!-- SUBJECT MODAL (SSR) -->
-    <c:if test="${sessionScope.role == 'PGV' && (not empty mode || not empty param.lnkAdd)}">
+    <c:if test="${(sessionScope.role == 'PGV' || sessionScope.role == 'KHOA') && (not empty mode || not empty param.lnkAdd)}">
         <div class="modal fade show d-block" id="subjectModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">

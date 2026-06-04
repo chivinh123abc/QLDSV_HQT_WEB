@@ -88,9 +88,37 @@ public class StudentService {
         return studentDAO.findById(maSV);
     }
 
-    public void insertStudent(SinhVien sv) {
+    public void insertStudent(SinhVien sv) throws Exception {
         if (sv.getMaLop() != null) {
             sv.setLop(studentDAO.getSession().get(Lop.class, sv.getMaLop()));
+        }
+        String maSV = sv.getMaSV();
+        if (maSV != null) {
+            maSV = maSV.trim();
+            Number count = (Number) studentDAO.getSession()
+                    .createNativeQuery("SELECT COUNT(*) FROM sinh_vien WHERE id = :id", Object.class)
+                    .setParameter("id", maSV).uniqueResult();
+            if (count != null && count.intValue() > 0) {
+                Object ngayXoa = studentDAO.getSession()
+                        .createNativeQuery("SELECT ngay_xoa FROM sinh_vien WHERE id = :id", Object.class)
+                        .setParameter("id", maSV).uniqueResult();
+                if (ngayXoa == null) {
+                    throw new Exception("Mã sinh viên [" + maSV + "] đã tồn tại!");
+                } else {
+                    try {
+                        studentDAO.getSession()
+                                .createNativeMutationQuery("DELETE FROM tai_khoan WHERE ten_dang_nhap = :id")
+                                .setParameter("id", maSV).executeUpdate();
+                        studentDAO.getSession().createNativeMutationQuery("DELETE FROM sinh_vien WHERE id = :id")
+                                .setParameter("id", maSV).executeUpdate();
+                        studentDAO.getSession().flush();
+                    } catch (org.springframework.dao.DataIntegrityViolationException
+                            | jakarta.persistence.PersistenceException e) {
+                        throw new Exception(
+                                "Mã sinh viên này thuộc về một hồ sơ cũ đã có dữ liệu học tập và không thể tái sử dụng.");
+                    }
+                }
+            }
         }
         studentDAO.save(sv);
     }
@@ -109,6 +137,13 @@ public class StudentService {
         }
         SinhVien sv = studentDAO.findById(maSV);
         if (sv != null) {
+            // Cascade-delete corresponding TaiKhoan in the same transaction
+            String username = sv.getMaSV() != null ? sv.getMaSV().trim() : "";
+            TaiKhoan tk = accountDAO.getAccountByUsername(username);
+            if (tk != null) {
+                tk.setNgayXoa(com.ptithcm.shared.utils.DateUtil.nowVn());
+                accountDAO.updateAccount(tk);
+            }
             studentDAO.delete(sv);
         } else {
             throw new Exception("Không tìm thấy sinh viên để xóa!");
@@ -148,9 +183,9 @@ public class StudentService {
                 return errorLines;
             }
             // Check headers
-            if (header.length < 6) {
+            if (header.length < 7) {
                 errorLines.add(
-                        "File CSV không đúng định dạng. Cần ít nhất 6 cột: MASV, HOTEN, GIOITINH, NGAYSINH, EMAIL, MALOP");
+                        "File CSV không đúng định dạng. Cần ít nhất 7 cột: MASV, HOTEN, GIOITINH, NGAYSINH, EMAIL, DIACHI, MALOP");
                 return errorLines;
             }
             // Normalize header
@@ -158,8 +193,9 @@ public class StudentService {
                 header[i] = header[i].trim().toUpperCase().replace("\uFEFF", ""); // remove BOM if present
             }
             if (!header[0].equals("MASV") || !header[1].equals("HOTEN") || !header[2].equals("GIOITINH")
-                    || !header[3].equals("NGAYSINH") || !header[4].equals("EMAIL") || !header[5].equals("MALOP")) {
-                errorLines.add("Header không hợp lệ. Yêu cầu: MASV, HOTEN, GIOITINH, NGAYSINH, EMAIL, MALOP");
+                    || !header[3].equals("NGAYSINH") || !header[4].equals("EMAIL") || !header[5].equals("DIACHI")
+                    || !header[6].equals("MALOP")) {
+                errorLines.add("Header không hợp lệ. Yêu cầu: MASV, HOTEN, GIOITINH, NGAYSINH, EMAIL, DIACHI, MALOP");
                 return errorLines;
             }
 
@@ -173,46 +209,48 @@ public class StudentService {
                 if (nextLine.length == 0 || (nextLine.length == 1 && nextLine[0].trim().isEmpty())) {
                     continue; // Skip empty rows
                 }
-                if (nextLine.length < 6) {
-                    errorLines.add("Dòng " + lineNumber + ": Không đủ dữ liệu cột (yêu cầu 6 cột).");
-                    continue;
-                }
-
-                String maSV = nextLine[0].trim();
-                String hoTen = nextLine[1].trim();
-                String gioiTinh = nextLine[2].trim();
-                String ngaySinhStr = nextLine[3].trim();
-                String email = nextLine[4].trim();
-                String maLop = nextLine[5].trim();
-
-                if (maSV.isEmpty() || hoTen.isEmpty() || gioiTinh.isEmpty() || ngaySinhStr.isEmpty() || email.isEmpty()
-                        || maLop.isEmpty()) {
-                    errorLines.add("Dòng " + lineNumber + ": Có trường dữ liệu rỗng.");
-                    continue;
-                }
-
-                // Check gender format
-                if (!gioiTinh.equalsIgnoreCase("Nam") && !gioiTinh.equalsIgnoreCase("Nữ")) {
-                    errorLines.add("Dòng " + lineNumber + ": Giới tính phải là 'Nam' hoặc 'Nữ'.");
-                    continue;
-                }
-
-                // Check date format
-                java.util.Date ngaySinh;
                 try {
-                    ngaySinh = sdf.parse(ngaySinhStr);
-                } catch (ParseException e) {
-                    errorLines.add("Dòng " + lineNumber + ": Định dạng ngày sinh không hợp lệ (yêu cầu yyyy-MM-dd).");
-                    continue;
-                }
+                    if (nextLine.length < 7) {
+                        errorLines.add("Dòng " + lineNumber + ": Không đủ dữ liệu cột (yêu cầu 7 cột).");
+                        continue;
+                    }
 
-                // Email basic check
-                if (!email.contains("@")) {
-                    errorLines.add("Dòng " + lineNumber + ": Định dạng email không hợp lệ.");
-                    continue;
-                }
+                    String maSV = nextLine[0] != null ? nextLine[0].trim() : "";
+                    String hoTen = nextLine[1] != null ? nextLine[1].trim() : "";
+                    String gioiTinh = nextLine[2] != null ? nextLine[2].trim() : "";
+                    String ngaySinhStr = nextLine[3] != null ? nextLine[3].trim() : "";
+                    String email = nextLine[4] != null ? nextLine[4].trim() : "";
+                    String diaChi = nextLine[5] != null ? nextLine[5].trim() : "";
+                    String maLop = nextLine[6] != null ? nextLine[6].trim() : "";
 
-                try {
+                    if (maSV.isEmpty() || hoTen.isEmpty() || gioiTinh.isEmpty() || ngaySinhStr.isEmpty()
+                            || email.isEmpty() || diaChi.isEmpty() || maLop.isEmpty()) {
+                        errorLines.add("Dòng " + lineNumber + ": Có trường dữ liệu rỗng.");
+                        continue;
+                    }
+
+                    // Check gender format
+                    if (!gioiTinh.equalsIgnoreCase("Nam") && !gioiTinh.equalsIgnoreCase("Nữ")) {
+                        errorLines.add("Dòng " + lineNumber + ": Giới tính phải là 'Nam' hoặc 'Nữ'.");
+                        continue;
+                    }
+
+                    // Check date format
+                    java.util.Date ngaySinh;
+                    try {
+                        ngaySinh = sdf.parse(ngaySinhStr);
+                    } catch (ParseException e) {
+                        errorLines
+                                .add("Dòng " + lineNumber + ": Định dạng ngày sinh không hợp lệ (yêu cầu yyyy-MM-dd).");
+                        continue;
+                    }
+
+                    // Email basic check
+                    if (!email.contains("@")) {
+                        errorLines.add("Dòng " + lineNumber + ": Định dạng email không hợp lệ.");
+                        continue;
+                    }
+
                     // Split Ho and Ten
                     int lastSpaceIdx = hoTen.lastIndexOf(' ');
                     String ho = "";
@@ -233,7 +271,7 @@ public class StudentService {
                     sv.setNgaySinh(ngaySinh);
                     sv.setMaLop(maLop);
                     sv.setTrangThaiHoc(com.ptithcm.shared.enums.TrangThaiHoc.DANG_HOC);
-                    sv.setDiaChi("Chưa cập nhật");
+                    sv.setDiaChi(diaChi);
 
                     TaiKhoan tk = new TaiKhoan();
                     tk.setTenDangNhap(maSV);
@@ -248,6 +286,9 @@ public class StudentService {
                     tk.setMatKhau(hashedPw);
 
                     self.importSingleStudent(sv, tk);
+                } catch (NullPointerException | IllegalStateException | IndexOutOfBoundsException e) {
+                    errorLines.add("Dòng " + lineNumber + ": Định dạng dữ liệu không hợp lệ hoặc bị lỗi ("
+                            + e.getClass().getSimpleName() + ").");
                 } catch (Exception e) {
                     errorLines.add("Dòng " + lineNumber + ": " + e.getMessage());
                 }
@@ -260,12 +301,64 @@ public class StudentService {
 
     @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     public void importSingleStudent(SinhVien sv, TaiKhoan tk) throws Exception {
-        if (studentExists(sv.getMaSV())) {
-            throw new Exception("Mã sinh viên [" + sv.getMaSV() + "] đã tồn tại!");
+        String maSV = sv.getMaSV() != null ? sv.getMaSV().trim() : "";
+        String username = tk.getTenDangNhap() != null ? tk.getTenDangNhap().trim() : "";
+
+        // Check physical existence of Student
+        if (!maSV.isEmpty()) {
+            Number count = (Number) studentDAO.getSession()
+                    .createNativeQuery("SELECT COUNT(*) FROM sinh_vien WHERE id = :id", Object.class)
+                    .setParameter("id", maSV).uniqueResult();
+            if (count != null && count.intValue() > 0) {
+                Object ngayXoa = studentDAO.getSession()
+                        .createNativeQuery("SELECT ngay_xoa FROM sinh_vien WHERE id = :id", Object.class)
+                        .setParameter("id", maSV).uniqueResult();
+                if (ngayXoa == null) {
+                    throw new Exception("Mã sinh viên [" + maSV + "] đã tồn tại!");
+                } else {
+                    try {
+                        studentDAO.getSession()
+                                .createNativeMutationQuery("DELETE FROM tai_khoan WHERE ten_dang_nhap = :id")
+                                .setParameter("id", maSV).executeUpdate();
+                        studentDAO.getSession().createNativeMutationQuery("DELETE FROM sinh_vien WHERE id = :id")
+                                .setParameter("id", maSV).executeUpdate();
+                        studentDAO.getSession().flush();
+                    } catch (org.springframework.dao.DataIntegrityViolationException
+                            | jakarta.persistence.PersistenceException e) {
+                        throw new Exception(
+                                "Mã sinh viên này thuộc về một hồ sơ cũ đã có dữ liệu học tập và không thể tái sử dụng.");
+                    }
+                }
+            }
         }
-        if (accountExists(tk.getTenDangNhap())) {
-            throw new Exception("Tài khoản với tên đăng nhập [" + tk.getTenDangNhap() + "] đã tồn tại!");
+
+        // Check physical existence of Account (if different from maSV)
+        if (!username.isEmpty() && !username.equalsIgnoreCase(maSV)) {
+            Number count = (Number) studentDAO.getSession()
+                    .createNativeQuery("SELECT COUNT(*) FROM tai_khoan WHERE ten_dang_nhap = :username", Object.class)
+                    .setParameter("username", username).uniqueResult();
+            if (count != null && count.intValue() > 0) {
+                Object ngayXoa = studentDAO.getSession()
+                        .createNativeQuery("SELECT ngay_xoa FROM tai_khoan WHERE ten_dang_nhap = :username",
+                                Object.class)
+                        .setParameter("username", username).uniqueResult();
+                if (ngayXoa == null) {
+                    throw new Exception("Tài khoản với tên đăng nhập [" + username + "] đã tồn tại!");
+                } else {
+                    try {
+                        studentDAO.getSession()
+                                .createNativeMutationQuery("DELETE FROM tai_khoan WHERE ten_dang_nhap = :username")
+                                .setParameter("username", username).executeUpdate();
+                        studentDAO.getSession().flush();
+                    } catch (org.springframework.dao.DataIntegrityViolationException
+                            | jakarta.persistence.PersistenceException e) {
+                        throw new Exception(
+                                "Tài khoản này thuộc về một hồ sơ cũ đã có dữ liệu học tập và không thể tái sử dụng.");
+                    }
+                }
+            }
         }
+
         importStudentAndCreateAccount(sv, tk);
     }
 }

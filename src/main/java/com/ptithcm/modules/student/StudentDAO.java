@@ -40,9 +40,8 @@ public class StudentDAO extends BaseDAO<SinhVien, String> {
     }
 
     public List<SinhVien> getStudentsWithAccount() {
-        return getSession()
-                .createQuery("SELECT s FROM SinhVien s WHERE s.maSV IN (SELECT t.tenDangNhap FROM TaiKhoan t)",
-                        SinhVien.class)
-                .list();
+        return getSession().createQuery(
+                "SELECT s FROM SinhVien s WHERE UPPER(TRIM(s.maSV)) IN (SELECT UPPER(TRIM(t.tenDangNhap)) FROM TaiKhoan t)",
+                SinhVien.class).list();
     }
 }

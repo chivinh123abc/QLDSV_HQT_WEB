@@ -2,6 +2,9 @@
 
 Chào mừng bạn đến với **QLDSV_HTC_WEB** - hệ thống Web quản lý điểm sinh viên học theo hệ thống tín chỉ. Dự án được phát triển theo mô hình MVC sử dụng các công nghệ Spring Framework (Spring MVC, Spring ORM), Hibernate, và SQL Server.
 
+> [!IMPORTANT]
+> Toàn bộ luồng xử lý nghiệp vụ của hệ thống hoạt động theo mô hình **Server-Side Rendering (SSR)**. Mọi tương tác giữa người dùng và server đều thông qua **form submission** và **page redirect/reload** (PRG - Post/Redirect/Get pattern). Hệ thống **KHÔNG** sử dụng REST API hay AJAX cho các luồng nghiệp vụ chính, ngoại trừ module nhập điểm.
+
 ---
 
 ## 📘 Tài Liệu Liên Quan
@@ -38,6 +41,8 @@ Dự án được xây dựng dựa trên ngăn xếp công nghệ (Tech Stack) 
 - **Thư viện ORM:** Hibernate 6.4.4.Final
 - **Hệ quản trị CSDL:** SQL Server (sử dụng Driver `mssql-jdbc` phiên bản 12.4.2)
 - **Bể chứa kết nối (Connection Pooling):** Apache Commons DBCP2
+- **Hàng đợi & Cache:** Redis (Jedis client) — sử dụng cho Queue đăng ký tín chỉ, OTP xác thực email, Rate Limiting
+- **Thanh toán trực tuyến:** MoMo Payment Gateway (Provider pattern)
 - **Trình biên dịch & Đóng gói:** Maven
 - **Web Server nhúng:** Apache Tomcat 10.x thông qua Cargo Maven Plugin
 
@@ -45,7 +50,7 @@ Dự án được xây dựng dựa trên ngăn xếp công nghệ (Tech Stack) 
 
 ## 📂 Kiến Trúc Thư Mục Dự Án
 
-Kiến trúc mã nguồn được phân chia rõ ràng theo mô hình layered, loại bỏ các bảng quản trị tập trung (dư thừa) và tích hợp cấu trúc đặt tên chuẩn hóa:
+Kiến trúc mã nguồn được phân chia rõ ràng theo mô hình layered, tổ chức theo **hai phân vùng URL** riêng biệt (`/admin/*` cho giáo vụ/khoa và `/student/*` cho sinh viên):
 
 ```text
 QLDSV_HQT_WEB
@@ -54,199 +59,176 @@ QLDSV_HQT_WEB
 ├── db.dbml                                  # Bản vẽ thiết kế CSDL (Lowercase snake_case)
 ├── README.md                                # Tài liệu tổng quan dự án (File này)
 ├── docs/                                    # Thư mục lưu trữ tài liệu liên quan
-│   ├── Luu_y_ap_dung.md                     # Danh sách lưu ý & các tính năng cần áp dụng (Đọc trước)
-│   └── lessons/                             # Thư mục phân chia chương bài học lý thuyết & thực hành
-│       ├── Chuong_1_Spring_MVC.md
-│       ├── Chuong_2_Controller.md
-│       ├── Chuong_3_Form.md
-│       ├── Chuong_4_EL_JSTL.md
-│       ├── Chuong_5_Bean_DI_File_Email.md
-│       ├── Chuong_6_Hibernate.md
-│       ├── Chuong_7_Validation_Interceptor.md
-│       ├── Chuong_8_To_Chuc_Giao_Dien.md
-│       └── Tong_hop_kien_thuc.md            # Tài liệu tổng hợp kiến thức (LESSON NOTES)
+│   ├── Luu_y_ap_dung.md                     # Danh sách lưu ý & các tính năng cần áp dụng
+│   └── lessons/                             # Thư mục phân chia chương bài học
 └── src
     └── main
         ├── java
         │   └── com
         │       └── ptithcm
-        │           ├── entity               # Các Java class ánh xạ trực tiếp sang các bảng CSDL
-        │           │   ├── base
-        │           │   │   └── LuuVetThoiGian.java # MappedSuperclass chứa các trường audit (ngay_tao, ngay_cap_nhat, ngay_xoa)
-        │           │   ├── DangKy.java
-        │           │   ├── DangKyId.java     # Khóa chính phức hợp cho bảng Đăng ký
-        │           │   ├── GiangVien.java
-        │           │   ├── Khoa.java
-        │           │   ├── Lop.java
-        │           │   ├── LopTinChi.java
-        │           │   ├── MonHoc.java
-        │           │   └── SinhVien.java
-        │           ├── modules              # Tổ chức mã nguồn theo Module (Controller, Service, DAO)
-        │           │   ├── auth/            # Module xác thực (Đăng nhập, đăng xuất, cookie)
-        │           │   │   ├── AuthDAO.java
-        │           │   │   ├── AuthService.java
-        │           │   │   └── LoginController.java
-        │           │   ├── dangky/          # Module đăng ký lớp tín chỉ
-        │           │   │   ├── DangKyController.java
-        │           │   │   ├── DangKyDAO.java
-        │           │   │   └── DangKyService.java
-        │           │   ├── diemso/          # Module quản lý điểm số
-        │           │   │   ├── MarkController.java
-        │           │   │   ├── MarkDAO.java
-        │           │   │   └── MarkService.java
-        │           │   ├── giangvien/       # Module quản lý thông tin giảng viên
-        │           │   │   ├── GiangVienController.java
-        │           │   │   ├── GiangVienDAO.java
-        │           │   │   └── GiangVienService.java
-        │           │   ├── home/            # Module trang chủ điều hướng
-        │           │   │   ├── HomeController.java
-        │           │   │   ├── HomeDAO.java
-        │           │   │   └── HomeService.java
-        │           │   ├── khoa/            # Module quản lý danh mục khoa
-        │           │   │   ├── KhoaController.java
-        │           │   │   ├── KhoaDAO.java
-        │           │   │   └── KhoaService.java
-        │           │   ├── lop/             # Module quản lý lớp sinh viên
-        │           │   │   ├── LopController.java
-        │           │   │   ├── LopDAO.java
-        │           │   │   └── LopService.java
-        │           │   ├── loptinchi/       # Module quản lý lớp tín chỉ
-        │           │   │   ├── LopTinChiController.java
-        │           │   │   ├── LopTinChiDAO.java
-        │           │   │   └── LopTinChiService.java
-        │           │   ├── monhoc/          # Module quản lý danh mục môn học
-        │           │   │   ├── MonHocController.java
-        │           │   │   ├── MonHocDAO.java
-        │           │   │   └── MonHocService.java
-        │           │   ├── report/          # Module thống kê & báo cáo dữ liệu
-        │           │   │   ├── ReportController.java
-        │           │   │   ├── ReportDAO.java
-        │           │   │   └── ReportService.java
-        │           │   └── sinhvien/        # Module quản lý sinh viên
-        │           │       ├── SinhVienController.java
-        │           │       ├── SinhVienDAO.java
-        │           │       └── SinhVienService.java
-        │           └── shared               # Các DTO, Interceptor, Validator và Utility dùng chung
-        │               ├── base/            # DAO cơ bản và Query Builder động
-        │               │   ├── BaseDAO.java
-        │               │   └── HqlQueryBuilder.java
-        │               ├── constant/        # Định nghĩa các hằng số hệ thống
-        │               │   ├── MessageConstant.java
-        │               │   └── SessionConstant.java
-        │               ├── dto/             # Data Transfer Objects
-        │               │   ├── FindOptions.java
-        │               │   ├── PaginationDTO.java
-        │               │   ├── PaginationResult.java
-        │               │   ├── Sort.java
-        │               │   └── UserSession.java
-        │               ├── interceptor/     # Bộ lọc phân quyền (Authentication/RBAC)
-        │               │   └── AuthInterceptor.java
-        │               ├── util/            # Các tiện ích (Mã hóa, Xử lý chuỗi, Session)
-        │               │   ├── DateUtil.java
-        │               │   ├── SecurityUtil.java
-        │               │   └── SessionUtil.java
-        │               └── validator/       # Bộ xác thực dữ liệu đầu vào (Validation)
-        │                   ├── CreditClassValidator.java
-        │                   ├── ClassroomValidator.java
-        │                   ├── SubjectValidator.java
-        │                   └── StudentValidator.java
-        └── webapp
-            ├── resources                    # Thư mục chứa CSS, Javascript tĩnh
-            │   ├── css
-            │   │   └── style.css
-            │   └── js
-            │       └── main.js
-            └── WEB-INF
-                 ├── config                  # Cấu hình Spring Beans, MVC, Hibernate Datasource
-                 │   ├── spring-config-bean.xml
-                 │   └── spring-config-mvc.xml
-                ├── views                    # Các trang hiển thị JSP (được tổ chức theo thực thể)
-                │   ├── class
-                │   ├── credit-class
-                │   ├── faculty
-                │   ├── lecturer
-                │   ├── mark
-                │   ├── registration
-                │   ├── report
-                │   ├── shared
-                │   ├── student
-                │   ├── subject
-                │   ├── index.jsp
-                │   └── login.jsp
-                └── web.xml                  # Cấu hình khởi tạo DispatcherServlet và Filters
+        │           ├── entities/             # JPA Entity classes + @SQLRestriction Soft Delete
+        │           │   ├── base/
+        │           │   │   └── LuuVetThoiGian.java  # @MappedSuperclass (ngay_tao, ngay_cap_nhat, ngay_xoa)
+        │           │   ├── DangKy.java              # Bảng đăng ký (composite PK: maLTC + maSV)
+        │           │   ├── DangKyId.java            # Khóa chính phức hợp
+        │           │   ├── GiangVien.java           # Bảng giảng viên
+        │           │   ├── Khoa.java                # Bảng khoa
+        │           │   ├── Lop.java                 # Bảng lớp sinh viên
+        │           │   ├── LopTinChi.java           # Bảng lớp tín chỉ (UUID PK)
+        │           │   ├── MonHoc.java               # Bảng môn học
+        │           │   ├── SinhVien.java            # Bảng sinh viên
+        │           │   ├── TaiKhoan.java            # Bảng tài khoản đăng nhập
+        │           │   └── ThongBao.java            # Bảng thông báo
+        │           ├── modules/
+        │           │   ├── auth/                    # Xác thực (Login, Logout, Cookie, Kích hoạt TK)
+        │           │   ├── home/                    # Trang chủ dashboard
+        │           │   ├── announcement/            # Xem thông báo (tất cả vai trò)
+        │           │   ├── profile/                 # Hồ sơ cá nhân, đổi mật khẩu, avatar
+        │           │   ├── registration/            # Service & Worker xử lý đăng ký tín chỉ
+        │           │   ├── mark/                    # Service quản lý điểm số
+        │           │   ├── report/                  # Service báo cáo (Stored Procedure)
+        │           │   ├── payment/                 # Service & Provider thanh toán MoMo
+        │           │   ├── student/                 # ─── PHÂN VÙNG SINH VIÊN ───
+        │           │   │   ├── StudentController.java    # CRUD SV (admin dùng)
+        │           │   │   ├── registration/             # /student/registration
+        │           │   │   ├── mark/                     # /student/mark
+        │           │   │   └── payment/                  # /student/payment
+        │           │   ├── admin/                   # ─── PHÂN VÙNG QUẢN TRỊ ───
+        │           │   │   ├── account/             # /admin/account (CRUD tài khoản)
+        │           │   │   ├── announcement/        # /admin/announcement (CRUD thông báo)
+        │           │   │   ├── classroom/           # /admin/classroom (CRUD lớp)
+        │           │   │   ├── creditclass/         # /admin/creditclass (CRUD lớp tín chỉ)
+        │           │   │   ├── faculty/             # /admin/faculty (CRUD khoa)
+        │           │   │   ├── lecturer/            # /admin/lecturer (CRUD giảng viên)
+        │           │   │   ├── mark/                # /admin/mark (nhập điểm)
+        │           │   │   ├── payment/             # /admin/payment (thống kê học phí)
+        │           │   │   ├── registration/        # /admin/registration (đăng ký hộ SV)
+        │           │   │   ├── report/              # /admin/report (xuất báo cáo)
+        │           │   │   ├── student/             # /admin/student (quản lý SV)
+        │           │   │   └── subject/             # /admin/subject (CRUD môn học)
+        │           │   ├── account/                 # Service tài khoản
+        │           │   ├── classroom/               # Service lớp
+        │           │   ├── creditclass/             # Service lớp tín chỉ
+        │           │   ├── faculty/                 # Service khoa
+        │           │   ├── lecturer/                # Service giảng viên
+        │           │   ├── subject/                 # Service môn học
+        │           │   └── error/                   # Controller xử lý lỗi HTTP
+        │           └── shared/
+        │               ├── advices/                 # @ControllerAdvice (Global UI Config)
+        │               ├── aspects/                 # Spring AOP (Audit Logging)
+        │               ├── bases/                   # BaseDAO + HqlQueryBuilder
+        │               ├── constants/               # Hằng số hệ thống (Message, Session, Cache)
+        │               ├── dtos/                    # DTO dùng chung (Pagination, UserSession, Sort)
+        │               ├── enums/                   # Enum (Role, TrangThaiDangKy, RegistrationStatus...)
+        │               ├── events/                  # Spring Event
+        │               ├── exceptions/              # Custom exceptions
+        │               ├── interceptors/            # Auth, CSRF, RateLimit, AdminAuth
+        │               ├── listeners/               # Event listeners
+        │               ├── services/                # Redis, Mailer, Captcha, CSV, EmailOTP
+        │               └── utils/                   # Date, Security, Session utilities
+        ├── resources/
+        │   └── i18n-res/                            # Tệp đa ngôn ngữ (global_vi.properties, global_en.properties)
+        └── webapp/
+            ├── resources/                           # CSS, JS tĩnh, uploads
+            └── WEB-INF/
+                 ├── config/                         # Spring Beans, MVC, Hibernate config
+                 ├── views/                          # JSP views
+                 │   ├── admin/                      # Giao diện quản trị (12 module)
+                 │   ├── student/                    # Giao diện sinh viên (mark, payment, registration)
+                 │   ├── announcement/               # Giao diện xem thông báo
+                 │   ├── auth/                       # Login, Activate
+                 │   ├── profile/                    # Hồ sơ cá nhân
+                 │   ├── shared/                     # Header, Sidebar, Error pages (429, error)
+                 │   └── index.jsp                   # Dashboard trang chủ
+                 └── web.xml                         # DispatcherServlet & Filters config
 ```
 
 ---
 
 ## 👥 Vai Trò & Phân Quyền (RBAC)
 
-Hệ thống cung cấp cơ chế phân quyền dựa trên 3 nhóm vai trò (Roles) chính được xác định trực tiếp từ dữ liệu sinh viên/giảng viên:
+Hệ thống cung cấp cơ chế phân quyền dựa trên 3 nhóm vai trò (Roles) chính. Mỗi vai trò có phân vùng URL riêng biệt:
 
-| Quyền | Vai trò (Role Code)      | Phạm vi thao tác                                                                                                                                                                                                                 |
-| :---- | :----------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | **PGV** (Phòng Giáo Vụ)  | Toàn quyền CRUD trên danh mục Khoa, Lớp, Môn Học, Lớp Tín Chỉ, Sinh Viên. Nhập và lưu điểm cho mọi sinh viên. Xem các loại báo cáo trên toàn trường.                                                                             |
-| **2** | **KHOA** (Khoa)          | Quyền hạn tương tự PGV nhưng **bị giới hạn phạm vi**: chỉ được phép xem, thêm, sửa, xóa các Lớp, Sinh Viên, Lớp Tín Chỉ, và Điểm số thuộc về Khoa của mình (được nhận diện qua mã Khoa của tài khoản giảng viên đang đăng nhập). |
-| **3** | **SINHVIEN** (Sinh Viên) | Chỉ được phép đăng nhập vào giao diện Đăng ký / Hủy đăng ký Lớp Tín Chỉ (trong học kỳ hiện tại), và xem bảng điểm cá nhân của mình.                                                                                              |
+| Quyền | Vai trò (Role Code)      | Phân vùng URL | Phạm vi thao tác                                                                                                           |
+| :---- | :----------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------- |
+| **1** | **PGV** (Phòng Giáo Vụ)  | `/admin/*`    | Toàn quyền CRUD trên tất cả danh mục. Nhập điểm, xuất báo cáo, quản lý tài khoản, thông báo, thống kê học phí toàn trường. |
+| **2** | **KHOA** (Khoa)          | `/admin/*`    | Tương tự PGV nhưng **bị giới hạn phạm vi** theo mã Khoa đăng nhập. Chỉ xem/sửa dữ liệu thuộc Khoa mình.                    |
+| **3** | **SINHVIEN** (Sinh Viên) | `/student/*`  | Đăng ký/Hủy đăng ký lớp tín chỉ, xem bảng điểm cá nhân, thanh toán học phí trực tuyến (MoMo).                              |
+
+**Các trang dùng chung (tất cả vai trò):** `/profile`, `/announcements`, `/index` (Dashboard).
 
 ---
 
 ## 📋 Danh Sách Tính Năng Hệ Thống (Feature Checklist)
 
-Dưới đây là danh sách chi tiết các tính năng nghiệp vụ cốt lõi, cơ chế bắt buộc và kỹ thuật nâng cao đã được triển khai hoàn chỉnh trong dự án:
-
 ### 🛠️ 1. Các Tính Năng Nghiệp Vụ Cốt Lõi (Core Features)
 
 - [x] **Quản lý danh mục (Category Management):**
-  - [x] Quản lý thông tin Khoa.
-  - [x] Quản lý thông tin Lớp học (Regular Class).
-  - [x] Quản lý thông tin Sinh viên.
-  - [x] Quản lý thông tin Giảng viên.
-  - [x] Quản lý danh mục Môn học.
-  - [x] Đảm bảo toàn vẹn dữ liệu (ràng buộc khóa chính, khóa ngoại, unique constraints trong CSDL quan hệ).
-- [x] **Quản lý Lớp tín chỉ (Credit Class Management):**
+  - [x] Quản lý thông tin Khoa (`/admin/faculty`).
+  - [x] Quản lý thông tin Lớp học (`/admin/classroom`).
+  - [x] Quản lý thông tin Sinh viên (`/admin/student`).
+  - [x] Quản lý thông tin Giảng viên (`/admin/lecturer`).
+  - [x] Quản lý danh mục Môn học (`/admin/subject`).
+  - [x] Đảm bảo toàn vẹn dữ liệu (ràng buộc khóa chính, khóa ngoại, unique constraints).
+- [x] **Quản lý Lớp tín chỉ (`/admin/creditclass`):**
   - [x] Mở lớp tín chỉ theo: Niên khóa, Học kỳ, Môn học, Nhóm.
-  - [x] Cấu hình số lượng sinh viên tối thiểu (Min size) và tối đa (Max size) của lớp.
-  - [x] Cho phép hủy lớp tín chỉ nếu không đủ số sinh viên tối thiểu.
-- [x] **Đăng ký Lớp tín chỉ (Course Registration):**
-  - [x] Sinh viên đăng nhập bằng mã sinh viên để đăng ký.
-  - [x] Lọc và hiển thị danh sách lớp tín chỉ đang mở theo Niên khóa và Học kỳ.
-  - [x] Hỗ trợ Đăng ký lớp & Hủy đăng ký trực tuyến.
-  - [x] Hiển thị real-time số lượng sinh viên đã đăng ký, tên môn học và giảng viên phụ trách.
-- [x] **Quản lý Điểm số (Marks Entry):**
-  - [x] Giáo vụ hoặc Giảng viên nhập điểm cho sinh viên theo lớp tín chỉ.
-  - [x] Hỗ trợ nhập 3 cột điểm: Điểm chuyên cần (diemCC - 10%), Điểm giữa kỳ (diemGK - 30%), Điểm cuối kỳ (diemCK - 60%).
-  - [x] Tự động tính toán điểm hết môn: $\text{Điểm hết môn} = \text{diemCC} \times 0.1 + \text{diemGK} \times 0.3 + \text{diemCK} \times 0.6$ (lưu dạng số thập phân `Float`).
-  - [x] Ràng buộc bảo mật: Cấm sinh viên hủy đăng ký lớp tín chỉ một khi đã có bất kỳ cột điểm nào được nhập.
-- [x] **In ấn Báo cáo (Reports Generation):**
-  - [x] Xuất danh sách lớp tín chỉ.
-  - [x] Xuất danh sách sinh viên đăng ký lớp tín chỉ.
-  - [x] Xuất bảng điểm lớp tín chỉ.
-  - [x] Xuất phiếu điểm cá nhân cho sinh viên.
-  - [x] Xuất bảng điểm tổng kết của lớp học (xoay ngang cột môn học bằng Dynamic Pivot).
+  - [x] Cấu hình số lượng sinh viên tối thiểu (Min size) và tối đa (Max size).
+  - [x] Cho phép hủy lớp tín chỉ nếu không đủ sinh viên tối thiểu.
+- [x] **Đăng ký Lớp tín chỉ:**
+  - [x] **Sinh viên** tự đăng ký tại `/student/registration`.
+  - [x] **Giáo vụ/Khoa** đăng ký hộ sinh viên tại `/admin/registration`.
+  - [x] Luồng xử lý bất đồng bộ qua Redis Queue + Worker (xem mục chi tiết bên dưới).
+  - [x] Hỗ trợ Đăng ký & Hủy đăng ký trực tuyến.
+  - [x] Kiểm tra trùng môn học trong cùng học kỳ, kiểm tra sĩ số tối đa.
+- [x] **Quản lý Điểm số (`/admin/mark`):**
+  - [x] Nhập điểm cho sinh viên theo lớp tín chỉ (3 cột: CC 10%, GK 30%, CK 60%).
+  - [x] Lưu điểm đồng loạt qua form POST (SSR Batch Update).
+  - [x] Sinh viên xem bảng điểm cá nhân tại `/student/mark`.
+  - [x] Cấm hủy đăng ký lớp tín chỉ khi đã có điểm.
+- [x] **Thanh toán học phí trực tuyến:**
+  - [x] Sinh viên thanh toán qua MoMo tại `/student/payment`.
+  - [x] Giáo vụ xem thống kê học phí theo lớp tại `/admin/payment`.
+- [x] **In ấn Báo cáo (`/admin/report`):**
+  - [x] Xuất danh sách sinh viên đăng ký lớp tín chỉ (SP: `sp_LayDanhSachSinhVienDangKyLopTinChi`).
+  - [x] Xuất bảng điểm tổng kết lớp học (Dynamic Pivot SP: `sp_LayBangDiemTongKet`).
+- [x] **Quản lý Tài khoản (`/admin/account`):**
+  - [x] CRUD tài khoản đăng nhập cho sinh viên và giảng viên.
+  - [x] Import hàng loạt tài khoản từ file CSV.
+  - [x] Kích hoạt/Khóa tài khoản.
+- [x] **Quản lý Thông báo (`/admin/announcement`):**
+  - [x] CRUD thông báo toàn trường.
+  - [x] Đánh dấu đã đọc/chưa đọc cho từng người dùng.
+- [x] **Hồ sơ cá nhân (`/profile`):**
+  - [x] Xem thông tin tài khoản.
+  - [x] Đổi mật khẩu (yêu cầu xác thực OTP qua Email).
+  - [x] Cập nhật ảnh đại diện (Upload file ảnh).
 
 ### ⚙️ 2. Các Cơ Chế & Kỹ Thuật Bắt Buộc (Mandatory Core Features)
 
 - [x] **Đa ngôn ngữ (i18n):** Chuyển đổi giao diện linh hoạt giữa Tiếng Việt (`vi`) và Tiếng Anh (`en`) sử dụng `ReloadableResourceBundleMessageSource`, `CookieLocaleResolver` và `LocaleChangeInterceptor` của Spring.
 - [x] **Chế độ Sáng/Tối (Light/Dark Mode):** Cho phép chuyển đổi giao diện sáng/tối và lưu trạng thái cục bộ vào LocalStorage để đồng bộ hiển thị mà không bị nhấp nháy trang.
-- [x] **Gửi Email tự động (Email Service):** Cấu hình thư viện `javax.mail` và `JavaMailSenderImpl` sử dụng Gmail SMTP thật để gửi email thông báo điểm số cho sinh viên.
-- [x] **Xác thực CAPTCHA cục bộ (Local Image CAPTCHA):** Sinh ảnh CAPTCHA ngẫu nhiên hoàn toàn trên server bằng `BufferedImage` và lưu đáp án vào `HttpSession` để xác thực form đăng nhập (loại bỏ reCAPTCHA bên thứ ba).
+- [x] **Gửi Email tự động (Email Service):** Cấu hình thư viện `javax.mail` và `JavaMailSenderImpl` sử dụng Gmail SMTP thật để gửi email OTP kích hoạt tài khoản và xác thực đổi mật khẩu.
+- [x] **Xác thực CAPTCHA cục bộ (Local Image CAPTCHA):** Sinh ảnh CAPTCHA ngẫu nhiên hoàn toàn trên server bằng `BufferedImage` và lưu đáp án vào `HttpSession` để xác thực form đăng nhập.
 
 ### 🚀 3. Các Cơ Chế Nâng Cao & Tối Ưu Hệ Thống (Advanced Features)
 
-- [x] **Mô hình kiến trúc 3-Tier chuẩn:** Tổ chức mã nguồn chặt chẽ theo lớp: Entity ➡️ DAO (Data Access Object) ➡️ Service ➡️ Controller.
-- [x] **Chống lỗ hổng Mass Assignment:** Loại bỏ việc nhận trực tiếp các Entity từ form submit ở Controller, thay thế bằng các lớp DTO (Data Transfer Objects) có chú thích xác thực Jakarta Bean Validation để lọc sạch dữ liệu đầu vào.
-- [x] **Bảo mật mã hóa mật khẩu:** Sử dụng thuật toán băm **BCrypt** độ an toàn cao để mã hóa mật khẩu người dùng thay vì lưu plain text.
-- [x] **Bảo mật chống tấn công CSRF (Anti-CSRF Protection):** Triển khai `CsrfInterceptor` sinh CSRF token lưu trong session và chèn hidden input `csrf_token` vào tất cả các form POST để kiểm tra chống giả mạo request.
-- [x] **Xử lý Race Condition (Concurrency Control):** Áp dụng cơ chế khóa bi quan (Pessimistic Locking) ở tầng Cơ sở dữ liệu nhằm ngăn chặn tình trạng đăng ký vượt quá giới hạn số lượng sinh viên tối đa khi có nhiều yêu cầu gửi lên cùng lúc.
-- [x] **Chống Spam & Rate Limiting (Bucket4j):** Triển khai `RateLimitInterceptor` chặn spam tối đa 5 requests/giây đối với các yêu cầu ghi dữ liệu (`POST`, `PUT`, `DELETE`) trên mỗi Session/IP, tự động chuyển hướng qua trang lỗi thân thiện [429.jsp](file:///d:/CODE%20PLAYGROUND/Projects/Thi%20LTW/QLDSV_HQT_WEB/src/main/webapp/WEB-INF/views/shared/429.jsp).
-- [x] **Kiểm soát phiên bản dữ liệu (Optimistic Locking):** Áp dụng cột `@Version` (`INT` trong Database) trên các thực thể quan trọng (`SinhVien`, `GiangVien`, `TaiKhoan`) và các DTO tương ứng để bắt và xử lý `OptimisticLockException`, hiển thị thông báo lỗi khi có xung đột ghi đè dữ liệu.
-- [x] **Hàng đợi đăng ký tín chỉ không đồng bộ (Redis Queue):** Khi sinh viên gửi yêu cầu đăng ký tín chỉ, hệ thống sẽ đẩy payload vào Redis List (`QUEUE_DANG_KY`), lưu trạng thái tạm thời `PROCESSING` và chuyển hướng tới trang chờ polling tự động refresh. Tiến trình chạy ngầm (`RegistrationWorker`) tiêu thụ hàng đợi tuần tự kết hợp khóa bi quan (`PESSIMISTIC_WRITE`) trên lớp tín chỉ để đảm bảo sĩ số an toàn.
-- [x] **Bắt lỗi tập trung (Global Exception Handling):** Sử dụng `@ControllerAdvice` để bắt toàn bộ exception của ứng dụng và điều hướng hiển thị trang báo lỗi thân thiện `shared/error.jsp`.
-- [x] **Ghi vết hệ thống (Audit Logging via AOP):** Sử dụng Spring AOP để tự động ghi nhật ký lịch sử các hành động thay đổi dữ liệu nhạy cảm (như nhập điểm, cập nhật sinh viên).
-- [x] **UUID Khóa chính:** Sử dụng chuỗi định danh duy nhất UUID thay cho ID tự tăng truyền thống nhằm gia tăng tính bảo mật cho các bảng quan trọng (như `LopTinChi`).
-- [x] **Tích hợp Audit Trails (Lưu vết thời gian):** Kế thừa `@MappedSuperclass` `LuuVetThoiGian` với các trường `createdAt`, `updatedAt` tự động điền giá trị bằng `@PrePersist` và `@PreUpdate`.
-- [x] **Dynamic Pivot Procedure:** Tạo stored procedure xoay ngang dữ liệu môn học linh hoạt trên SQL Server để xuất bảng điểm tổng kết lớp học.
-- [x] **Clean View Layer:** Loại bỏ hoàn toàn mã scriptlet Java khỏi giao diện JSP, sử dụng 100% EL và JSTL.
+- [x] **Mô hình kiến trúc 3-Tier chuẩn:** Tổ chức mã nguồn chặt chẽ theo lớp: Entity ➡️ DAO ➡️ Service ➡️ Controller.
+- [x] **Chống lỗ hổng Mass Assignment:** Loại bỏ việc nhận trực tiếp Entity từ form submit, thay thế bằng DTO (Data Transfer Objects) có chú thích Jakarta Bean Validation.
+- [x] **Bảo mật mã hóa mật khẩu:** Sử dụng thuật toán băm **BCrypt** (độ an toàn 12 rounds) để mã hóa mật khẩu.
+- [x] **Bảo mật chống tấn công CSRF:** Triển khai `CsrfInterceptor` sinh CSRF token lưu trong session và chèn hidden input `csrf_token` vào tất cả form POST. Token bị thiếu/sai ➡️ redirect `/login?error=session_expired`.
+- [x] **Xử lý Race Condition (Pessimistic Locking):** Sử dụng `LockMode.PESSIMISTIC_WRITE` khi đọc `LopTinChi` trong luồng đăng ký để ngăn đăng ký vượt sĩ số tối đa.
+- [x] **Chống Spam & Rate Limiting (Bucket4j):** `RateLimitInterceptor` chặn tối đa 5 requests/giây cho `POST/PUT/DELETE` trên mỗi Session/IP ➡️ chuyển hướng `429.jsp`.
+- [x] **Optimistic Locking:** Cột `@Version` trên `SinhVien`, `GiangVien`, `TaiKhoan`, `ThongBao` để phát hiện xung đột ghi đè.
+- [x] **Hàng đợi đăng ký tín chỉ bất đồng bộ (Redis Queue):** Payload đăng ký ➡️ Redis List ➡️ `RegistrationWorker` tiêu thụ tuần tự ➡️ `processing.jsp` polling kết quả (chi tiết ở mục luồng đăng ký).
+- [x] **Bắt lỗi tập trung (@ControllerAdvice):** `GlobalUIConfigAdvice` xử lý toàn bộ exception và cấu hình UI chung.
+- [x] **Ghi vết hệ thống (AOP Audit Logging):** `AuditLogAspect` sử dụng Spring AOP ghi nhật ký các hành động thay đổi dữ liệu nhạy cảm.
+- [x] **UUID Khóa chính:** Sử dụng UUID cho `LopTinChi` thay vì ID tự tăng.
+- [x] **Lưu vết thời gian (Audit Trails):** `LuuVetThoiGian` với `@PrePersist`, `@PreUpdate` tự động điền `createdAt`, `updatedAt`.
+- [x] **Global Soft Delete Filtering:** Áp dụng `@SQLRestriction("ngay_xoa IS NULL")` trên tất cả Entity có cột `ngay_xoa`. Hibernate tự động loại trừ bản ghi đã xóa mềm khỏi mọi truy vấn.
+- [x] **Dynamic Pivot Procedure:** Stored procedure xoay ngang dữ liệu môn học linh hoạt trên SQL Server.
+- [x] **Clean View Layer:** 100% EL và JSTL, không sử dụng Java Scriptlet trong JSP.
+- [x] **Kích hoạt tài khoản lần đầu (Email OTP):** Sinh viên mới phải kích hoạt tài khoản bằng mã OTP gửi qua email + đặt mật khẩu mới.
+- [x] **Thanh toán trực tuyến MoMo:** Tích hợp cổng thanh toán MoMo qua Provider Pattern với hỗ trợ IPN callback.
 
 ---
 
@@ -258,79 +240,460 @@ Dưới đây là danh sách chi tiết các tính năng nghiệp vụ cốt lõ
 sequenceDiagram
     autonumber
     actor User as Người dùng
-    participant Client as Browser (JSP)
-    participant Interceptor as AuthInterceptor
-    participant Controller as LoginController
+    participant Browser as Browser (JSP)
+    participant Auth as AuthInterceptor
+    participant Controller as AuthController
     participant DB as SQL Server
 
-    User->>Client: Nhập Username/Password & submit
-    Client->>Controller: POST /login (username, password)
-    Note over Controller, DB: Kiểm tra kép (Dual Query) trên 2 bảng sinh_vien và giang_vien
-    Controller->>DB: Truy vấn thông tin trong sinh_vien
-    alt Tìm thấy sinh viên
-        DB-->>Controller: Trả về SinhVien profile
-    else Không thấy sinh viên
-        Controller->>DB: Truy vấn thông tin trong giang_vien
-        DB-->>Controller: Trả về GiangVien profile (chứa vai trò PGV/KHOA)
-    end
-    alt Đăng nhập thành công
-        Controller->>Client: Lưu UserSession vào Session & Tạo cookie remember_me (mã hóa Base64)
-        Controller-->>User: Chuyển hướng tới /index (hoặc /registration nếu là SINHVIEN)
-    else Sai thông tin
-        Controller-->>User: Trả về trang login kèm thông báo lỗi
+    User->>Browser: Truy cập hệ thống
+    Browser->>Auth: HTTP Request
+
+    alt Có Cookie "remember_me"
+        Auth->>Auth: Giải mã cookie (Base64)
+        Auth->>DB: Truy vấn TaiKhoan theo username
+        DB-->>Auth: Trả về TaiKhoan (kiểm tra BCrypt + trạng thái)
+        Auth->>Auth: Tái lập UserSession vào HttpSession
+        Auth-->>Browser: Cho phép truy cập (bypass login)
+    else Không có Cookie
+        Auth-->>Browser: Redirect /login
     end
 
-    Note over User, Interceptor: Khi truy cập lại sau đó:
-    User->>Interceptor: Gửi request bất kỳ kèm Cookie
-    Interceptor->>Interceptor: Phát hiện Session trống nhưng có Cookie "remember_me"
-    Interceptor->>DB: Giải mã Cookie lấy username/password kiểm tra trên 2 bảng
-    DB-->>Interceptor: Khớp dữ liệu sinh_vien hoặc giang_vien
-    Interceptor->>Interceptor: Tái lập UserSession & StudentProfile (nếu có) vào Session
-    Interceptor-->>User: Cho phép truy cập tài nguyên trực tiếp
+    User->>Browser: Nhập Username/Password + CAPTCHA & submit
+    Browser->>Controller: POST /login (LoginDTO)
+
+    Controller->>DB: Truy vấn TaiKhoan theo username
+    alt Tài khoản bị khóa (KHOA)
+        Controller-->>Browser: Hiển thị lỗi "Tài khoản đã bị khóa"
+    else Tài khoản chưa kích hoạt (CHUA_KICH_HOAT)
+        Controller-->>Browser: Redirect /auth/activate
+    else Tài khoản hợp lệ
+        Controller->>DB: BCrypt.checkpw(password, hash)
+        alt Mật khẩu đúng
+            Controller->>Controller: Tạo UserSession + lưu Session + tạo Cookie
+            alt Vai trò = PGV hoặc KHOA
+                Controller-->>Browser: Redirect /index (Admin Dashboard)
+            else Vai trò = SINHVIEN
+                Controller-->>Browser: Redirect /index (Student Dashboard)
+            end
+        else Mật khẩu sai
+            Controller-->>Browser: Hiển thị lỗi đăng nhập
+        end
+    end
 ```
 
-### 2. Luồng Đăng Ký Lớp Tín Chỉ (Course Registration Flow)
+**Chi tiết kỹ thuật:**
+
+- `AuthInterceptor` chạy trước mọi request, tự động khôi phục session từ cookie `remember_me` (Base64 encoded, 30 ngày).
+- Kiểm tra `TrangThaiTaiKhoan` (`DA_KICH_HOAT`, `CHUA_KICH_HOAT`, `KHOA`) trước khi cho phép truy cập.
+- `AdminAuthInterceptor` kiểm tra thêm phân quyền URL `/admin/*` chỉ cho PGV và KHOA.
+- `CsrfInterceptor` kiểm tra CSRF token cho mọi request POST/PUT/DELETE.
+
+---
+
+### 2. Luồng Kích Hoạt Tài Khoản Lần Đầu (First-Time Account Activation)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor SV as Sinh viên mới
+    participant Browser as Browser
+    participant Controller as AuthController
+    participant Redis as Redis (OTP Store)
+    participant Email as Gmail SMTP
+
+    SV->>Browser: Truy cập /auth/activate
+    SV->>Browser: Nhập Mã SV + Email đã đăng ký
+    Browser->>Controller: POST /auth/activate/request-otp
+
+    Controller->>Controller: Kiểm tra TaiKhoan tồn tại + trạng thái CHUA_KICH_HOAT
+    Controller->>Controller: Kiểm tra Email nhập vào = Email trong DB
+
+    alt Email khớp
+        Controller->>Redis: Lưu mã OTP (6 ký tự, TTL 5 phút)
+        Controller->>Email: Gửi email chứa mã OTP
+        Email-->>SV: Email OTP
+        Controller-->>Browser: Redirect /auth/activate (hiển thị form nhập OTP)
+    else Email không khớp
+        Controller-->>Browser: Hiển thị lỗi "Email không chính xác"
+    end
+
+    SV->>Browser: Nhập OTP + Mật khẩu mới + Xác nhận mật khẩu
+    Browser->>Controller: POST /auth/activate/confirm
+
+    Controller->>Redis: Xác minh OTP
+    alt OTP đúng
+        Controller->>Controller: Hash mật khẩu mới (BCrypt 12 rounds)
+        Controller->>Controller: Cập nhật TaiKhoan: trạng thái = DA_KICH_HOAT
+        Controller->>Redis: Xóa OTP
+        Controller-->>Browser: Redirect /login?activated=true
+    else OTP sai/hết hạn
+        Controller-->>Browser: Hiển thị lỗi "OTP không chính xác"
+    end
+```
+
+---
+
+### 3. ⭐ Luồng Đăng Ký Lớp Tín Chỉ (Course Registration Flow — Chi tiết)
+
+> [!IMPORTANT]
+> Đây là luồng phức tạp nhất của hệ thống, sử dụng **Redis Queue** cho xử lý bất đồng bộ và **`processing.jsp`** cho Server-Side Polling. Hoạt động giống hệt nhau cho cả **Sinh viên** (`/student/registration`) và **Giáo vụ** (`/admin/registration`).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant Browser as Browser (JSP)
+    participant Controller as RegistrationController
+    participant Redis as Redis
+    participant Worker as RegistrationWorker
+    participant Service as RegistrationService
+    participant DB as SQL Server
+
+    Note over User, DB: PHASE 1: Hiển thị trang đăng ký (GET)
+    User->>Browser: Truy cập /student/registration
+    Browser->>Controller: GET /student/registration
+    Controller->>Service: getAvailableClasses()
+    Service->>DB: HQL: FROM LopTinChi WHERE trangThaiLop = HOAT_DONG
+    DB-->>Service: Danh sách lớp tín chỉ đang mở
+    Controller->>Service: listRegistration() [lọc theo maSV]
+    Service->>DB: Lấy danh sách đăng ký của SV
+    DB-->>Service: Các môn đã đăng ký
+    Controller-->>Browser: Render index.jsp (danh sách lớp + trạng thái đăng ký)
+
+    Note over User, DB: PHASE 2: Submit đăng ký (POST → Redirect → processing.jsp)
+    User->>Browser: Chọn lớp & ấn "Đăng ký"
+    Browser->>Controller: POST /student/registration?btnInsert (CourseRegistrationDTO)
+
+    rect rgb(255, 240, 220)
+        Note over Controller, Redis: Bước 2a: Đẩy yêu cầu vào Redis Queue
+        Controller->>Redis: SET status_key = "PROCESSING" (TTL)
+        Controller->>Redis: LPUSH QUEUE_REGISTRATION {"maLTC":"...","maSV":"..."}
+        Controller-->>Browser: HTTP 302 Redirect → /student/registration/processing?maLTC=xxx
+    end
+
+    Note over User, DB: PHASE 3: Trang chờ xử lý (processing.jsp)
+    Browser->>Controller: GET /student/registration/processing?maLTC=xxx
+    Controller->>Redis: GET status_key
+    Redis-->>Controller: "PROCESSING"
+    Controller-->>Browser: Render processing.jsp (spinner + thông tin đăng ký)
+
+    rect rgb(220, 240, 255)
+        Note over Browser: processing.jsp chứa META http-equiv="refresh" content="3"
+        Note over Browser: Trang tự động reload mỗi 3 giây (SSR Polling)
+    end
+
+    Note over User, DB: PHASE 4: Worker xử lý hàng đợi (Background)
+    rect rgb(220, 255, 220)
+        Worker->>Redis: RPOP QUEUE_REGISTRATION
+        Redis-->>Worker: JSON payload {"maLTC":"...","maSV":"..."}
+        Worker->>Service: registerClass(maLTC, maSV)
+
+        Service->>DB: getLtcByIdWithLock(maLTC) [PESSIMISTIC_WRITE]
+        DB-->>Service: LopTinChi (locked row)
+        Service->>DB: Kiểm tra: SV tồn tại? Nghỉ học? Lớp bị hủy? Sĩ số đầy? Trùng môn?
+
+        alt Tất cả kiểm tra OK
+            Service->>DB: findById(DangKyId)
+            alt Đã từng đăng ký + đã hủy trước đó
+                Service->>DB: UPDATE DangKy SET huyDangKy = false
+            else Lần đầu đăng ký
+                Service->>DB: INSERT DangKy mới
+            end
+            Worker->>Redis: SET status_key = "SUCCESS" (TTL)
+        else Kiểm tra thất bại
+            Worker->>Redis: SET status_key = "FAILED:Lý do cụ thể" (TTL)
+        end
+    end
+
+    Note over User, DB: PHASE 5: Polling phát hiện kết quả
+    Browser->>Controller: GET /student/registration/processing?maLTC=xxx (auto-refresh)
+    Controller->>Redis: GET status_key
+
+    alt Status = "SUCCESS"
+        Controller->>Redis: DELETE status_key
+        Controller-->>Browser: HTTP 302 Redirect → /student/registration (flash: "Thành công!")
+    else Status = "FAILED:reason"
+        Controller->>Redis: DELETE status_key
+        Controller-->>Browser: HTTP 302 Redirect → /student/registration (flash: "Thất bại: reason")
+    else Status = "PROCESSING"
+        Controller-->>Browser: Render processing.jsp (tiếp tục chờ)
+    else Status = null (hết hạn)
+        Controller-->>Browser: HTTP 302 Redirect → /student/registration (flash: "Hết hạn")
+    end
+```
+
+**Giải thích chi tiết `processing.jsp`:**
+
+| Yếu tố                      | Chi tiết                                                                                                                                                                                                 |
+| :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Khi nào hiển thị?**       | Ngay sau khi Controller đẩy payload vào Redis Queue và redirect user.                                                                                                                                    |
+| **Hiển thị bằng cách nào?** | Controller trả về view name `"student/registration/processing"` → JSP render trang chờ với spinner animation.                                                                                            |
+| **Cơ chế polling?**         | JSP chứa thẻ `<meta http-equiv="refresh" content="3;url=...">` → trình duyệt tự động reload trang mỗi **3 giây** (hoàn toàn SSR, KHÔNG dùng AJAX).                                                       |
+| **Mỗi lần reload?**         | Browser gửi GET request mới → Controller kiểm tra `status_key` trong Redis → nếu vẫn `PROCESSING` thì render lại `processing.jsp`; nếu `SUCCESS`/`FAILED` thì redirect về trang chính kèm flash message. |
+| **Khi nào biến mất?**       | Khi Worker xử lý xong (status ≠ `PROCESSING`), Controller redirect về `/student/registration` → trang `processing.jsp` không còn được render nữa.                                                        |
+
+**Ràng buộc nghiệp vụ khi đăng ký:**
 
 ```mermaid
 graph TD
-    A[Sinh viên chọn môn học & đăng ký] --> B{Kiểm tra trạng thái SV}
-    B -- Đang nghỉ học --> C[Báo lỗi: SV nghỉ học]
-    B -- Đang đi học --> D{Kiểm tra trạng thái lớp}
-    D -- Lớp đã bị hủy --> E[Báo lỗi: Lớp đã hủy]
-    D -- Lớp đang mở --> F{Kiểm tra môn học trùng lặp}
-    F -- Đã đăng ký môn này trong học kỳ --> G[Báo lỗi: Trùng môn học trong học kỳ]
-    F -- Chưa đăng ký --> H{Kiểm tra lịch sử đăng ký trước đó}
-    H -- Đã từng đăng ký và hủy --> I[Cập nhật is_huy_dang_ky = false]
-    H -- Lần đầu đăng ký --> J[Thêm bản ghi dang_ky mới]
-    I --> K[Thành công & Cập nhật giao diện bằng AJAX]
-    J --> K
+    A["Sinh viên chọn lớp & ấn Đăng ký"] --> B{"Sinh viên tồn tại?"}
+    B -- Không --> C["❌ Lỗi: SV không tồn tại"]
+    B -- Có --> D{"SV đang nghỉ học?"}
+    D -- Có --> E["❌ Lỗi: SV đã nghỉ học"]
+    D -- Không --> F{"Lớp tín chỉ bị hủy?"}
+    F -- Có --> G["❌ Lỗi: Lớp đã bị hủy"]
+    F -- Không --> H{"Sĩ số đạt tối đa?"}
+    H -- Có --> I["❌ Lỗi: Lớp đã đầy"]
+    H -- Không --> J{"Đã đăng ký cùng MH trong HK?"}
+    J -- Có --> K["❌ Lỗi: Trùng môn học"]
+    J -- Không --> L{"Đã từng đăng ký + hủy?"}
+    L -- Có --> M["✅ Cập nhật: huyDangKy = false"]
+    L -- Không --> N["✅ Tạo bản ghi DangKy mới"]
 ```
 
-### 3. Luồng Quản Lý Điểm Số (Marks Management Flow)
+---
 
-1. Giảng viên/Giáo vụ chọn **Niên khóa**, **Học kỳ**, **Môn học**, và **Nhóm** (Lớp tín chỉ).
-2. Hệ thống gọi API `load-students` tải danh sách sinh viên đã đăng ký lớp học này kèm theo các cột điểm hiện tại: Điểm chuyên cần (diem_chuyen_can), Điểm giữa kỳ (diem_giua_ky), Điểm cuối kỳ (diem_cuoi_ky).
-3. Người dùng nhập điểm trực tiếp trên bảng Excel-like.
-4. Khi ấn **Lưu tất cả**, một JSON array chứa danh sách điểm được gửi lên API `/mark/save-all` qua phương thức POST AJAX.
-5. Controller thực hiện cập nhật đồng loạt (Batch Update) dữ liệu điểm vào CSDL.
-6. **Ràng buộc quan trọng:** Hệ thống cấm sinh viên tự ý hủy đăng ký môn học một khi bất kỳ cột điểm nào đã được giáo vụ nhập điểm.
+### 4. Luồng Hủy Đăng Ký Lớp Tín Chỉ (Cancel Registration Flow)
 
-### 4. Luồng Xuất Báo Cáo (Reports Flow)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant Browser as Browser
+    participant Controller as RegistrationController
+    participant Service as RegistrationService
+    participant DB as SQL Server
 
-Hệ thống cung cấp hai loại báo cáo chính gọi thông qua stored procedure:
+    User->>Browser: Ấn "Hủy đăng ký" trên một lớp
+    Browser->>Controller: POST /student/registration?btnDelete (CourseRegistrationDTO)
 
-- **Danh sách sinh viên đăng ký lớp tín chỉ:**
-  - Truy vấn danh sách sinh viên có trạng thái `is_huy_dang_ky = 0` dựa theo bộ lọc niên khóa, học kỳ, môn học, nhóm.
-  - Gọi Procedure: `sp_LayDanhSachSinhVienDangKyLopTinChi`
-- **Bảng điểm tổng kết lớp học:**
-  - Tải bảng điểm tổng kết của cả một lớp học (tất cả các môn học trong chương trình). Cột môn học được xoay ngang động (Pivot) trên Database.
-  - Gọi Procedure: `sp_LayBangDiemTongKet`
+    Controller->>Service: cancelRegistration(maLTC, maSV)
+    Service->>DB: findById(DangKyId)
+
+    alt Đã có điểm (CC/GK/CK ≠ null)
+        Service-->>Controller: Throw Exception "Không thể hủy - đã có điểm"
+        Controller-->>Browser: Redirect + flash error
+    else Chưa có điểm
+        Service->>DB: UPDATE DangKy SET huyDangKy = true
+        Controller-->>Browser: Redirect + flash "Hủy thành công"
+    end
+```
+
+> [!WARNING]
+> Hủy đăng ký **KHÔNG** sử dụng Redis Queue — thực hiện **đồng bộ ngay lập tức** vì không có rủi ro race condition (chỉ cập nhật trạng thái, không kiểm tra sĩ số).
+
+---
+
+### 5. Luồng Nhập Điểm Số (Marks Management Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor GV as Giáo vụ / Giảng viên
+    participant Browser as Browser
+    participant Controller as AdminMarkController
+    participant Service as MarkService
+    participant DB as SQL Server
+
+    GV->>Browser: Truy cập /admin/mark
+    Browser->>Controller: GET /admin/mark
+
+    GV->>Browser: Chọn Khoa → Niên khóa → Học kỳ → Môn học → Nhóm
+    Browser->>Controller: GET /admin/mark?nienKhoa=...&hocKy=...&maMH=...&nhom=...
+
+    Note over Controller: SSR: Tất cả dropdown và danh sách SV render server-side
+    Controller->>Service: loadStudents(nienKhoa, hocKy, maMH, nhom, maKhoa)
+    Service->>DB: HQL Query JOIN DangKy + SinhVien + LopTinChi
+    DB-->>Controller: Danh sách SV + điểm hiện tại
+
+    Controller-->>Browser: Render admin/mark/index.jsp (bảng nhập điểm)
+
+    GV->>Browser: Nhập/sửa điểm CC, GK, CK cho từng sinh viên
+    Browser->>Controller: POST /admin/mark/save (maSV[], maLTC[], diemCC[], diemGK[], diemCK[])
+
+    loop Mỗi sinh viên trong danh sách
+        Controller->>Service: saveMark(maLTC, maSV, cc, gk, ck)
+        Service->>DB: UPDATE DangKy SET diemCC=?, diemGK=?, diemCK=?
+    end
+
+    Controller-->>Browser: Redirect /admin/mark?... (flash: "Lưu thành công")
+```
+
+**Sinh viên xem điểm:** Truy cập `/student/mark` → `StudentMarkController` gọi `markService.getStudentGrades(maSV)` → kết quả được nhóm theo học kỳ (`LinkedHashMap`) → render `student/mark/index.jsp`.
+
+---
+
+### 6. Luồng Thanh Toán Học Phí MoMo (Payment Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor SV as Sinh viên
+    participant Browser as Browser
+    participant Controller as StudentPaymentController
+    participant MoMo as MoMo API
+    participant Service as PaymentService
+    participant DB as SQL Server
+
+    SV->>Browser: Truy cập /student/payment
+    Browser->>Controller: GET /student/payment
+    Controller->>Service: getRegistrations(maSV, nienKhoa, hocKy)
+    Controller-->>Browser: Render trang hiển thị tổng tín chỉ + tổng tiền + trạng thái thanh toán
+
+    SV->>Browser: Ấn "Thanh toán MoMo"
+    Browser->>Controller: POST /student/payment/checkout (nienKhoa, hocKy, method=momo)
+
+    Controller->>Service: getUnpaidRegistrations(maSV, nienKhoa, hocKy)
+    Controller->>MoMo: PaymentProvider.generatePaymentUrl(orderId, amount, baseUrl)
+    MoMo-->>Controller: payUrl (URL thanh toán MoMo)
+    Controller-->>Browser: Redirect → MoMo Payment Page
+
+    SV->>MoMo: Quét QR / Thanh toán
+    MoMo-->>Browser: Redirect → /student/payment/momo-return?resultCode=0&orderId=...
+
+    Browser->>Controller: GET /student/payment/momo-return
+    Controller->>MoMo: PaymentProvider.verifySignature(params)
+    alt Thanh toán thành công (resultCode=0)
+        Controller->>MoMo: PaymentProvider.processIpn(params)
+        Note over Service, DB: IPN handler: markAsPaid(maSV, nienKhoa, hocKy)
+        Service->>DB: UPDATE DangKy SET daThanhToan=true, ngayThanhToan=NOW()
+        Controller-->>Browser: Redirect /student/payment (flash: "Thành công!")
+    else Thanh toán thất bại
+        Controller-->>Browser: Redirect /student/payment (flash: "Thất bại")
+    end
+```
+
+---
+
+### 7. Luồng Xuất Báo Cáo (Reports Flow)
+
+Hệ thống cung cấp hai loại báo cáo chính tại `/admin/report` gọi thông qua stored procedure:
+
+| Loại báo cáo                 | Stored Procedure                        | Mô tả                                                                                                    |
+| :--------------------------- | :-------------------------------------- | :------------------------------------------------------------------------------------------------------- |
+| **Danh sách SV đăng ký LTC** | `sp_LayDanhSachSinhVienDangKyLopTinChi` | Lọc theo niên khóa, học kỳ, môn học, nhóm. Tự động loại trừ bản ghi soft-deleted.                        |
+| **Bảng điểm tổng kết lớp**   | `sp_LayBangDiemTongKet`                 | Xoay ngang cột môn học (Dynamic Pivot). Cột được sinh động dựa trên danh sách môn học mà lớp đã đăng ký. |
+
+**Luồng SSR:** User chọn bộ lọc → form GET → Controller gọi `ReportService` → Service gọi `ReportDAO` → DAO gọi Stored Procedure → Kết quả trả về dạng `List<Map<String, Object>>` → JSP render bảng dữ liệu.
+
+---
+
+### 8. Luồng Quản Lý Tài Khoản & Import CSV (Account Management)
+
+```mermaid
+graph LR
+    A["Admin truy cập<br>/admin/account"] --> B["Xem danh sách tài khoản"]
+    B --> C{"Hành động?"}
+    C -->|Thêm mới| D["Form: Username + Password + Role + Email"]
+    C -->|Sửa| E["Form: Cập nhật Role/Status/Email"]
+    C -->|Xóa| F["POST /admin/account/delete"]
+    C -->|Import CSV| G["Upload file .csv chứa danh sách MSSV"]
+
+    D --> H["POST /admin/account/save"]
+    E --> H
+
+    G --> I["CsvService.extractMssvFromCsv()"]
+    I --> J["AccountService.provisionStudentAccounts()"]
+    J --> K["Tự động tạo TaiKhoan cho từng SV<br>Mật khẩu random BCrypt"]
+    K --> L["Xuất file CSV credentials<br>cho SV tải về"]
+```
+
+---
+
+### 9. Luồng Đổi Mật Khẩu (Password Change Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant Browser as Browser
+    participant Controller as ProfileController
+    participant Redis as Redis (OTP)
+    participant Email as Gmail SMTP
+
+    User->>Browser: Truy cập /profile
+    User->>Browser: Ấn "Gửi mã OTP"
+    Browser->>Controller: POST /profile/send-otp
+    Controller->>Controller: Lấy email từ DB (không từ form — chống IDOR)
+    Controller->>Redis: Lưu OTP 6 ký tự (TTL 5 phút)
+    Controller->>Email: Gửi email OTP
+    Controller-->>Browser: Redirect /profile (flash: "OTP đã gửi")
+
+    User->>Browser: Nhập Mật khẩu cũ + Mật khẩu mới + OTP
+    Browser->>Controller: POST /profile/change-password
+
+    Controller->>Redis: Xác minh OTP
+    Controller->>Controller: BCrypt.checkpw(oldPassword, hash)
+    Controller->>Controller: Kiểm tra newPassword ≠ oldPassword
+    Controller->>Controller: BCrypt.hashpw(newPassword, salt=12)
+    Controller->>Controller: Cập nhật DB
+    Controller->>Redis: Xóa OTP
+    Controller-->>Browser: Redirect /profile (flash: "Đổi mật khẩu thành công")
+```
+
+---
+
+## 🛡️ Chuỗi Interceptor (Request Pipeline)
+
+Mọi HTTP request đều đi qua chuỗi interceptor theo thứ tự sau trước khi đến Controller:
+
+```text
+HTTP Request
+    │
+    ▼
+┌─────────────────────────┐
+│  1. AuthInterceptor      │  Khôi phục session từ cookie, kiểm tra đăng nhập,
+│                         │  kiểm tra trạng thái tài khoản (KHOA/CHUA_KICH_HOAT)
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│  2. AdminAuthInterceptor │  Chỉ áp dụng cho /admin/*
+│                         │  Kiểm tra role = PGV hoặc KHOA
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│  3. CsrfInterceptor     │  GET → sinh token; POST/PUT/DELETE → kiểm tra token
+│                         │  Token sai → redirect /login?error=session_expired
+│                         │  Đồng thời inject pusherKey + pusherCluster vào request
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│  4. RateLimitInterceptor │  Chặn spam POST/PUT/DELETE > 5 req/s per session
+│                         │  Vi phạm → redirect 429.jsp
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│  5. Controller           │  Xử lý nghiệp vụ
+└─────────────────────────┘
+```
+
+---
+
+## 🗃️ Mô Hình Soft Delete
+
+Tất cả Entity kế thừa `LuuVetThoiGian` đều hỗ trợ xóa mềm:
+
+| Hành vi                    | Cơ chế                                                                                                                             |
+| :------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| **Xóa**                    | `UPDATE SET ngay_xoa = NOW()` (không DELETE vật lý)                                                                                |
+| **Truy vấn**               | `@SQLRestriction("ngay_xoa IS NULL")` tự động lọc bản ghi đã xóa                                                                   |
+| **Stored Procedures**      | Đã được ALTER để thêm `AND ngay_xoa IS NULL`                                                                                       |
+| **Tái tạo bản ghi đã xóa** | Native SQL hard-delete bản ghi cũ trước khi INSERT mới. Nếu có FK reference (dữ liệu lịch sử) → từ chối tái tạo với thông báo lỗi. |
 
 ---
 
 ## 🚀 Hướng Dẫn Cài Đặt & Chạy Dự Án
 
-Để chạy dự án ở môi trường cục bộ (Local), hãy thực hiện tuần tự các bước sau:
+### Yêu Cầu Hệ Thống
+
+- **Java Development Kit (JDK):** 17+
+- **Apache Maven:** 3.8+
+- **SQL Server:** 2019+ (cổng mặc định 1433)
+- **Redis Server:** 6.0+ (cổng mặc định 6379)
 
 ### Bước 1: Thiết lập Cơ sở dữ liệu SQL Server
 
@@ -339,7 +702,15 @@ Hệ thống cung cấp hai loại báo cáo chính gọi thông qua stored proc
 3. Mở file [Gendb.sql](./Gendb.sql) (hoặc schema tương ứng cấu trúc snake_case).
 4. Nhấn **Execute** (hoặc phím `F5`) để tạo cơ sở dữ liệu `QLDSV_HTC_WEB`, tạo cấu trúc bảng, các ràng buộc khóa ngoại và chèn dữ liệu mẫu.
 
-### Bước 2: Cấu hình Datasource trong Project
+### Bước 2: Khởi chạy Redis Server
+
+```bash
+redis-server
+```
+
+Redis được sử dụng cho: hàng đợi đăng ký tín chỉ, lưu OTP xác thực email, Rate Limiting.
+
+### Bước 3: Cấu hình Datasource trong Project
 
 Nếu SQL Server của bạn sử dụng tài khoản/mật khẩu khác hoặc cổng kết nối khác:
 
@@ -351,7 +722,7 @@ Nếu SQL Server của bạn sử dụng tài khoản/mật khẩu khác hoặc 
    <property name="password" value="mật_khẩu_của_bạn" />
    ```
 
-### Bước 3: Build và Chạy dự án bằng Maven hoặc Make
+### Bước 4: Build và Chạy dự án bằng Maven hoặc Make
 
 Hệ thống sử dụng **Cargo Maven Plugin** đóng gói Web Server Tomcat nhúng giúp khởi chạy ngay lập tức mà không cần cài đặt Tomcat độc lập bên ngoài.
 
@@ -362,12 +733,12 @@ Bạn có thể chạy dự án bằng một trong hai cách:
   make dev
   ```
 - **Sử dụng lệnh Maven trực tiếp:**
-  `bash
-mvn clean package cargo:run
-`
+  ```bash
+  mvn clean package cargo:run
+  ```
   _Lệnh này sẽ tải các thư viện phụ thuộc, biên dịch mã nguồn Java, đóng gói file `.war`, khởi chạy Tomcat nhúng ở cổng `8080`._
 
-### Bước 4: Kiểm tra và Đăng nhập hệ thống
+### Bước 5: Kiểm tra và Đăng nhập hệ thống
 
 Mở trình duyệt web và truy cập địa chỉ:
 
@@ -383,6 +754,68 @@ Sử dụng các tài khoản mẫu sau để trải nghiệm các phân quyền
 | `GV02`                         | `123`               | **KHOA**         | Giảng viên thuộc khoa CNTT (chỉ quản lý dữ liệu CNTT)      |
 | `SV01`                         | `123`               | **SINHVIEN**     | Sinh viên Nguyễn A - Lớp CNTT1 (Xem điểm, Đăng ký môn)     |
 | `SV02`                         | `123`               | **SINHVIEN**     | Sinh viên Trần B - Lớp CNTT1 (Xem điểm, Đăng ký môn)       |
+
+---
+
+## 📊 Bản Đồ URL Hệ Thống (URL Map)
+
+### Trang công khai (Không cần đăng nhập)
+
+| URL              | Method   | Controller       | Mô tả                       |
+| :--------------- | :------- | :--------------- | :-------------------------- |
+| `/login`         | GET      | `AuthController` | Hiển thị form đăng nhập     |
+| `/login`         | POST     | `AuthController` | Xử lý đăng nhập             |
+| `/logout`        | GET      | `AuthController` | Đăng xuất + xóa cookie      |
+| `/auth/activate` | GET/POST | `AuthController` | Kích hoạt tài khoản lần đầu |
+
+### Trang dùng chung (Tất cả vai trò sau đăng nhập)
+
+| URL                          | Method | Controller               | Mô tả                |
+| :--------------------------- | :----- | :----------------------- | :------------------- |
+| `/`, `/index`, `/home`       | GET    | `HomeController`         | Dashboard trang chủ  |
+| `/profile`                   | GET    | `ProfileController`      | Xem hồ sơ cá nhân    |
+| `/profile/send-otp`          | POST   | `ProfileController`      | Gửi OTP đổi mật khẩu |
+| `/profile/change-password`   | POST   | `ProfileController`      | Đổi mật khẩu         |
+| `/profile/update-avatar`     | POST   | `ProfileController`      | Upload ảnh đại diện  |
+| `/announcements`             | GET    | `AnnouncementController` | Danh sách thông báo  |
+| `/announcements/detail/{id}` | GET    | `AnnouncementController` | Chi tiết thông báo   |
+
+### Phân vùng Sinh viên (`/student/*`)
+
+| URL                                | Method             | Controller                      | Mô tả                     |
+| :--------------------------------- | :----------------- | :------------------------------ | :------------------------ |
+| `/student/registration`            | GET                | `StudentRegistrationController` | Trang đăng ký lớp tín chỉ |
+| `/student/registration`            | POST (`btnInsert`) | `StudentRegistrationController` | Đăng ký lớp → Redis Queue |
+| `/student/registration`            | POST (`btnDelete`) | `StudentRegistrationController` | Hủy đăng ký lớp           |
+| `/student/registration/processing` | GET                | `StudentRegistrationController` | Trang chờ xử lý (polling) |
+| `/student/mark`                    | GET                | `StudentMarkController`         | Xem bảng điểm cá nhân     |
+| `/student/payment`                 | GET                | `StudentPaymentController`      | Xem/thanh toán học phí    |
+| `/student/payment/checkout`        | POST               | `StudentPaymentController`      | Tạo link thanh toán MoMo  |
+| `/student/payment/momo-return`     | GET                | `StudentPaymentController`      | Callback trả về từ MoMo   |
+
+### Phân vùng Quản trị (`/admin/*`)
+
+| URL                              | Method   | Controller                    | Mô tả                          |
+| :------------------------------- | :------- | :---------------------------- | :----------------------------- |
+| `/admin/faculty`                 | GET/POST | `AdminFacultyController`      | CRUD Khoa                      |
+| `/admin/classroom`               | GET/POST | `AdminClassroomController`    | CRUD Lớp                       |
+| `/admin/student`                 | GET/POST | `AdminStudentController`      | CRUD Sinh viên                 |
+| `/admin/lecturer`                | GET/POST | `AdminLecturerController`     | CRUD Giảng viên                |
+| `/admin/subject`                 | GET/POST | `AdminSubjectController`      | CRUD Môn học                   |
+| `/admin/creditclass`             | GET/POST | `AdminCreditClassController`  | CRUD Lớp tín chỉ               |
+| `/admin/registration`            | GET/POST | `AdminRegistrationController` | Đăng ký hộ SV (Redis Queue)    |
+| `/admin/registration/processing` | GET      | `AdminRegistrationController` | Trang chờ xử lý                |
+| `/admin/mark`                    | GET      | `AdminMarkController`         | Xem danh sách SV cần nhập điểm |
+| `/admin/mark/save`               | POST     | `AdminMarkController`         | Lưu điểm hàng loạt             |
+| `/admin/report`                  | GET      | `AdminReportController`       | Xuất báo cáo (2 loại SP)       |
+| `/admin/account`                 | GET/POST | `AdminAccountController`      | CRUD Tài khoản                 |
+| `/admin/account/import`          | POST     | `AdminAccountController`      | Import CSV tạo hàng loạt TK    |
+| `/admin/announcement`            | GET      | `AdminAnnouncementController` | Danh sách thông báo            |
+| `/admin/announcement/create`     | GET      | `AdminAnnouncementController` | Form tạo thông báo             |
+| `/admin/announcement/edit`       | GET      | `AdminAnnouncementController` | Form sửa thông báo             |
+| `/admin/announcement/save`       | POST     | `AdminAnnouncementController` | Lưu thông báo (add/edit)       |
+| `/admin/announcement/delete`     | POST     | `AdminAnnouncementController` | Xóa thông báo                  |
+| `/admin/payment`                 | GET      | `AdminPaymentController`      | Thống kê học phí theo lớp      |
 
 ---
 

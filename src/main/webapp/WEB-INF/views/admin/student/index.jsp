@@ -340,7 +340,7 @@
                                                                             <th
                                                                                 class="border-0 small fw-bold text-muted">
                                                                                 <s:message
-                                                                                    code="student.lbl.lastName" /> VÀ
+                                                                                    code="student.lbl.lastName" /> V├Ç
                                                                                 <s:message
                                                                                     code="lecturer.lbl.firstName.required" />
                                                                             </th>
@@ -497,7 +497,7 @@
                         </div>
 
                         <!-- STUDENT MODAL -->
-                        <c:if test="${sessionScope.role == 'PGV' && (not empty mode || not empty param.lnkAdd)}">
+                        <c:if test="${(sessionScope.role == 'PGV' || sessionScope.role == 'KHOA') && (not empty mode || not empty param.lnkAdd)}">
                             <div class="modal fade show d-block" id="studentModal" tabindex="-1"
                                 style="background: rgba(0,0,0,0.5);">
                                 <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -532,7 +532,7 @@
                                                                 <label class="form-label small fw-bold text-muted">
                                                                     <s:message code="student.lbl.studentId.form" />
                                                                 </label>
-                                                                <%-- form:input tự động điền lại giá trị khi form lỗi
+                                                                <%-- form:input tự động điền lại gi├í trß╗ï khi form lß╗ùi
                                                                     (giữ dữ liệu đã nhập) --%>
                                                                     <s:message code="student.example.id"
                                                                         var="lblStudentExampleId" />
@@ -565,8 +565,8 @@
                                                                 <label class="form-label small fw-bold text-muted">
                                                                     <s:message code="student.lbl.gender.upper" />
                                                                 </label>
-                                                                <%-- form:select tự động chọn đúng option theo giá trị
-                                                                    hiện tại --%>
+                                                                <%-- form:select tß╗▒ ─æß╗Öng chß╗ìn ─æ├║ng option theo gi├í trß╗ï
+                                                                    hiß╗çn tß║íi --%>
                                                                     <s:message code="global.gender.male"
                                                                         var="lblGenderMale" />
                                                                     <s:message code="global.gender.female"
@@ -575,7 +575,7 @@
                                                                         cssClass="form-select rounded-3" id="inp_phai">
                                                                         <form:option value="Nam"
                                                                             label="${lblGenderMale}" />
-                                                                        <form:option value="Nữ"
+                                                                        <form:option value="Nß╗»"
                                                                             label="${lblGenderFemale}" />
                                                                     </form:select>
                                                             </div>
@@ -583,7 +583,7 @@
                                                                 <label class="form-label small fw-bold text-muted">
                                                                     <s:message code="student.lbl.dob.upper" />
                                                                 </label>
-                                                                <%-- fmt:formatDate để format ngày sinh sang yyyy-MM-dd
+                                                                <%-- fmt:formatDate ─æß╗â format ng├áy sinh sang yyyy-MM-dd
                                                                     cho input[type=date] --%>
                                                                     <fmt:formatDate var="fmtDate"
                                                                         value="${sinhVien.ngaySinh}"
@@ -596,8 +596,8 @@
                                                                 <label class="form-label small fw-bold text-muted">
                                                                     <s:message code="student.lbl.currentClass" />
                                                                 </label>
-                                                                <%-- form:input path="maLop" readonly vì lớp được chọn
-                                                                    từ sidebar, không cho sửa --%>
+                                                                <%-- form:input path="maLop" readonly v├¼ lß╗¢p ─æ╞░ß╗úc chß╗ìn
+                                                                    tß╗½ sidebar, không cho sửa --%>
                                                                     <form:input path="maLop"
                                                                         cssClass="form-control rounded-3 bg-light"
                                                                         readonly="true" />
@@ -614,9 +614,7 @@
                                                             </div>
                                                             <div class="col-md-12">
                                                                 <div
-                                                                    class="form-check form-switch p-0 d-flex align-items-center gap-2">
-                                                                    <%-- form:checkbox tự động render checked dựa vào
-                                                                        giá trị boolean --%>
+                                                                    class="form-check form-switch p-0 d-flex align-items-center gap-2"> 
                                                                         <form:checkbox path="daNghiHoc"
                                                                             cssClass="form-check-input ms-0 mt-0"
                                                                             id="daNghiHoc" value="true" />
@@ -676,7 +674,7 @@
                                         enctype="multipart/form-data">
                                         <input type="hidden" name="csrf_token" value="${csrfToken}" />
                                         <div class="modal-body p-4">
-                                            <!-- Hướng dẫn cấu trúc file -->
+                                            <!-- Hướng dẫn cß║Ñu tr├║c file -->
                                             <div class="alert alert-info border-0 rounded-3 mb-3 small">
                                                 <h6 class="fw-bold mb-2"><i class="bi bi-info-circle-fill me-1"></i>
                                                     <s:message code="student.import.guide.title" />
@@ -704,13 +702,13 @@
                                                     <strong>
                                                         <s:message code="student.import.guide.example" />
                                                     </strong><br>
-                                                    <code>MASV,HOTEN,GIOITINH,NGAYSINH,EMAIL,MALOP</code><br>
-                                                    <code>N21DCCN001,Nguyễn Văn A,Nam,2003-05-15,n21dccn001@student.ptit.edu.vn,D21CQCN01</code>
+                                                    <code>MASV,HOTEN,GIOITINH,NGAYSINH,EMAIL,DIACHI,MALOP</code><br>
+                                                    <code>N21DCCN001,Nguyễn Văn A,Nam,2003-05-15,n21dccn001@student.ptit.edu.vn,Hà Nội,D21CQCN01</code>
                                                 </div>
                                             </div>
 
                                             <s:message code="student.import.file.noFile" var="noFileMsg" />
-                                            <!-- Chọn tệp dịch chuyển label -->
+                                            <!-- Chọn tệp label -->
                                             <div class="mb-3">
                                                 <label class="form-label small fw-bold text-muted">
                                                     <s:message code="student.import.file.select" />

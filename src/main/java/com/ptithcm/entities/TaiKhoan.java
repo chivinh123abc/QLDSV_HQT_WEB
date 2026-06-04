@@ -7,11 +7,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.ptithcm.entities.base.LuuVetThoiGian;
 import com.ptithcm.shared.enums.TrangThaiTaiKhoan;
 
 @Entity
 @Table(name = "tai_khoan")
+@SQLRestriction("ngay_xoa IS NULL")
 public class TaiKhoan extends LuuVetThoiGian {
 
     @Id

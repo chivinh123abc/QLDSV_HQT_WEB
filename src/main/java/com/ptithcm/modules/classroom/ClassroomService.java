@@ -60,13 +60,33 @@ public class ClassroomService {
         if (lop.getMaKhoa() != null) {
             lop.setKhoa(classroomDAO.getSession().get(Khoa.class, lop.getMaKhoa()));
         }
-        Lop existing = classroomDAO.findById(lop.getMaLop());
+        String maLop = lop.getMaLop() != null ? lop.getMaLop().trim() : "";
         if ("add".equals(mode)) {
-            if (existing != null) {
-                throw new Exception("Mã lớp [" + lop.getMaLop() + "] đã tồn tại!");
+            if (!maLop.isEmpty()) {
+                Number count = (Number) classroomDAO.getSession()
+                        .createNativeQuery("SELECT COUNT(*) FROM lop WHERE id = :id", Object.class)
+                        .setParameter("id", maLop).uniqueResult();
+                if (count != null && count.intValue() > 0) {
+                    Object ngayXoa = classroomDAO.getSession()
+                            .createNativeQuery("SELECT ngay_xoa FROM lop WHERE id = :id", Object.class)
+                            .setParameter("id", maLop).uniqueResult();
+                    if (ngayXoa == null) {
+                        throw new Exception("Mã lớp [" + maLop + "] đã tồn tại!");
+                    } else {
+                        try {
+                            classroomDAO.getSession().createNativeMutationQuery("DELETE FROM lop WHERE id = :id")
+                                    .setParameter("id", maLop).executeUpdate();
+                            classroomDAO.getSession().flush();
+                        } catch (org.springframework.dao.DataIntegrityViolationException
+                                | jakarta.persistence.PersistenceException e) {
+                            throw new Exception("Mã này đã từng tồn tại và có dữ liệu lịch sử, không thể tái sử dụng.");
+                        }
+                    }
+                }
             }
             classroomDAO.save(lop);
         } else if ("edit".equals(mode)) {
+            Lop existing = classroomDAO.findById(maLop);
             if (existing == null) {
                 throw new Exception("Không tìm thấy lớp để chỉnh sửa!");
             }

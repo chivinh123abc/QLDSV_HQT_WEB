@@ -193,7 +193,7 @@
                                         <p class="text-muted small mb-0"><s:message code="classroom.management.desc"/>
                                         </p>
                                     </div>
-                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                    <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                         <!-- GET link to open add modal -->
                                         <a href="${pageContext.request.contextPath}/admin/classroom?maKhoa=${maKhoa}&lnkAdd=true" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">
                                             <i class="bi bi-plus-circle-fill me-1"></i> <s:message code="classroom.btn.add"/>
@@ -249,7 +249,7 @@
                                                     <th><s:message code="classroom.lbl.className"/></th>
                                                     <th class="text-center"><s:message code="classroom.lbl.academicTerm"/></th>
                                                     <th class="text-center">KHOA</th>
-                                                    <c:if test="${sessionScope.role == 'PGV'}">
+                                                    <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                                         <th class="text-center"><s:message code="global.lbl.actions"/></th>
                                                     </c:if>
                                                 </tr>
@@ -273,7 +273,7 @@
                                                             <span
                                                                 class="badge border border-info text-info rounded-pill px-3 py-1 fw-bold small">${item.maKhoa}</span>
                                                         </td>
-                                                        <c:if test="${sessionScope.role == 'PGV'}">
+                                                        <c:if test="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA'}">
                                                             <td class="text-center">
                                                                 <div class="d-flex gap-2 justify-content-center">
                                                                     <!-- Edit Link GET -->
@@ -297,7 +297,7 @@
                                                 </c:forEach>
                                                 <c:if test="${empty lopList}">
                                                     <tr>
-                                                        <td colspan="${sessionScope.role == 'PGV' ? 5 : 4}" class="text-center py-5 text-muted">
+                                                        <td colspan="${sessionScope.role == 'PGV' || sessionScope.role == 'KHOA' ? 5 : 4}" class="text-center py-5 text-muted">
                                                             <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
                                                             <s:message code="classroom.no.data"/>
                                                         </td>
@@ -318,7 +318,7 @@
             </div>
 
         <!-- CLASS MODAL -->
-        <c:if test="${sessionScope.role == 'PGV' && (not empty mode || not empty param.lnkAdd)}">
+        <c:if test="${(sessionScope.role == 'PGV' || sessionScope.role == 'KHOA') && (not empty mode || not empty param.lnkAdd)}">
             <div class="modal fade show d-block" id="classModal" tabindex="-1" style="background: rgba(0,0,0,0.5);">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content border-0 shadow-lg rounded-4">
