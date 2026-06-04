@@ -62,7 +62,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
                                             if (sv != null) {
                                                 UserSession user = new UserSession(sv.getMaSV(), "SINHVIEN", null,
-                                                        sv.getHo() + " " + sv.getTen());
+                                                        sv.getHo() + " " + sv.getTen(), tk.getAvatar());
                                                 SessionUtil.setUser(session, user);
                                                 SessionUtil.setRole(session, RoleEnum.SINHVIEN.getCode());
                                                 SessionUtil.setStudentProfile(session, sv);
@@ -75,7 +75,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
                                             if (gv != null) {
                                                 UserSession user = new UserSession(gv.getMaGV(), tk.getPhanQuyen(),
-                                                        gv.getMaKhoa(), gv.getHo() + " " + gv.getTen());
+                                                        gv.getMaKhoa(), gv.getHo() + " " + gv.getTen(), tk.getAvatar());
                                                 SessionUtil.setUser(session, user);
                                                 SessionUtil.setRole(session, user.getRole());
                                                 if (RoleEnum.KHOA.getCode().equals(user.getRole())) {

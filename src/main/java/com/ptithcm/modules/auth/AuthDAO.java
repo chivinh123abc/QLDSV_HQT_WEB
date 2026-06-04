@@ -59,13 +59,15 @@ public class AuthDAO {
         if ("SINHVIEN".equals(taiKhoan.getPhanQuyen())) {
             SinhVien sv = findSinhVienByMaSV(u);
             if (sv != null) {
-                return new UserSession(sv.getMaSV(), "SINHVIEN", null, sv.getHo() + " " + sv.getTen());
+                return new UserSession(sv.getMaSV(), "SINHVIEN", null, sv.getHo() + " " + sv.getTen(),
+                        taiKhoan.getAvatar());
             }
         } else {
             GiangVien gv = findGiangVienByMaGV(u);
             if (gv != null) {
                 return new UserSession(gv.getMaGV(), taiKhoan.getPhanQuyen(),
-                        gv.getKhoa() != null ? gv.getKhoa().getMaKhoa() : null, gv.getHo() + " " + gv.getTen());
+                        gv.getKhoa() != null ? gv.getKhoa().getMaKhoa() : null, gv.getHo() + " " + gv.getTen(),
+                        taiKhoan.getAvatar());
             }
         }
 

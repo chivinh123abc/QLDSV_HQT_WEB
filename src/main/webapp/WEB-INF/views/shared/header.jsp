@@ -42,30 +42,71 @@
             </span>
         </div>
         
-        <div class="header-user" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
-            <div class="header-user-info d-none d-sm-block">
-                <div class="name">
-                    <c:choose>
-                        <c:when test="${sessionScope.role == 'SINHVIEN'}">
-                            ${sessionScope.studentProfile.ho} ${sessionScope.studentProfile.ten}
-                        </c:when>
-                        <c:otherwise>
-                            ${sessionScope.user.username}
-                        </c:otherwise>
-                    </c:choose>
+        <div class="dropdown" style="position: relative;">
+            <a href="#" class="header-user text-decoration-none d-flex align-items-center border-0" id="myAvatarBtn" role="button" style="outline: none; cursor: pointer;">
+                <div class="header-user-info d-none d-sm-block text-end me-2">
+                    <div class="name text-dark fw-semibold">
+                        <c:choose>
+                            <c:when test="${sessionScope.role == 'SINHVIEN'}">
+                                ${sessionScope.studentProfile.ho} ${sessionScope.studentProfile.ten}
+                            </c:when>
+                            <c:otherwise>
+                                ${sessionScope.user.username}
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div class="role text-muted small">
+                        <c:choose>
+                            <c:when test="${sessionScope.role == 'SINHVIEN'}">
+                                <s:message code="role.display.student" />
+                            </c:when>
+                            <c:when test="${sessionScope.role == 'KHOA'}">
+                                <s:message code="role.display.faculty" />
+                            </c:when>
+                            <c:when test="${sessionScope.role == 'PGV'}">
+                                <s:message code="role.display.pgv" />
+                            </c:when>
+                            <c:otherwise>
+                                ${sessionScope.role}
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
-                <div class="role">${sessionScope.role}</div>
-            </div>
-            <div class="header-avatar" aria-hidden="true">
                 <c:choose>
-                    <c:when test="${sessionScope.role == 'SINHVIEN'}">
-                        ${sessionScope.studentProfile.ten.substring(0,1)}
+                    <c:when test="${not empty sessionScope.user.avatar}">
+                        <img src="${pageContext.request.contextPath}${sessionScope.user.avatar}" 
+                             class="rounded-circle border border-2 border-primary-subtle shadow-sm" 
+                             style="width: 40px; height: 40px; object-fit: cover;" alt="Avatar">
                     </c:when>
                     <c:otherwise>
-                        ${sessionScope.user.username.substring(0,1).toUpperCase()}
+                        <div class="header-avatar" aria-hidden="true">
+                            <c:choose>
+                                <c:when test="${sessionScope.role == 'SINHVIEN'}">
+                                    ${sessionScope.studentProfile.ten.substring(0,1)}
+                                </c:when>
+                                <c:otherwise>
+                                    ${sessionScope.user.username.substring(0,1).toUpperCase()}
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </c:otherwise>
                 </c:choose>
-            </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2" id="myAvatarMenu" style="position: absolute; right: 0; top: 100%; display: none;">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="${pageContext.request.contextPath}/profile">
+                        <i class="bi bi-person-circle text-primary fs-5"></i>
+                        <span><s:message code="profile.title"/></span>
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item text-danger d-flex align-items-center gap-2 py-2" href="${pageContext.request.contextPath}/logout">
+                        <i class="bi bi-box-arrow-right fs-5"></i>
+                        <span><s:message code="sidebar.btn.logout"/></span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </header>
@@ -141,6 +182,30 @@
             });
         } catch (err) {
             console.error("❌ [Lỗi Hệ Thống] Không thể khởi tạo Pusher hoặc Toastr:", err);
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const avatarBtn = document.getElementById('myAvatarBtn');
+        const avatarMenu = document.getElementById('myAvatarMenu');
+
+        if (avatarBtn && avatarMenu) {
+            avatarBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (avatarMenu.style.display === 'block') {
+                    avatarMenu.style.display = 'none';
+                } else {
+                    avatarMenu.style.display = 'block';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!avatarBtn.contains(e.target) && !avatarMenu.contains(e.target)) {
+                    avatarMenu.style.display = 'none';
+                }
+            });
         }
     });
 </script>

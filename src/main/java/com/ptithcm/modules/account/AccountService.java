@@ -112,6 +112,10 @@ public class AccountService {
         return accountDAO.getAccountByUsername(userId);
     }
 
+    public void updateAccount(TaiKhoan account) {
+        accountDAO.updateAccount(account);
+    }
+
     public void saveAccount(String username, String password, String roleIdStr, String email, String mode,
             String userId, Integer version) throws Exception {
         username = username.trim();

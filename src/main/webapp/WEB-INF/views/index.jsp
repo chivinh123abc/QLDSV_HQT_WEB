@@ -375,7 +375,7 @@
                                             <i class="bi bi-lightning-charge-fill position-absolute" style="right: -10px; bottom: -20px; font-size: 8rem; opacity: 0.1;"></i>
                                             <h5 class="fw-bold mb-3"><s:message code="dashboard.technical.support"/></h5>
                                             <p class="small opacity-75 mb-4"><s:message code="dashboard.support.desc"/></p>
-                                            <a href="mailto:support@ptithcm.edu.vn" class="btn btn-light btn-sm px-4 fw-bold text-primary"><s:message code="dashboard.btn.contact"/></a>
+                                            <a href="mailto:ptquanh.contact@gmail.com" class="btn btn-light btn-sm px-4 fw-bold text-primary"><s:message code="dashboard.btn.contact"/></a>
                                         </div>
                                     </div>
                                 </div>

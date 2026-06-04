@@ -19,6 +19,7 @@ RUN rm -rf webapps/ROOT webapps/ROOT.war
 
 # Copy file WAR đã build từ Stage 1 vào thư mục triển khai của Tomcat
 COPY --from=builder /app/target/*.war webapps/ROOT.war
+RUN mkdir -p webapps/ROOT && cd webapps/ROOT && jar -xf ../ROOT.war && rm ../ROOT.war
 
 # Khởi chạy Tomcat server
 EXPOSE 8080
