@@ -14,13 +14,11 @@ RUN mvn clean package -DskipTests -Dspotless.check.skip=true
 FROM tomcat:10.1-jdk21
 WORKDIR /usr/local/tomcat
 
-# Xóa các ứng dụng mặc định của Tomcat để tránh xung đột routing ROOT
+# Xóa các ứng dụng mặc định
 RUN rm -rf webapps/ROOT webapps/ROOT.war
 
-# Copy file WAR đã build từ Stage 1 vào thư mục triển khai của Tomcat
+# CHỈ CẦN COPY FILE WAR, KHÔNG CẦN GIẢI NÉN THỦ CÔNG NỮA
 COPY --from=builder /app/target/*.war webapps/ROOT.war
-RUN mkdir -p webapps/ROOT && cd webapps/ROOT && jar -xf ../ROOT.war && rm ../ROOT.war
 
-# Khởi chạy Tomcat server
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
