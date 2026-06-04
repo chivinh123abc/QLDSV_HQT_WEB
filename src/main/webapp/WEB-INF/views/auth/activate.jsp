@@ -119,12 +119,22 @@
 
             <div class="mb-3">
                 <label class="form-label"><s:message code="auth.activate.newPassword"/></label>
-                <input type="password" name="newPassword" class="form-control" placeholder="<s:message code="auth.activate.newPassword.placeholder"/>" required>
+                <div class="input-group">
+                    <input type="password" name="newPassword" id="newPassword" class="form-control" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" placeholder="<s:message code="auth.activate.newPassword.placeholder"/>" required>
+                    <button class="btn btn-outline-secondary toggle-password" style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #e2e8f0; background-color: #f8fafc;" type="button" data-target="newPassword">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="mb-4">
                 <label class="form-label"><s:message code="auth.activate.confirmPassword"/></label>
-                <input type="password" name="confirmPassword" class="form-control" placeholder="<s:message code="auth.activate.confirmPassword.placeholder"/>" required>
+                <div class="input-group">
+                    <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" placeholder="<s:message code="auth.activate.confirmPassword.placeholder"/>" required>
+                    <button class="btn btn-outline-secondary toggle-password" style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #e2e8f0; background-color: #f8fafc;" type="button" data-target="confirmPassword">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="login-btn"><s:message code="auth.activate.btn.submit"/></button>
@@ -136,5 +146,26 @@
             </a>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.toggle-password').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('bi-eye');
+                        icon.classList.add('bi-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('bi-eye-slash');
+                        icon.classList.add('bi-eye');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

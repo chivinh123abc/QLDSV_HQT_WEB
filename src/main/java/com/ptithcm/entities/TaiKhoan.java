@@ -31,6 +31,9 @@ public class TaiKhoan extends LuuVetThoiGian {
     @Enumerated(EnumType.STRING)
     private TrangThaiTaiKhoan trangThai = TrangThaiTaiKhoan.CHUA_KICH_HOAT;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     public String getTenDangNhap() {
         return tenDangNhap;
     }
@@ -81,5 +84,13 @@ public class TaiKhoan extends LuuVetThoiGian {
 
     public void setTrangThai(TrangThaiTaiKhoan trangThai) {
         this.trangThai = trangThai;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

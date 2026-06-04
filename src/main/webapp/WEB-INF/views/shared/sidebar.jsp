@@ -31,7 +31,7 @@
                         </li>
                         <li>
                             <a class="nav-link" href="${pageContext.request.contextPath}/payment">
-                                <i class="bi bi-credit-card"></i> Thanh Toán Học Phí
+                                <i class="bi bi-credit-card"></i> <s:message code="payment.title"/>
                             </a>
                         </li>
                     </c:if>
@@ -106,7 +106,7 @@
                                                     <li>
                                                         <a class="nav-link"
                                                             href="${pageContext.request.contextPath}/payment/stats">
-                                                            <i class="bi bi-pie-chart"></i> Thống Kê Học Phí
+                                                            <i class="bi bi-pie-chart"></i> <s:message code="payment.stats.title"/>
                                                         </a>
                                                     </li>
                                                 </c:if>
@@ -125,9 +125,17 @@
 
             <div class="sidebar-footer">
                 <div class="sidebar-roles">
-                    <span class="role-badge role-pgv ${sessionScope.role == 'PGV' ? 'active' : ''}">PGV</span>
-                    <span class="role-badge role-khoa ${sessionScope.role == 'KHOA' ? 'active' : ''}">KHOA</span>
-                    <span class="role-badge role-sv ${sessionScope.role == 'SINHVIEN' ? 'active' : ''}">SV</span>
+                    <c:choose>
+                        <c:when test="${sessionScope.role == 'PGV'}">
+                            <span class="role-badge role-pgv active"><s:message code="role.display.pgv"/></span>
+                        </c:when>
+                        <c:when test="${sessionScope.role == 'KHOA'}">
+                            <span class="role-badge role-khoa active"><s:message code="role.display.faculty"/></span>
+                        </c:when>
+                        <c:when test="${sessionScope.role == 'SINHVIEN'}">
+                            <span class="role-badge role-sv active"><s:message code="role.display.student"/></span>
+                        </c:when>
+                    </c:choose>
                 </div>
                 <a href="${pageContext.request.contextPath}/logout" class="sidebar-logout text-decoration-none"
                     aria-label="<s:message code="sidebar.tooltip.logout"/>">

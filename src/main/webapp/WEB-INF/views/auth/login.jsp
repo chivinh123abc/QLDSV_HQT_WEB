@@ -130,7 +130,12 @@
 
             <div class="mb-4">
                 <label class="form-label"><s:message code="auth.login.password"/></label>
-                <input type="password" name="password" class="form-control" placeholder="<s:message code="auth.login.enter.password"/>" required>
+                <div class="input-group">
+                    <input type="password" name="password" id="password" class="form-control" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" placeholder="<s:message code="auth.login.enter.password"/>" required>
+                    <button class="btn btn-outline-secondary toggle-password" style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #e2e8f0; background-color: #f8fafc;" type="button" onclick="togglePassVisibility()">
+                        <i id="eye-icon" class="bi bi-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="login-btn"><s:message code="global.btn.login"/></button>
@@ -140,6 +145,22 @@
             <span class="text-muted small"><s:message code="auth.login.forgot.password"/></span>
         </div>
     </div>
+
+    <script>
+        function togglePassVisibility() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    </script>
 </body>
 </html>
 

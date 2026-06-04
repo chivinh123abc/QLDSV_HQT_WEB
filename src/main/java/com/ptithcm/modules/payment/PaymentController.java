@@ -26,6 +26,7 @@ import com.ptithcm.entities.DangKy;
 import com.ptithcm.entities.Lop;
 import com.ptithcm.modules.classroom.ClassroomService;
 import com.ptithcm.modules.payment.providers.PaymentProvider;
+import com.ptithcm.shared.constants.MessageConstant;
 import com.ptithcm.shared.constants.SessionConstant;
 import com.ptithcm.shared.enums.RoleEnum;
 
@@ -114,14 +115,14 @@ public class PaymentController {
         }
 
         if (tongTinChi == 0) {
-            redirectAttributes.addFlashAttribute("error", "Không có môn học nào cần thanh toán!");
+            redirectAttributes.addFlashAttribute("error", MessageConstant.PAYMENT_NO_SUBJECT);
             return "redirect:/payment";
         }
 
         PaymentProvider provider = paymentProviderRegistry.get(method);
         if (provider == null) {
             log.warn("[PAYMENT] Yêu cầu cổng thanh toán không được hỗ trợ: {}", method);
-            redirectAttributes.addFlashAttribute("error", "Cổng thanh toán không hỗ trợ!");
+            redirectAttributes.addFlashAttribute("error", MessageConstant.PAYMENT_METHOD_UNSUPPORTED);
             return "redirect:/payment";
         }
 
@@ -142,13 +143,13 @@ public class PaymentController {
             String payUrl = provider.generatePaymentUrl(orderId, amount, baseUrl);
             if (payUrl == null) {
                 redirectAttributes.addFlashAttribute("error",
-                        "Không thể kết nối đến cổng thanh toán " + method.toUpperCase() + ". Vui lòng thử lại sau.");
+                        String.format(MessageConstant.PAYMENT_CONNECTION_ERROR_TEMPLATE, method.toUpperCase()));
                 return "redirect:/payment";
             }
             return "redirect:" + payUrl;
         } catch (Exception e) {
             log.error("[PAYMENT] Exception generating payment url via {}", method, e);
-            redirectAttributes.addFlashAttribute("error", "Lỗi xử lý kết nối cổng thanh toán!");
+            redirectAttributes.addFlashAttribute("error", MessageConstant.PAYMENT_CONNECTION_FAILED);
             return "redirect:/payment";
         }
     }
@@ -160,7 +161,7 @@ public class PaymentController {
         PaymentProvider provider = paymentProviderRegistry.get("momo");
         if (provider == null || !provider.verifySignature(params)) {
             log.warn("[PAYMENT] Cảnh báo bảo mật: Chữ ký thanh toán không hợp lệ!");
-            redirectAttributes.addFlashAttribute("error", "Thông tin xác thực thanh toán không hợp lệ!");
+            redirectAttributes.addFlashAttribute("error", MessageConstant.PAYMENT_SIGNATURE_INVALID);
             return "redirect:/payment";
         }
 
@@ -171,18 +172,18 @@ public class PaymentController {
             try {
                 provider.processIpn(params); // Tận dụng method processIpn của MoMoPaymentProvider để cập nhật DB
                 log.info("[PAYMENT] Sinh vien da THANH TOAN THANH CONG qua MoMo cho order {}", orderId);
-                redirectAttributes.addFlashAttribute("message", "Thanh toán thành công!");
+                redirectAttributes.addFlashAttribute("message", MessageConstant.PAYMENT_SUCCESS);
                 String[] parts = orderId.split("_");
                 if (parts.length >= 3) {
                     return "redirect:/payment?nienKhoa=" + parts[1] + "&hocKy=" + parts[2];
                 }
             } catch (Exception e) {
                 log.error("[PAYMENT] Error processing checkout redirect success for order {}", orderId, e);
-                redirectAttributes.addFlashAttribute("error", "Lỗi ghi nhận thanh toán vào hệ thống!");
+                redirectAttributes.addFlashAttribute("error", MessageConstant.PAYMENT_RECORD_ERROR);
             }
         } else {
             redirectAttributes.addFlashAttribute("error",
-                    "Thanh toán thất bại hoặc đã bị hủy (Mã lỗi: " + resultCode + ")");
+                    String.format(MessageConstant.PAYMENT_FAILED_TEMPLATE, resultCode));
 
             String[] orderParts = orderId != null ? orderId.split("_") : new String[0];
             if (orderParts.length >= 3) {

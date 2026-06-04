@@ -19,6 +19,11 @@ public final class CacheConstant {
     public static final String REG_STATUS_KEY_PREFIX = "reg_status:";
     public static final int REGISTRATION_STATUS_TTL_SECONDS = 600; // 10 minutes
 
+    // OTP Reset Password keys
+    public static final String OTP_RESET_PW_PREFIX = "OTP_RESET_PW_";
+    public static final long OTP_RESET_PW_TTL_SECONDS = 300; // 5 minutes
+    public static final int OTP_LENGTH = 6;
+
     // Khóa động (Ví dụ nếu muốn cache theo điều kiện lọc cụ thể)
     public static String getClassroomByFacultyKey(String maKhoa) {
         return "sys:classroom:faculty:" + maKhoa;
@@ -29,5 +34,12 @@ public final class CacheConstant {
      */
     public static String getRegStatusKey(String maSV, String maLTC) {
         return REG_STATUS_KEY_PREFIX + maSV.trim() + ":" + maLTC.trim();
+    }
+
+    /**
+     * Helper to build OTP Reset Password Redis key
+     */
+    public static String getOtpResetPwKey(String email) {
+        return OTP_RESET_PW_PREFIX + email.trim();
     }
 }

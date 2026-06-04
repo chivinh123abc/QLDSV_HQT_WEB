@@ -9,6 +9,7 @@ public class UserSession implements Serializable {
     private String role; // "PGV", "KHOA", "SINHVIEN"
     private String maKhoa;
     private String fullName;
+    private String avatar;
 
     public UserSession() {
     }
@@ -18,6 +19,14 @@ public class UserSession implements Serializable {
         this.role = role;
         this.maKhoa = maKhoa;
         this.fullName = fullName;
+    }
+
+    public UserSession(String username, String role, String maKhoa, String fullName, String avatar) {
+        this.username = username;
+        this.role = role;
+        this.maKhoa = maKhoa;
+        this.fullName = fullName;
+        this.avatar = avatar;
     }
 
     public String getUsername() {
@@ -50,5 +59,13 @@ public class UserSession implements Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }
