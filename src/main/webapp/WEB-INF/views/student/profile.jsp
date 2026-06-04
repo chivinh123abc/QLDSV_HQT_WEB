@@ -60,12 +60,15 @@
                                     <div class="position-relative d-inline-block mb-3">
                                         <c:choose>
                                             <c:when test="${not empty sessionScope.user.avatar}">
-                                                <img src="${pageContext.request.contextPath}${sessionScope.user.avatar}" 
+                                                <img id="avatarPreviewImg" src="${pageContext.request.contextPath}${sessionScope.user.avatar}" 
                                                      alt="Avatar" class="rounded-circle shadow-sm border border-3 border-primary-subtle" 
                                                      style="width: 120px; height: 120px; object-fit: cover;">
                                             </c:when>
                                             <c:otherwise>
-                                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" 
+                                                <img id="avatarPreviewImg" src="" 
+                                                     alt="Avatar" class="rounded-circle shadow-sm border border-3 border-primary-subtle d-none" 
+                                                     style="width: 120px; height: 120px; object-fit: cover;">
+                                                <div id="avatarPlaceholder" class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" 
                                                      style="width: 100px; height: 100px; font-size: 2.5rem; font-weight: 700; text-transform: uppercase;">
                                                     <c:choose>
                                                         <c:when test="${sessionScope.role == 'SINHVIEN' && not empty studentProfile}">
@@ -233,6 +236,31 @@
                 const fileSelectedNameDiv = document.getElementById("fileSelectedName");
                 const msgNoFileChosen = "<s:message code='profile.avatar.no_file' text='Không có tệp nào được chọn'/>";
 
+                // Store original preview states
+                const avatarPreviewImg = document.getElementById("avatarPreviewImg");
+                const avatarPlaceholder = document.getElementById("avatarPlaceholder");
+                const originalSrc = avatarPreviewImg ? avatarPreviewImg.src : "";
+                const originalImgHidden = avatarPreviewImg ? avatarPreviewImg.classList.contains("d-none") : true;
+                const originalPlaceholderHidden = avatarPlaceholder ? avatarPlaceholder.classList.contains("d-none") : false;
+
+                function resetPreview() {
+                    if (avatarPreviewImg) {
+                        avatarPreviewImg.src = originalSrc;
+                        if (originalImgHidden) {
+                            avatarPreviewImg.classList.add("d-none");
+                        } else {
+                            avatarPreviewImg.classList.remove("d-none");
+                        }
+                    }
+                    if (avatarPlaceholder) {
+                        if (originalPlaceholderHidden) {
+                            avatarPlaceholder.classList.add("d-none");
+                        } else {
+                            avatarPlaceholder.classList.remove("d-none");
+                        }
+                    }
+                }
+
                 fileInput.addEventListener("change", function() {
                     errorDiv.style.display = "none";
                     errorDiv.textContent = "";
@@ -249,6 +277,7 @@
                             if (fileSelectedNameDiv) {
                                 fileSelectedNameDiv.textContent = msgNoFileChosen;
                             }
+                            resetPreview();
                             return;
                         }
 
@@ -259,16 +288,31 @@
                             if (fileSelectedNameDiv) {
                                 fileSelectedNameDiv.textContent = msgNoFileChosen;
                             }
+                            resetPreview();
                             return;
                         }
 
                         if (fileSelectedNameDiv) {
                             fileSelectedNameDiv.textContent = file.name;
                         }
+
+                        // Load and display preview via FileReader
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            if (avatarPreviewImg) {
+                                avatarPreviewImg.src = e.target.result;
+                                avatarPreviewImg.classList.remove("d-none");
+                            }
+                            if (avatarPlaceholder) {
+                                avatarPlaceholder.classList.add("d-none");
+                            }
+                        };
+                        reader.readAsDataURL(file);
                     } else {
                         if (fileSelectedNameDiv) {
                             fileSelectedNameDiv.textContent = msgNoFileChosen;
                         }
+                        resetPreview();
                     }
                 });
 

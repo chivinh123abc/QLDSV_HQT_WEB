@@ -1,6 +1,5 @@
 package com.ptithcm.modules.student;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -18,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.SinhVien;
 import com.ptithcm.entities.TaiKhoan;
+import com.ptithcm.models.UploadFile;
 import com.ptithcm.modules.account.AccountService;
 import com.ptithcm.shared.constants.MessageConstant;
 import com.ptithcm.shared.dtos.UserSession;
@@ -40,7 +40,7 @@ public class StudentController {
     private StudentService studentService;
 
     @Autowired
-    private ServletContext servletContext;
+    private UploadFile uploadFile;
 
     @GetMapping("/profile")
     public String showProfile(ModelMap model, HttpSession session) {
@@ -212,15 +212,6 @@ public class StudentController {
                 return "redirect:/student/profile";
             }
 
-            String uploadDir = servletContext.getRealPath("/resources/uploads/avatars/");
-            if (uploadDir == null) {
-                uploadDir = "/usr/local/tomcat/webapps/ROOT/resources/uploads/avatars/";
-            }
-            java.io.File dir = new java.io.File(uploadDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
@@ -229,8 +220,7 @@ public class StudentController {
             }
             String newFilename = java.util.UUID.randomUUID().toString() + extension;
 
-            java.nio.file.Path path = java.nio.file.Paths.get(uploadDir + newFilename);
-            java.nio.file.Files.write(path, file.getBytes());
+            uploadFile.saveFile(file.getBytes(), newFilename);
 
             String avatarUrl = "/resources/uploads/avatars/" + newFilename;
             account.setAvatar(avatarUrl);

@@ -16,4 +16,8 @@
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
 
+    <bean id="uploadfile" class="com.ptithcm.models.UploadFile">
+        <property name="basePath" value="/resources/uploads/avatars" />
+    </bean>
+
 </beans>

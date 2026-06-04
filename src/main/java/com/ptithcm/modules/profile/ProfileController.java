@@ -1,6 +1,5 @@
 package com.ptithcm.modules.profile;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -18,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptithcm.entities.SinhVien;
 import com.ptithcm.entities.TaiKhoan;
+import com.ptithcm.models.UploadFile;
 import com.ptithcm.modules.account.AccountService;
 import com.ptithcm.modules.student.StudentService;
 import com.ptithcm.shared.constants.MessageConstant;
@@ -41,7 +41,7 @@ public class ProfileController {
     private StudentService studentService;
 
     @Autowired
-    private ServletContext servletContext;
+    private UploadFile uploadFile;
 
     @GetMapping
     public String showProfile(ModelMap model, HttpSession session) {
@@ -217,17 +217,7 @@ public class ProfileController {
                 return "redirect:/profile";
             }
 
-            // 1. Chỉ định thư mục lưu ảnh.
-            String uploadDir = servletContext.getRealPath("/resources/uploads/avatars/");
-            if (uploadDir == null) {
-                uploadDir = "/usr/local/tomcat/webapps/ROOT/resources/uploads/avatars/";
-            }
-            java.io.File dir = new java.io.File(uploadDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            // 2. Đổi tên file để tránh trùng lặp (dùng UUID)
+            // 1. Đổi tên file để tránh trùng lặp (dùng UUID)
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
@@ -236,11 +226,10 @@ public class ProfileController {
             }
             String newFilename = java.util.UUID.randomUUID().toString() + extension;
 
-            // 3. Lưu file vật lý
-            java.nio.file.Path path = java.nio.file.Paths.get(uploadDir + newFilename);
-            java.nio.file.Files.write(path, file.getBytes());
+            // 2. Lưu file vật lý
+            uploadFile.saveFile(file.getBytes(), newFilename);
 
-            // 4. Lưu đường dẫn tương đối xuống Database
+            // 3. Lưu đường dẫn tương đối xuống Database
             String avatarUrl = "/resources/uploads/avatars/" + newFilename;
             account.setAvatar(avatarUrl);
             accountService.updateAccount(account); // Cập nhật Entity trong DB

@@ -107,8 +107,6 @@
     <!-- Khởi tạo CKEditor -->
     <script>
         CKEDITOR.replace('noiDung', {
-            filebrowserBrowseUrl: '${pageContext.request.contextPath}/ckfinder/ckfinder.html',
-            filebrowserImageBrowseUrl: '${pageContext.request.contextPath}/ckfinder/ckfinder.html?type=Images',
             height: '400px'
         });
     </script>
