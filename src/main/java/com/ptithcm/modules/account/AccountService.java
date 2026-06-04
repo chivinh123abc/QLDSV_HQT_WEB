@@ -94,6 +94,7 @@ public class AccountService {
             // Không cho phép tự xóa chính mình
             boolean canDelete = !tk.getTenDangNhap().equalsIgnoreCase(currentLoggedInUser);
             map.put("canDelete", canDelete);
+            map.put("status", tk.getTrangThai() != null ? tk.getTrangThai().name() : "");
 
             userList.add(map);
         }
@@ -117,7 +118,7 @@ public class AccountService {
     }
 
     public void saveAccount(String username, String password, String roleIdStr, String email, String mode,
-            String userId, Integer version) throws Exception {
+            String userId, Integer version, String statusStr) throws Exception {
         username = username.trim();
         email = email.trim();
 
@@ -139,7 +140,11 @@ public class AccountService {
                 phanQuyen = "KHOA";
             }
             tk.setPhanQuyen(phanQuyen);
-            tk.setTrangThai(TrangThaiTaiKhoan.DA_KICH_HOAT); // Admin tạo thì kích hoạt trực tiếp
+            if ("SINHVIEN".equals(phanQuyen)) {
+                tk.setTrangThai(TrangThaiTaiKhoan.CHUA_KICH_HOAT);
+            } else {
+                tk.setTrangThai(TrangThaiTaiKhoan.DA_KICH_HOAT); // PGV/KHOA tạo thì kích hoạt trực tiếp
+            }
 
             accountDAO.saveAccount(tk);
         } else if ("edit".equalsIgnoreCase(mode)) {
@@ -161,6 +166,10 @@ public class AccountService {
 
             if (password != null && !password.trim().isEmpty()) {
                 tk.setMatKhau(BCrypt.hashpw(password, BCrypt.gensalt(12)));
+            }
+
+            if (statusStr != null && !statusStr.trim().isEmpty()) {
+                tk.setTrangThai(TrangThaiTaiKhoan.valueOf(statusStr));
             }
 
             accountDAO.updateAccount(tk);

@@ -82,7 +82,7 @@ public class AccountController {
         }
         try {
             accountService.saveAccount(dto.getUsername(), dto.getPassword(), dto.getRoleId(), dto.getEmail(),
-                    dto.getMode(), dto.getUserId(), dto.getVersion());
+                    dto.getMode(), dto.getUserId(), dto.getVersion(), dto.getStatus());
             String targetUser = "add".equalsIgnoreCase(dto.getMode())
                     ? dto.getUsername().trim()
                     : dto.getUserId().trim();

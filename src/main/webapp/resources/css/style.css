@@ -147,6 +147,8 @@
   --bs-body-bg: var(--color-background);
   --bs-body-color: var(--color-foreground);
   --bs-tertiary-bg: var(--color-muted);
+  --bs-secondary-bg: var(--color-muted);
+  --bs-secondary-color: var(--color-muted-foreground);
   --bs-table-bg: var(--color-card);
   --bs-table-hover-bg: var(--color-table-hover);
   --bs-table-hover-color: var(--color-foreground);
@@ -656,6 +658,14 @@ body {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
   outline: none;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  background-color: var(--color-muted) !important;
+  color: var(--color-muted-foreground) !important;
+  border-color: var(--color-border) !important;
+  opacity: 0.8;
 }
 
 /* --------------------------------------------------------------------------

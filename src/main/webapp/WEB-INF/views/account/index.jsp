@@ -162,20 +162,24 @@
                                                         <th style="width: 15%;">
                                                             <s:message code="account.username.label" />
                                                         </th>
-                                                        <th style="width: 20%;">
+                                                        <th style="width: 15%;">
                                                             <s:message code="account.lbl.fullName" />
                                                         </th>
-                                                        <th style="width: 25%;">EMAIL</th>
+                                                        <th style="width: 20%;">EMAIL</th>
                                                         <th class="text-center" style="width: 15%;">
                                                             <s:message code="account.lbl.roleGroup" />
                                                         </th>
                                                         <th class="text-center" style="width: 15%;">
+                                                            TRẠNG THÁI
+                                                        </th>
+                                                        <th class="text-center" style="width: 10%;">
                                                             <s:message code="global.lbl.actions" />
                                                         </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="user-table-body">
-                                                    <c:forEach var="item" items="${userList}">
+                                                    <s:message code="account.js.confirmDelete" var="confirmDeleteMsg" />
+                                                 <c:forEach var="item" items="${userList}">
                                                         <tr data-role="${item.roleId}">
                                                             <td class="px-3"><span
                                                                     class="badge-soft-primary">${item.userId}</span>
@@ -205,6 +209,22 @@
                                                                 </c:choose>
                                                             </td>
                                                             <td class="text-center">
+                                                                <c:choose>
+                                                                    <c:when test="${item.status == 'CHUA_KICH_HOAT'}">
+                                                                        <span class="badge bg-secondary">Chưa kích hoạt</span>
+                                                                    </c:when>
+                                                                    <c:when test="${item.status == 'DA_KICH_HOAT'}">
+                                                                        <span class="badge bg-success">Đã kích hoạt</span>
+                                                                    </c:when>
+                                                                    <c:when test="${item.status == 'KHOA'}">
+                                                                        <span class="badge bg-danger">Bị khóa</span>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="badge bg-light text-dark">${item.status}</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
+                                                            <td class="text-center">
                                                                 <div class="d-flex gap-2 justify-content-center">
                                                                     <a href="${pageContext.request.contextPath}/accounts?userId=${item.userId}&lnkEdit"
                                                                         class="btn btn-sm btn-outline-primary border-0 rounded-3">
@@ -213,7 +233,7 @@
                                                                     <form
                                                                         action="${pageContext.request.contextPath}/accounts/delete"
                                                                         method="POST"
-                                                                        onsubmit="return confirm('<s:message code="account.js.confirmDelete" />');"
+                                                                         onsubmit="return confirm('${confirmDeleteMsg}');"
                                                                         class="d-inline">
                                                                         <input type="hidden" name="csrf_token"
                                                                             value="${csrfToken}" />
@@ -234,7 +254,7 @@
                                                     </c:forEach>
                                                     <c:if test="${empty userList}">
                                                         <tr>
-                                                            <td colspan="6" class="text-center py-5 text-muted">
+                                                            <td colspan="7" class="text-center py-5 text-muted">
                                                                 <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
                                                                 <s:message code="account.no.data" />
                                                             </td>
@@ -283,11 +303,10 @@
                                                     <s:message code="account.lbl.roleGroup" /> <span
                                                         class="text-danger">*</span>
                                                 </label>
-                                                <select class="form-select rounded-3" name="roleId" id="inp_roleId"
-                                                    onchange="toggleRoleOptions()" <c:if test="${mode == 'edit'}">disabled</c:if>
-                                                    required>
-                                                    <option value="" disabled ${empty account.phanQuyen ? 'selected'
-                                                        : '' }>
+                                                 <select class="form-select rounded-3" name="roleId" id="inp_roleId"
+                                                     onchange="toggleRoleOptions()" ${mode == 'edit' ? 'disabled' : ''}
+                                                     required>
+                                                    <option value="" disabled ${empty account.phanQuyen ? 'selected' : ''}>
                                                         <s:message code="account.select.role" />
                                                     </option>
                                                     <option value="1" ${account.phanQuyen=='PGV' ? 'selected' : '' }>
@@ -295,8 +314,7 @@
                                                     </option>
                                                     <option value="2" ${account.phanQuyen=='KHOA' ? 'selected' : '' }>
                                                         <s:message code="account.role.faculty" /></option>
-                                                    <option value="3" ${account.phanQuyen=='SINHVIEN' ? 'selected' : ''
-                                                        }>
+                                                    <option value="3" ${account.phanQuyen=='SINHVIEN' ? 'selected' : '' }>
                                                         <s:message code="account.role.student" />
                                                     </option>
                                                 </select>
@@ -378,6 +396,18 @@
                                                     id="inp_email" value="${account.email}"
                                                     placeholder="<s:message code="account.enter.email" />" required>
                                             </div>
+                                            <c:if test="${mode == 'edit'}">
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold text-muted">
+                                                        Trạng thái tài khoản <span class="text-danger">*</span>
+                                                    </label>
+                                                    <select class="form-select rounded-3" name="status" id="inp_status" required>
+                                                        <option value="CHUA_KICH_HOAT" ${account.trangThai == 'CHUA_KICH_HOAT' ? 'selected' : ''}>Chưa kích hoạt</option>
+                                                        <option value="DA_KICH_HOAT" ${account.trangThai == 'DA_KICH_HOAT' ? 'selected' : ''}>Đã kích hoạt</option>
+                                                        <option value="KHOA" ${account.trangThai == 'KHOA' ? 'selected' : ''}>Bị khóa</option>
+                                                    </select>
+                                                </div>
+                                            </c:if>
                                         </div>
                                     </div>
                                     <div class="modal-footer border-0 px-4 pb-4">

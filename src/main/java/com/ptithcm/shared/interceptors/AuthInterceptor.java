@@ -134,18 +134,29 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        // 3. Phòng hờ: nếu user có session chính thức nhưng DB báo CHUA_KICH_HOAT
+        // 3. Phòng hờ: nếu user có session chính thức nhưng DB báo CHUA_KICH_HOAT hoặc
+        // KHOA
         UserSession currUser = SessionUtil.getUser(session);
         if (currUser != null) {
             boolean isUnactivated = false;
+            boolean isLocked = false;
             Session hSession = factory.openSession();
             try {
                 TaiKhoan tk = hSession.get(TaiKhoan.class, currUser.getUsername());
-                if (tk != null && tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
-                    isUnactivated = true;
+                if (tk != null) {
+                    if (tk.getTrangThai() == TrangThaiTaiKhoan.CHUA_KICH_HOAT) {
+                        isUnactivated = true;
+                    } else if (tk.getTrangThai() == TrangThaiTaiKhoan.KHOA) {
+                        isLocked = true;
+                    }
                 }
             } finally {
                 hSession.close();
+            }
+            if (isLocked) {
+                SessionUtil.invalidate(session);
+                response.sendRedirect(request.getContextPath() + "/login?error=locked");
+                return false;
             }
             if (isUnactivated) {
                 if (uri.contains("/login") || uri.contains("/logout") || uri.contains("/resources/")) {

@@ -102,70 +102,52 @@
     <div class="login-card animate__animated animate__zoomIn">
         <div class="login-header">
             <div class="mb-3">
-                <i class="bi bi-shield-check fs-1 text-primary"></i>
+                <i class="bi bi-shield-lock-fill fs-1 text-primary"></i>
             </div>
-            <h2><s:message code="auth.activate.title"/></h2>
-            <p><s:message code="auth.activate.desc"/></p>
+            <h2>Kích hoạt tài khoản</h2>
+            <p class="text-muted small">Chúng tôi đã gửi một mã OTP gồm 6 chữ số đến email: <br><strong>${maskedEmail}</strong></p>
         </div>
 
         <c:if test="${not empty error}">
-            <div class="alert alert-danger alert-custom">
+            <div class="alert alert-danger alert-custom animate__animated animate__shakeX">
                 <i class="bi bi-exclamation-circle me-2"></i> ${error}
+            </div>
+        </c:if>
+        <c:if test="${not empty message}">
+            <div class="alert alert-success alert-custom animate__animated animate__fadeIn">
+                <i class="bi bi-check-circle me-2"></i> ${message}
+            </div>
+        </c:if>
+        <c:if test="${not empty info}">
+            <div class="alert alert-info alert-custom animate__animated animate__fadeIn">
+                <i class="bi bi-info-circle me-2"></i> ${info}
             </div>
         </c:if>
 
         <form action="${pageContext.request.contextPath}/activate" method="post">
             <input type="hidden" name="csrf_token" value="${csrfToken}" />
 
-            <div class="mb-3">
-                <label class="form-label"><s:message code="auth.activate.newPassword"/></label>
-                <div class="input-group">
-                    <input type="password" name="newPassword" id="newPassword" class="form-control" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" placeholder="<s:message code="auth.activate.newPassword.placeholder"/>" required>
-                    <button class="btn btn-outline-secondary toggle-password" style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #e2e8f0; background-color: #f8fafc;" type="button" data-target="newPassword">
-                        <i class="bi bi-eye"></i>
-                    </button>
-                </div>
-            </div>
-
             <div class="mb-4">
-                <label class="form-label"><s:message code="auth.activate.confirmPassword"/></label>
+                <label class="form-label">Mã xác thực OTP (5 phút)</label>
                 <div class="input-group">
-                    <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" placeholder="<s:message code="auth.activate.confirmPassword.placeholder"/>" required>
-                    <button class="btn btn-outline-secondary toggle-password" style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #e2e8f0; background-color: #f8fafc;" type="button" data-target="confirmPassword">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                    <span class="input-group-text bg-light border-end-0" style="border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-color: #e2e8f0;">
+                        <i class="bi bi-key-fill text-muted"></i>
+                    </span>
+                    <input type="text" name="otpCode" id="otpCode" class="form-control border-start-0 text-center fw-bold fs-5" style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #e2e8f0; background-color: #f8fafc; letter-spacing: 2px;" placeholder="Mã OTP" maxlength="6" autocomplete="off" required>
                 </div>
             </div>
 
-            <button type="submit" class="login-btn"><s:message code="auth.activate.btn.submit"/></button>
+            <button type="submit" class="login-btn">KÍCH HOẠT TÀI KHOẢN</button>
         </form>
 
-        <div class="mt-4 text-center">
-            <a href="${pageContext.request.contextPath}/logout" class="text-decoration-none small fw-semibold text-primary">
-                <i class="bi bi-arrow-left me-1"></i><s:message code="global.btn.logout"/>
+        <div class="mt-4 d-flex justify-content-between align-items-center">
+            <a href="${pageContext.request.contextPath}/logout" class="text-decoration-none small fw-semibold text-muted">
+                <i class="bi bi-arrow-left me-1"></i>Đăng xuất
+            </a>
+            <a href="${pageContext.request.contextPath}/activate/resend" class="text-decoration-none small fw-semibold text-primary">
+                Gửi lại mã OTP <i class="bi bi-arrow-right-short"></i>
             </a>
         </div>
     </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll('.toggle-password').forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const input = document.getElementById(targetId);
-                    const icon = this.querySelector('i');
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        icon.classList.remove('bi-eye');
-                        icon.classList.add('bi-eye-slash');
-                    } else {
-                        input.type = 'password';
-                        icon.classList.remove('bi-eye-slash');
-                        icon.classList.add('bi-eye');
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>

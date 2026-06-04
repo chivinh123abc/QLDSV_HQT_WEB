@@ -58,6 +58,38 @@ public class EmailOTPService {
     }
 
     /**
+     * Sinh mã OTP 6 chữ số, lưu vào Redis và gửi mail kích hoạt tài khoản cho người
+     * dùng.
+     */
+    public void sendActivationOTP(String email) throws Exception {
+        // Sinh mã OTP 6 chữ số
+        StringBuilder otpBuilder = new StringBuilder();
+        for (int i = 0; i < CacheConstant.OTP_LENGTH; i++) {
+            otpBuilder.append(random.nextInt(10));
+        }
+        String otpCode = otpBuilder.toString();
+
+        // Lưu vào Redis với TTL là 5 phút
+        String key = CacheConstant.getOtpResetPwKey(email);
+        redisService.set(key, otpCode, CacheConstant.OTP_RESET_PW_TTL_SECONDS);
+
+        log.info("[OTP SERVICE] Đã lưu OTP kích hoạt vào Redis cho email: {}, key: {}", email, key);
+
+        // Gửi mail sử dụng MailerService
+        Map<String, String> variables = new HashMap<>();
+        variables.put("otpCode", otpCode);
+
+        MailInfoDTO mailInfo = new MailInfoDTO();
+        mailInfo.setTo(email);
+        mailInfo.setSubject("Mã OTP kích hoạt tài khoản - QLDSV PTITHCM");
+        mailInfo.setTemplatePath(MailConstant.TEMPLATE_ACTIVATE);
+        mailInfo.setVariables(variables);
+
+        mailerService.sendMail(mailInfo);
+        log.info("[OTP SERVICE] Đã gửi mail OTP kích hoạt thành công tới: {}", email);
+    }
+
+    /**
      * Kiểm tra mã OTP người dùng nhập vào.
      */
     public boolean verifyOTP(String email, String otpCode) {
