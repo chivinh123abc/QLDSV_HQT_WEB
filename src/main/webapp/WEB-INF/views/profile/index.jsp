@@ -12,19 +12,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css" />
 </head>
-<body class="app-body">
-    <!-- Navbar -->
-    <jsp:include page="/WEB-INF/views/shared/header.jsp" />
+<body>
+    <div class="app-layout">
+        <!-- SIDEBAR -->
+        <jsp:include page="/WEB-INF/views/shared/sidebar.jsp" />
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-white shadow-sm">
-                <jsp:include page="/WEB-INF/views/shared/sidebar.jsp" />
-            </div>
+        <div class="app-main">
+            <!-- HEADER -->
+            <jsp:include page="/WEB-INF/views/shared/header.jsp" />
 
-            <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 content-wrapper">
+            <!-- MAIN CONTENT -->
+            <main id="main-content" class="app-content p-4 bg-light">
+                <div class="container-fluid max-w-5xl mx-auto">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                     <h1 class="h2 text-primary fw-bold">
                         <i class="bi bi-person-circle me-2"></i><s:message code="profile.title"/>
@@ -217,6 +216,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             </main>
         </div>

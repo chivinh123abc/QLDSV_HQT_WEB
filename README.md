@@ -1,6 +1,14 @@
 # 🏫 Dự Án Quản Lý Điểm Sinh Viên Hệ Tín Chỉ (QLDSV_HTC_WEB)
 
-Chào mừng bạn đến với **QLDSV_HTC_WEB** - hệ thống Web quản lý điểm sinh viên học theo hệ thống tín chỉ. Dự án được phát triển theo mô hình MVC sử dụng các công nghệ Spring Framework (Spring MVC, Spring ORM), Hibernate, và SQL Server.
+> - 🎓 **Học viện Công nghệ Bưu chính Viễn thông cơ sở tại TP. Hồ Chí Minh (PTITHCM)**
+> - 📚 **Môn học:** Lập Trình Web
+> - 👨‍🏫 **Giảng viên hướng dẫn:** Thầy Nguyễn Minh Hiếu
+
+Chào mừng bạn đến với **QLDSV_HTC_WEB** - hệ thống Web quản lý điểm sinh viên học theo hệ thống tín chỉ.
+
+Dự án được phát triển theo mô hình MVC sử dụng các công nghệ lõi mạnh mẽ bao gồm **Spring Framework** (Spring MVC, Spring ORM), **Hibernate**, và **SQL Server**. Hệ thống không chỉ đáp ứng xuất sắc các yêu cầu nghiệp vụ của môn học mà còn được mở rộng với các kỹ thuật Backend nâng cao (Redis, IPN Webhook, Docker).
+
+[![Donate](https://img.shields.io/badge/Donate-Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](#-ủng-hộ--donate)
 
 > [!IMPORTANT]
 > Toàn bộ luồng xử lý nghiệp vụ của hệ thống hoạt động theo mô hình **Server-Side Rendering (SSR)**. Mọi tương tác giữa người dùng và server đều thông qua **form submission** và **page redirect/reload** (PRG - Post/Redirect/Get pattern). Hệ thống **KHÔNG** sử dụng REST API hay AJAX cho các luồng nghiệp vụ chính, ngoại trừ module nhập điểm.
@@ -15,6 +23,22 @@ Chào mừng bạn đến với **QLDSV_HTC_WEB** - hệ thống Web quản lý 
 > 👉 **[Đọc tài liệu tổng hợp kiến thức tại đây (LESSON NOTES)](./docs/lessons/Tong_hop_kien_thuc.md)**
 >
 > 👉 **[Đọc danh sách tính năng & lưu ý áp dụng tại đây](./docs/Luu_y_ap_dung.md)**
+
+---
+
+## 🏆 Nhật ký Bảo vệ Đồ án (05/06/2026)
+
+Dự án đã được bảo vệ thành công với điểm số tuyệt đối 10/10. Dưới đây là tóm tắt quá trình vấn đáp thực tế và cách nhóm giải quyết các câu hỏi từ Giảng viên:
+
+- **Mở đầu & Triển khai thực tế:** Ngay từ khi bắt đầu, nhóm đã cung cấp URL public cho thầy trải nghiệm trực tiếp. Nhóm nhấn mạnh dự án không chỉ chạy localhost mà đã được đóng gói hoàn chỉnh bằng Docker và deploy lên server thật.
+- **Phân chia công việc:** Thầy hỏi về cách chia task. Nhóm (2 thành viên) chia sẻ rằng cả 2 cùng làm Full-stack và áp dụng quy trình giống môi trường doanh nghiệp: một người code xong thì người kia phải Cross-check/Code Review (Pull Request) thì tính năng mới được đưa vào dự án.
+- **Demo Tính năng cốt lõi:** Nhóm tiến hành demo trôi chảy các luồng nghiệp vụ, đặc biệt trình bày chi tiết tính năng Xuất/Nhập dữ liệu hàng loạt bằng file CSV (Import/Export CSV).
+- **Bắt lỗi và Validate Dữ liệu:** Nhóm cố tình demo nhập sai mật khẩu/bỏ trống trường dữ liệu. Thầy hỏi nhóm bắt lỗi bằng gì. Nhóm trả lời: Ở Client-side, dùng Bootstrap để hiển thị cảnh báo ngay trên UI. Ở tầng Backend, nhóm áp dụng 2 cách là Validation Annotations và Custom Validation.
+- **Cấu hình Gửi Email:** Thầy yêu cầu giải thích tính năng Email. Nhóm show file spring-config-gmail.xml, giải thích cách truyền các Secret Key vào file properties (hoạt động tương tự file .env để ẩn key bảo mật), và cách dữ liệu được nạp vào Bean JavaMailSenderImpl.
+- **Tính năng Nâng cao (Vượt ngoài giáo trình):** Thầy hỏi nhóm có làm thêm tính năng gì mới không. Nhóm tự tin demo và giải thích 2 luồng xử lý "nặng đô" nhất:
+  - **Cổng thanh toán MoMo & Hóa đơn PDF:** Demo thực tế luồng quét mã QR và xử lý IPN để xác nhận thanh toán. Đặc biệt, nhóm trình bày luồng hệ thống tự động sinh hóa đơn điện tử định dạng PDF và gửi thẳng vào email của sinh viên ngay khi giao dịch thành công.
+  - **Redis Cache:** Giải thích cơ chế lưu trữ dữ liệu tạm thời trên bộ nhớ RAM để tăng tốc độ truy xuất hệ thống.
+- **ORM & Cơ sở dữ liệu:** Thầy hỏi hệ thống dùng công nghệ gì để tương tác với DB. Nhóm trả lời là Hibernate, sau đó mở trực tiếp source code (các file XML) và giải thích chi tiết luồng mapping dữ liệu cho thầy.
 
 ---
 
@@ -688,72 +712,7 @@ Tất cả Entity kế thừa `LuuVetThoiGian` đều hỗ trợ xóa mềm:
 
 ## 🚀 Hướng Dẫn Cài Đặt & Chạy Dự Án
 
-### Yêu Cầu Hệ Thống
-
-- **Java Development Kit (JDK):** 17+
-- **Apache Maven:** 3.8+
-- **SQL Server:** 2019+ (cổng mặc định 1433)
-- **Redis Server:** 6.0+ (cổng mặc định 6379)
-
-### Bước 1: Thiết lập Cơ sở dữ liệu SQL Server
-
-1. Mở công cụ **SQL Server Management Studio (SSMS)**.
-2. Kết nối tới SQL Server instance cục bộ (mặc định cổng `1433`).
-3. Mở file [Gendb.sql](./Gendb.sql) (hoặc schema tương ứng cấu trúc snake_case).
-4. Nhấn **Execute** (hoặc phím `F5`) để tạo cơ sở dữ liệu `QLDSV_HTC_WEB`, tạo cấu trúc bảng, các ràng buộc khóa ngoại và chèn dữ liệu mẫu.
-
-### Bước 2: Khởi chạy Redis Server
-
-```bash
-redis-server
-```
-
-Redis được sử dụng cho: hàng đợi đăng ký tín chỉ, lưu OTP xác thực email, Rate Limiting.
-
-### Bước 3: Cấu hình Datasource trong Project
-
-Nếu SQL Server của bạn sử dụng tài khoản/mật khẩu khác hoặc cổng kết nối khác:
-
-1. Mở file [spring-config-bean.xml](./src/main/webapp/WEB-INF/configs/spring-config-bean.xml).
-2. Chỉnh sửa thuộc tính của bean `dataSource` (từ dòng 15 tới 20):
-   ```xml
-   <property name="url" value="jdbc:sqlserver://localhost:1433;databaseName=QLDSV_HTC_WEB;encrypt=true;trustServerCertificate=true;" />
-   <property name="username" value="sa" />
-   <property name="password" value="mật_khẩu_của_bạn" />
-   ```
-
-### Bước 4: Build và Chạy dự án bằng Maven hoặc Make
-
-Hệ thống sử dụng **Cargo Maven Plugin** đóng gói Web Server Tomcat nhúng giúp khởi chạy ngay lập tức mà không cần cài đặt Tomcat độc lập bên ngoài.
-
-Bạn có thể chạy dự án bằng một trong hai cách:
-
-- **Sử dụng Make (Nhanh nhất):**
-  ```bash
-  make dev
-  ```
-- **Sử dụng lệnh Maven trực tiếp:**
-  ```bash
-  mvn clean package cargo:run
-  ```
-  _Lệnh này sẽ tải các thư viện phụ thuộc, biên dịch mã nguồn Java, đóng gói file `.war`, khởi chạy Tomcat nhúng ở cổng `8080`._
-
-### Bước 5: Kiểm tra và Đăng nhập hệ thống
-
-Mở trình duyệt web và truy cập địa chỉ:
-
-```text
-http://localhost:8080/
-```
-
-Sử dụng các tài khoản mẫu sau để trải nghiệm các phân quyền khác nhau:
-
-| Tài khoản đăng nhập (Username) | Mật khẩu (Password) | Quyền hạn (Role) | Chú thích                                                  |
-| :----------------------------- | :------------------ | :--------------- | :--------------------------------------------------------- |
-| `GV01`                         | `123`               | **PGV**          | Tài khoản giảng viên có vai trò Phòng Giáo Vụ (Toàn quyền) |
-| `GV02`                         | `123`               | **KHOA**         | Giảng viên thuộc khoa CNTT (chỉ quản lý dữ liệu CNTT)      |
-| `SV01`                         | `123`               | **SINHVIEN**     | Sinh viên Nguyễn A - Lớp CNTT1 (Xem điểm, Đăng ký môn)     |
-| `SV02`                         | `123`               | **SINHVIEN**     | Sinh viên Trần B - Lớp CNTT1 (Xem điểm, Đăng ký môn)       |
+👉 **[Xem Hướng dẫn Cài đặt & Chạy Project chi tiết tại đây](docs/SETUP.md)**
 
 ---
 
@@ -833,3 +792,25 @@ Bạn có thể chạy các lệnh kiểm tra và tự động căn chỉnh mã 
   ```bash
   make lint
   ```
+
+---
+
+## 👨‍💻 Đội ngũ phát triển (Contributors)
+
+Dự án được thiết kế, phát triển và tối ưu bởi nhóm 2 thành viên. Chúng mình đã áp dụng quy trình làm việc thực chiến (Code Review, Pull Request) để mang lại một kiến trúc hệ thống ổn định nhất.
+
+| <div align="center"><img src="https://github.com/ptquanh.png" width="100px;" alt=""/><br /><sub><b>Phan Tuấn Quốc Anh (Peter Phan)</b></sub></div> | <div align="center"><img src="https://github.com/chivinh123abc.png" width="100px;" alt=""/><br /><sub><b>Lương Chí Vinh (Ryan Luong)</b></sub></div> |
+| :------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------: |
+|                                                  [🔗 GitHub Profile](https://github.com/ptquanh)                                                   |                                                [🔗 GitHub Profile](https://github.com/chivinh123abc)                                                 |
+
+> _Nếu bạn thấy dự án này thú vị hoặc có bất kỳ câu hỏi nào về kiến trúc code, đừng ngần ngại kết nối với chúng mình qua GitHub nhé!_
+
+---
+
+## ☕ Ủng hộ / Donate
+
+Nếu mã nguồn này giúp ích cho bạn trong quá trình học tập Spring Boot hoặc làm đồ án, hãy cân nhắc mời nhóm một ly cà phê nhé! Sự ủng hộ của bạn là động lực rất lớn.
+
+- **Ngân hàng:** MB Bank
+- **Chủ tài khoản:** PHAN TUAN QUOC ANH
+- **Số tài khoản:** 042055678888
